@@ -1,36 +1,27 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# About MF Compass
 
-## Getting Started
+MF Compass is your guide to discovering and comparing India's best mutual funds. Our website makes it easy to find high-quality, consistent, and investor-friendly funds, so you can invest with confidence.
 
-First, run the development server:
+## What Makes MF Compass Unique?
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Curated Fund Selection:** Only the best direct, growth-oriented mutual funds are shown—no clutter, no confusion.
+- **Fair Comparisons:** Funds are ranked within their peer groups, so you always compare apples to apples.
+- **Simple Scores:** Each fund gets a clear score based on how much it outperforms its category, making your decision easier.
+- **Always Up-to-date:** Our data is refreshed automatically, so you always see the latest rankings and information.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Who Is MF Compass For?
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Anyone looking for a smarter, simpler way to choose mutual funds
+- Investors who want to save time and avoid information overload
+- Beginners and experts who value transparency and data-driven insights
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## How to Use MF Compass
 
-## Learn More
+1. **Browse Funds:** Explore top funds by category using our easy navigation.
+2. **Compare Easily:** Sort and filter funds to find the best fit for your needs.
+3. **See Details:** Click any fund to view its performance, risk, and more.
+4. **Learn:** Visit our Learn section for guides and tips on mutual fund investing.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MF Compass is designed to help you make informed investment decisions, quickly and confidently. For more information or feedback, please contact the project team.
