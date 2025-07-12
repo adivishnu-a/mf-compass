@@ -8,6 +8,7 @@ interface Fund {
 	id: number
 	kuvera_code: string
 	scheme_name: string
+	fund_house: string // <-- add this line
 	fund_house_name: string
 	fund_category: string
 	fund_type: string
@@ -93,82 +94,57 @@ export default function FundsPage() {
 						{/* Content Area */}
 						<div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
 							{loading ? (
-								<>
-									{/* Loading Header */}
+								// Loading skeleton matching FundsTable layout
+								<div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+									{/* Header Skeleton */}
 									<div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
 										<div className="flex items-center justify-between">
 											<div>
 												<div className="h-6 bg-slate-200 rounded w-32 animate-pulse"></div>
-												<div className="h-4 bg-slate-200 rounded w-48 mt-2 animate-pulse"></div>
 											</div>
-											<div className="flex items-center space-x-2">
-												<div className="w-2 h-2 bg-slate-200 rounded-full animate-pulse"></div>
-												<div className="h-4 bg-slate-200 rounded w-16 animate-pulse"></div>
-											</div>
+											<div className="h-4 bg-slate-200 rounded w-16 animate-pulse"></div>
 										</div>
 									</div>
-									
-									{/* Loading Table */}
+									{/* Table Skeleton */}
 									<div className="overflow-x-auto">
 										<table className="w-full">
 											<thead>
 												<tr className="border-b border-slate-200 bg-slate-50">
-													<th className="px-6 py-4 text-left">
-														<div className="h-4 bg-slate-200 rounded w-20 animate-pulse"></div>
-													</th>
-													<th className="px-6 py-4 text-left">
-														<div className="h-4 bg-slate-200 rounded w-16 animate-pulse"></div>
-													</th>
-													<th className="px-6 py-4 text-left">
-														<div className="h-4 bg-slate-200 rounded w-12 animate-pulse"></div>
-													</th>
-													<th className="px-6 py-4 text-left">
-														<div className="h-4 bg-slate-200 rounded w-12 animate-pulse"></div>
-													</th>
-													<th className="px-6 py-4 text-left">
-														<div className="h-4 bg-slate-200 rounded w-12 animate-pulse"></div>
-													</th>
-													<th className="px-6 py-4 text-left">
-														<div className="h-4 bg-slate-200 rounded w-12 animate-pulse"></div>
-													</th>
-													<th className="px-6 py-4 text-left">
-														<div className="h-4 bg-slate-200 rounded w-16 animate-pulse"></div>
-													</th>
+													<th className="px-6 py-4 text-left"><div className="h-4 bg-slate-200 rounded w-32 animate-pulse"></div></th>
+													<th className="px-4 py-4 text-left"><div className="h-4 bg-slate-200 rounded w-12 animate-pulse"></div></th>
+													<th className="px-2 py-4 text-left"><div className="h-4 bg-slate-200 rounded w-12 animate-pulse"></div></th>
+													<th className="px-2 py-4 text-left"><div className="h-4 bg-slate-200 rounded w-12 animate-pulse"></div></th>
+													<th className="px-2 py-4 text-left"><div className="h-4 bg-slate-200 rounded w-12 animate-pulse"></div></th>
+													<th className="px-2 py-4 text-left"><div className="h-4 bg-slate-200 rounded w-12 animate-pulse"></div></th>
+													<th className="px-2 py-4 text-left"><div className="h-4 bg-slate-200 rounded w-12 animate-pulse"></div></th>
 												</tr>
 											</thead>
 											<tbody>
 												{[...Array(8)].map((_, i) => (
 													<tr key={i} className="border-b border-slate-100">
-														<td className="px-6 py-4">
-															<div className="space-y-2">
-																<div className="h-4 bg-slate-200 rounded w-48 animate-pulse"></div>
-																<div className="h-3 bg-slate-200 rounded w-32 animate-pulse"></div>
+														{/* Fund Name + Logo (single line) */}
+														<td className="px-6 py-5">
+															<div className="flex items-center">
+																<div className="w-8 h-8 bg-slate-200 rounded-lg mr-2 animate-pulse"></div>
+																<div className="h-4 bg-slate-200 rounded w-40 animate-pulse"></div>
 															</div>
 														</td>
-														<td className="px-6 py-4">
-															<div className="h-6 bg-slate-200 rounded w-12 animate-pulse"></div>
+														{/* Score */}
+														<td className="px-4 py-5">
+															<div className="h-6 bg-slate-200 rounded w-10 mx-auto animate-pulse"></div>
 														</td>
-														<td className="px-6 py-4">
-															<div className="h-4 bg-slate-200 rounded w-16 animate-pulse"></div>
-														</td>
-														<td className="px-6 py-4">
-															<div className="h-4 bg-slate-200 rounded w-16 animate-pulse"></div>
-														</td>
-														<td className="px-6 py-4">
-															<div className="h-4 bg-slate-200 rounded w-16 animate-pulse"></div>
-														</td>
-														<td className="px-6 py-4">
-															<div className="h-4 bg-slate-200 rounded w-16 animate-pulse"></div>
-														</td>
-														<td className="px-6 py-4">
-															<div className="h-4 bg-slate-200 rounded w-20 animate-pulse"></div>
-														</td>
+														{/* Returns columns */}
+														{[...Array(5)].map((_, j) => (
+															<td key={j} className="px-2 py-5">
+																<div className="h-4 bg-slate-200 rounded w-12 mx-auto animate-pulse"></div>
+															</td>
+														))}
 													</tr>
 												))}
 											</tbody>
 										</table>
 									</div>
-								</>
+								</div>
 							) : error ? (
 								<div className="flex flex-col justify-center items-center h-64 space-y-4">
 									<div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center">

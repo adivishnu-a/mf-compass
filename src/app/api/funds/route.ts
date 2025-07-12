@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
       }
     }
     
-    query += ` AND total_score >= 60 ORDER BY total_score DESC`;
+    query += ` ORDER BY total_score DESC`;
     
     const result = await client.query(query, params);
     client.release();

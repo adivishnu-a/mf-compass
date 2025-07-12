@@ -76,18 +76,17 @@ export default function FundsTable({ funds }: FundsTableProps) {
   }
 
   const formatReturn = (value: number | string | null) => {
-    if (value === null || value === undefined) return 'N/A'
-    const numericValue = typeof value === 'string' ? parseFloat(value) : value
-    if (isNaN(numericValue)) return 'N/A'
-    const formatted = numericValue.toFixed(2)
-    return numericValue >= 0 ? `${formatted}%` : `${formatted}%`
+    if (value === null || value === undefined) return '--';
+    const numericValue = typeof value === 'string' ? parseFloat(value) : value;
+    if (isNaN(numericValue) || numericValue === 0) return '--';
+    return `${numericValue.toFixed(2)}%`;
   }
 
   const getReturnColor = (value: number | string | null) => {
-    if (value === null || value === undefined) return 'text-[#4574a1]'
-    const numericValue = typeof value === 'string' ? parseFloat(value) : value
-    if (isNaN(numericValue)) return 'text-[#4574a1]'
-    return numericValue >= 0 ? 'text-[#078838]' : 'text-[#dc2626]'
+    if (value === null || value === undefined) return 'text-slate-900';
+    const numericValue = typeof value === 'string' ? parseFloat(value) : value;
+    if (isNaN(numericValue) || numericValue === 0) return 'text-slate-900';
+    return numericValue < 0 ? 'text-red-600' : 'text-green-600';
   }
 
   const formatScore = (score: number | string | null) => {

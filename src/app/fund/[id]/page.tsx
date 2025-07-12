@@ -89,71 +89,133 @@ export default function FundDetail() {
     }
   }, [fundId])
   
+  // Helper to display DB timestamp as 'DD/MM/YYYY, h:mm AM/PM' or just 'DD/MM/YYYY' if no time needed
+  const formatDbTimestamp = (ts?: string, onlyDate = false) => {
+    if (!ts) return '--';
+    const match = ts.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})/);
+    if (!match) return ts;
+    const [ , year, month, day, hour, minute ] = match;
+    if (onlyDate) return `${day}/${month}/${year}`;
+    let h = parseInt(hour, 10);
+    const m = minute;
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12;
+    if (h === 0) h = 12;
+    return `${day}/${month}/${year}, ${h}:${m} ${ampm}`;
+  };
+
   if (loading) {
+    // Loading skeleton matching actual fund detail layout
     return (
       <div className="relative flex size-full min-h-screen flex-col bg-slate-50 overflow-x-hidden" style={{ fontFamily: 'Inter, "Noto Sans", sans-serif' }}>
         <div className="layout-container flex h-full grow flex-col">
-          
           <div className="flex flex-1 justify-center py-8">
-            <div className="max-w-6xl w-full px-8 md:px-16 lg:px-24 space-y-12">
+            <div className="max-w-6xl w-full px-8 md:px-16 lg:px-24 space-y-8">
               {/* Fund Header Skeleton */}
               <div className="flex items-start justify-between py-8 animate-fadeIn">
                 <div className="flex items-start space-x-6 flex-1">
-                  <div className="w-16 h-16 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 bg-[length:200%_100%] rounded-lg animate-shimmer"></div>
+                  <div className="w-16 h-16 bg-slate-200 rounded-xl animate-pulse"></div>
                   <div className="space-y-4 flex-1">
-                    <div className="h-10 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 bg-[length:200%_100%] rounded-lg animate-shimmer w-3/4"></div>
-                    <div className="h-6 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 bg-[length:200%_100%] rounded animate-shimmer w-1/2" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="h-10 bg-slate-200 rounded-lg w-3/4 animate-pulse"></div>
+                    <div className="h-6 bg-slate-100 rounded w-1/2 animate-pulse"></div>
                   </div>
                 </div>
-                <div className="text-right space-y-3 ml-8">
-                  <div className="h-12 w-32 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 bg-[length:200%_100%] rounded-lg animate-shimmer" style={{ animationDelay: '0.2s' }}></div>
-                  <div className="h-4 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 bg-[length:200%_100%] rounded animate-shimmer w-24" style={{ animationDelay: '0.3s' }}></div>
+                <div className="rounded-lg flex flex-col items-end justify-center px-4 py-3 min-w-[160px] bg-slate-100">
+                  <div className="h-4 bg-slate-200 rounded w-20 mb-2 animate-pulse"></div>
+                  <div className="h-8 bg-slate-200 rounded w-24 mb-1 animate-pulse"></div>
+                  <div className="h-3 bg-slate-100 rounded w-24 animate-pulse"></div>
                 </div>
               </div>
-
-              {/* Fund Details Grid Skeleton */}
+              {/* Fund Details and Metrics Grid Skeleton */}
               <div className="grid md:grid-cols-2 gap-8">
-                {[1, 2].map((i) => (
-                  <div key={i} className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 animate-fadeIn" style={{ animationDelay: `${0.4 + i * 0.1}s` }}>
-                    <div className="h-6 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 bg-[length:200%_100%] rounded animate-shimmer w-1/3 mb-6"></div>
-                    <div className="space-y-4">
-                      {[1, 2, 3, 4, 5].map((j) => (
-                        <div key={j} className="flex justify-between py-2">
-                          <div className="h-4 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 bg-[length:200%_100%] rounded animate-shimmer w-1/3" style={{ animationDelay: `${0.6 + j * 0.05}s` }}></div>
-                          <div className="h-4 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 bg-[length:200%_100%] rounded animate-shimmer w-1/4" style={{ animationDelay: `${0.65 + j * 0.05}s` }}></div>
-                        </div>
-                      ))}
-                    </div>
+                {/* Fund Details Card Skeleton */}
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                  <div className="h-6 bg-slate-200 rounded w-1/3 mb-6 animate-pulse"></div>
+                  <div className="space-y-3">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="bg-slate-100 rounded-lg px-4 py-3 flex justify-between items-center w-full">
+                        <div className="h-4 bg-slate-200 rounded w-1/3 animate-pulse"></div>
+                        <div className="h-4 bg-slate-200 rounded w-1/4 animate-pulse"></div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+                {/* Key Metrics Card Skeleton */}
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                  <div className="h-6 bg-slate-200 rounded w-1/3 mb-6 animate-pulse"></div>
+                  <div className="text-center bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 mb-2 border border-blue-100">
+                    <div className="h-10 bg-blue-200 rounded w-16 mx-auto mb-2 animate-pulse"></div>
+                    <div className="h-4 bg-blue-100 rounded w-20 mx-auto mb-1 animate-pulse"></div>
+                    <div className="h-3 bg-blue-100 rounded w-24 mx-auto animate-pulse"></div>
+                  </div>
+                  <div className="space-y-3">
+                    {[...Array(2)].map((_, i) => (
+                      <div key={i} className="bg-slate-100 rounded-lg px-4 py-3 flex justify-between items-center w-full">
+                        <div className="h-4 bg-slate-200 rounded w-1/3 animate-pulse"></div>
+                        <div className="h-4 bg-slate-200 rounded w-1/4 animate-pulse"></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              {/* Returns Performance Skeleton */}
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="px-6 pt-4 pb-2 bg-white" style={{marginBottom: '-10px'}}>
+                  <div className="h-6 bg-slate-200 rounded w-1/4 mb-2 animate-pulse"></div>
+                  <div className="h-4 bg-slate-100 rounded w-1/6 animate-pulse"></div>
+                </div>
+                <div className="overflow-x-auto px-2 md:px-4">
+                  <table className="w-full border-separate border-spacing-y-2 border-spacing-x-0">
+                    <tbody>
+                      <tr>
+                        {[...Array(6)].map((_, i) => (
+                          <td key={i} className="px-2 py-2 align-top">
+                            <div className="bg-slate-100 rounded-lg flex flex-col items-center justify-center py-2 px-2">
+                              <div className="h-6 bg-slate-200 rounded w-12 mb-2 animate-pulse"></div>
+                              <div className="h-3 bg-slate-100 rounded w-10 animate-pulse"></div>
+                            </div>
+                          </td>
+                        ))}
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {/* Risk Metrics Skeleton */}
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                <div className="h-6 bg-slate-200 rounded w-1/4 mb-4 animate-pulse"></div>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="flex flex-col items-center justify-center bg-slate-100 rounded-lg px-2 py-4 min-h-[90px] min-w-[110px]">
+                      <div className="h-6 bg-slate-200 rounded w-10 mb-2 animate-pulse"></div>
+                      <div className="h-4 bg-slate-100 rounded w-16 animate-pulse"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Investment Objective Skeleton */}
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <div className="h-6 bg-slate-200 rounded w-1/4 mb-4 animate-pulse"></div>
+                <div className="h-4 bg-slate-100 rounded w-3/4 animate-pulse"></div>
+                <div className="h-4 bg-slate-100 rounded w-2/3 mt-2 animate-pulse"></div>
+              </div>
+              {/* Data Information Skeleton */}
+              <div className="bg-slate-100 rounded-xl p-6">
+                <div className="h-5 bg-slate-200 rounded w-1/4 mb-4 animate-pulse"></div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                  {[...Array(2)].map((_, i) => (
+                    <div key={i} className="flex justify-between">
+                      <div className="h-4 bg-slate-200 rounded w-1/3 animate-pulse"></div>
+                      <div className="h-4 bg-slate-200 rounded w-1/4 animate-pulse"></div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
-
-        {/* CSS for animations */}
-        <style jsx>{`
-          @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-          }
-          
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          
-          .animate-shimmer {
-            animation: shimmer 2s ease-in-out infinite;
-          }
-          
-          .animate-fadeIn {
-            opacity: 0;
-            animation: fadeIn 0.6s ease-out forwards;
-          }
-        `}</style>
       </div>
-    )
+    );
   }
   
   if (error || !fund) {
@@ -188,15 +250,16 @@ export default function FundDetail() {
   }
 
   const formatReturn = (value: number | string | null) => {
-    if (value === null) return '--'
-    if (typeof value === 'number') return value.toFixed(2) + '%'
-    return value
+    if (value === null || value === undefined) return '--';
+    const numericValue = typeof value === 'string' ? parseFloat(value) : value;
+    if (isNaN(numericValue) || numericValue === 0) return '--';
+    return `${numericValue.toFixed(2)}%`;
   }
 
   const getReturnColor = (value: number | string | null) => {
-    if (value === null) return 'text-slate-600'
-    const numValue = typeof value === 'string' ? parseFloat(value) : value
-    if (isNaN(numValue)) return 'text-slate-600'
+    if (value === null || value === undefined) return 'text-slate-900';
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    if (isNaN(numValue) || numValue === 0) return 'text-slate-900';
     return numValue < 0 ? 'text-red-600' : 'text-green-600'
   }
 
@@ -270,7 +333,7 @@ export default function FundDetail() {
                   ₹{formatValue(fund.current_nav, 2)}
                 </div>
                 <div className="text-xs text-slate-500">
-                  NAV Date: {fund.current_nav_date ? new Date(fund.current_nav_date).toLocaleDateString('en-IN') : '--'}
+                  NAV Date: {formatDbTimestamp(fund.current_nav_date, true)}
                 </div>
               </div>
             </div>
@@ -291,7 +354,7 @@ export default function FundDetail() {
                   </div>
                   <div className="bg-slate-100 rounded-lg px-4 py-3 flex justify-between items-center w-full">
                     <span className="text-slate-600 font-medium">Launch Date</span>
-                    <span className="text-slate-900 font-semibold">{new Date(fund.start_date).toLocaleDateString('en-IN')}</span>
+                    <span className="text-slate-900 font-semibold">{formatDbTimestamp(fund.start_date, true)}</span>
                   </div>
                   <div className="bg-slate-100 rounded-lg px-4 py-3 flex justify-between items-center w-full">
                     <span className="text-slate-600 font-medium">AUM</span>
@@ -306,9 +369,9 @@ export default function FundDetail() {
                           try {
                             if (typeof fund.fund_managers === 'string') {
                               const parsed = JSON.parse(fund.fund_managers);
-                              if (Array.isArray(parsed)) managers = parsed.map(m => m.name || m);
+                              if (Array.isArray(parsed)) managers = parsed.map((m: string | { name: string }) => typeof m === 'string' ? m : m.name);
                             } else if (Array.isArray(fund.fund_managers)) {
-                              managers = fund.fund_managers.map(m => m.name || m);
+                              managers = fund.fund_managers.map((m: string | { name: string }) => typeof m === 'string' ? m : m.name);
                             }
                           } catch {
                             managers = [fund.fund_managers.toString()];
@@ -334,7 +397,7 @@ export default function FundDetail() {
                   </div>
                   <div className="text-sm font-semibold text-blue-700">MF Compass Score</div>
                   <div className="text-xs text-blue-500 mt-1">
-                    {fund.score_updated ? `Updated: ${new Date(fund.score_updated).toLocaleDateString('en-IN')}` : ''}
+                    {fund.score_updated ? `Updated: ${formatDbTimestamp(fund.score_updated, true)}` : ''}
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -381,7 +444,7 @@ export default function FundDetail() {
               <div className="px-6 pt-4 pb-2 bg-white" style={{marginBottom: '-10px'}}>
                 <h3 className="text-xl font-semibold text-slate-900">Returns Performance</h3>
                 <p className="text-sm text-slate-500">
-                  As of {fund.returns_date ? new Date(fund.returns_date).toLocaleDateString('en-IN') : '--'}
+                  As of {formatDbTimestamp(fund.returns_date, true)}
                 </p>
               </div>
               <div className="overflow-x-auto px-2 md:px-4">
@@ -473,7 +536,7 @@ export default function FundDetail() {
                 <div className="flex justify-between">
                   <span className="text-slate-700">Last Updated:</span>
                   <span className="text-slate-900 font-medium">
-                    {new Date(fund.last_updated).toLocaleString('en-IN')}
+                    {formatDbTimestamp(fund.last_updated)}
                   </span>
                 </div>
               </div>
