@@ -1,9 +1,24 @@
-/* Import Inter font - must be at the top */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
-
 @import "tailwindcss";
 
-/* Set Inter as default font */
+/* Set Inter as default font - Next.js will handle the font loading */
 body {
-  font-family: 'Inter', 'Noto Sans', sans-serif;
+  font-family: "Inter", "Noto Sans", sans-serif;
+}
+
+/* Hide scrollbar for mobile category tabs */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Line clamp utility for mobile fund names */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
