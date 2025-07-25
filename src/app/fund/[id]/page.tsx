@@ -101,12 +101,20 @@ export default function FundDetail() {
     return `${day}/${month}/${year}, ${h}:${m} ${ampm}`
   }
 
+  const formatValue = (value: number | string | null | undefined, decimals = 2, suffix = "") => {
+    if (value === null || value === undefined) return "--"
+    if (typeof value === "string") {
+      const parsed = Number.parseFloat(value)
+      if (isNaN(parsed)) return value
+      return parsed.toFixed(decimals) + suffix
+    }
+    if (typeof value === "number") return value.toFixed(decimals) + suffix
+    return "--"
+  }
+
   if (loading) {
     return (
-      <div
-        className="relative flex size-full min-h-screen flex-col bg-slate-50 overflow-x-hidden"
-        style={{ fontFamily: 'Inter, "Noto Sans", sans-serif' }}
-      >
+      <div className="relative flex size-full min-h-screen flex-col bg-slate-50 overflow-x-hidden" style={{ fontFamily: 'Inter, "Noto Sans", sans-serif' }}>
         <div className="layout-container flex h-full grow flex-col">
           <div className="flex flex-1 justify-center py-4 md:py-8">
             <div className="max-w-6xl w-full px-4 md:px-8 lg:px-16 xl:px-24 space-y-6 md:space-y-8">
@@ -114,9 +122,7 @@ export default function FundDetail() {
               <div className="block md:hidden">
                 <div className="py-6">
                   <div className="flex items-start space-x-4 mb-4">
-                    <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
-                      <div className="w-full h-full bg-slate-200 rounded-xl animate-pulse"></div>
-                    </div>
+                    <div className="w-12 h-12 bg-slate-200 rounded-sm animate-pulse flex items-center justify-center flex-shrink-0 overflow-hidden relative" />
                     <div className="flex-1 min-w-0">
                       <div className="h-6 bg-slate-200 rounded w-3/4 mb-2 animate-pulse"></div>
                       <div className="h-4 bg-slate-100 rounded w-1/2 animate-pulse"></div>
@@ -124,14 +130,14 @@ export default function FundDetail() {
                   </div>
                   <div className="flex flex-row gap-3 mb-4">
                     <div className="flex-1 rounded-lg flex flex-col items-center justify-center px-4 py-3 min-w-[140px] bg-slate-100">
-                      <div className="h-4 bg-slate-200 rounded w-20 mb-2 animate-pulse"></div>
-                      <div className="h-8 bg-slate-200 rounded w-24 mb-1 animate-pulse"></div>
-                      <div className="h-3 bg-slate-100 rounded w-24 animate-pulse"></div>
+                      <div className="h-4 w-20 bg-slate-200 rounded animate-pulse mb-2"></div>
+                      <div className="h-8 w-24 bg-slate-200 rounded animate-pulse mb-1"></div>
+                      <div className="h-3 w-24 bg-slate-100 rounded animate-pulse"></div>
                     </div>
                     <div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
-                      <div className="h-8 bg-blue-200 rounded w-16 mb-1 animate-pulse"></div>
-                      <div className="h-4 bg-blue-100 rounded w-20 mb-1 animate-pulse"></div>
-                      <div className="h-3 bg-blue-100 rounded w-24 animate-pulse"></div>
+                      <div className="h-8 w-16 bg-blue-200 rounded animate-pulse mb-1"></div>
+                      <div className="h-4 w-20 bg-blue-100 rounded animate-pulse mb-1"></div>
+                      <div className="h-3 w-24 bg-blue-100 rounded animate-pulse"></div>
                     </div>
                   </div>
                 </div>
@@ -152,9 +158,7 @@ export default function FundDetail() {
               <div className="hidden md:block">
                 <div className="flex items-start justify-between py-8">
                   <div className="flex items-start space-x-6 flex-1">
-                    <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
-                      <div className="w-full h-full bg-slate-200 rounded-xl animate-pulse"></div>
-                    </div>
+                    <div className="w-16 h-16 bg-slate-200 rounded-sm animate-pulse flex items-center justify-center flex-shrink-0 overflow-hidden relative" />
                     <div className="space-y-2 flex-1">
                       <div className="h-10 bg-slate-200 rounded-lg w-3/4 animate-pulse"></div>
                       <div className="h-6 bg-slate-100 rounded w-1/2 animate-pulse"></div>
@@ -261,7 +265,7 @@ export default function FundDetail() {
   )
 }
 
-  if (error || !fund) {
+  if (error) {
     return (
       <div className="relative flex size-full min-h-screen flex-col bg-slate-50">
         <div className="flex flex-1 items-center justify-center px-4">
@@ -285,15 +289,9 @@ export default function FundDetail() {
     )
   }
 
-  const formatValue = (value: number | string | null | undefined, decimals = 2, suffix = "") => {
-    if (value === null || value === undefined) return "--"
-    if (typeof value === "string") {
-      const parsed = Number.parseFloat(value)
-      if (isNaN(parsed)) return value
-      return parsed.toFixed(decimals) + suffix
-    }
-    if (typeof value === "number") return value.toFixed(decimals) + suffix
-    return "--"
+  if (!fund) {
+    // Defensive: If fund is still null, show nothing or a fallback
+    return null;
   }
 
   const formatReturn = (value: number | string | null) => {
@@ -348,19 +346,19 @@ export default function FundDetail() {
               {/* Mobile Fund Header */}
               <div className="py-6">
                 <div className="flex items-start space-x-4 mb-4">
-                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
+                  {/* Fund House Logo */}
+                  <div className="w-12 h-12 bg-white rounded-sm flex items-center justify-center flex-shrink-0 overflow-hidden relative">
                     <Image
                       src={getFundHouseLogoUrl() || "/placeholder.svg"}
                       alt={`${fund.fund_house_name} Logo`}
-                      width={48}
-                      height={48}
-                      className="w-full h-full object-cover rounded-xl"
+                      fill
+                      quality={100}
+                      className="object-cover rounded-sm"
+                      sizes="(max-width: 768px) 48px, 64px"
                       onError={(e) => {
                         e.currentTarget.style.display = "none"
                         e.currentTarget.parentElement!.innerHTML = `
-                          <div class='w-full h-full bg-slate-100 rounded-lg flex items-center justify-center'>
-                            <span class='text-slate-500 text-xs font-medium'>${fund.fund_house}</span>
-                          </div>
+                          <div class='w-full h-full bg-slate-200 rounded-sm animate-pulse flex items-center justify-center'></div>
                         `
                       }}
                     />
@@ -378,16 +376,12 @@ export default function FundDetail() {
                   <div className="flex-1 rounded-lg flex flex-col items-center justify-center px-4 py-3 min-w-[140px] bg-slate-100">
                     <div className="text-sm text-slate-500">Current NAV</div>
                     <div className="text-2xl font-bold text-slate-900">₹{formatValue(fund.current_nav, 2)}</div>
-                    <div className="text-xs text-slate-500">
-                      NAV Date: {formatDbTimestamp(fund.current_nav_date, true)}
-                    </div>
+                    <div className="text-xs text-slate-500">NAV Date: {formatDbTimestamp(fund.current_nav_date, true)}</div>
                   </div>
                   <div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
                     <div className="text-2xl font-bold text-blue-600 mb-1">{formatValue(fund.total_score, 1)}</div>
                     <div className="text-xs font-semibold text-blue-700">MF Compass Score</div>
-                    <div className="text-[10px] text-blue-500 mt-1">
-                      {fund.score_updated ? `Updated: ${formatDbTimestamp(fund.score_updated, true)}` : ""}
-                    </div>
+                    <div className="text-[10px] text-blue-500 mt-1">{fund.score_updated ? `Updated: ${formatDbTimestamp(fund.score_updated, true)}` : ""}</div>
                   </div>
                 </div>
               </div>
@@ -415,7 +409,7 @@ export default function FundDetail() {
                 </div>
               </div>
 
-              {/* Mobile Fund Details */}
+              {/* Fund Details Card (Mobile Only) */}
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-4">
                 <h3 className="text-lg font-semibold text-slate-900 mb-4">Fund Details</h3>
                 <div className="space-y-3">
@@ -428,22 +422,53 @@ export default function FundDetail() {
                     <span className="text-slate-900 font-medium text-sm">{formatAUM(fund.aum)}</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                    <span className="text-slate-600 text-sm">Expense Ratio</span>
-                    <span className="text-slate-900 font-medium text-sm">
-                      {formatValue(fund.expense_ratio, 2, "%")}
-                    </span>
+                    <span className="text-slate-600 text-sm">ISIN</span>
+                    <span className="text-slate-900 font-medium text-sm">{fund.isin || "--"}</span>
                   </div>
-                  <div className="flex justify-between items-center py-2">
+                  <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                    <span className="text-slate-600 text-sm">Launch Date</span>
+                    <span className="text-slate-900 font-medium text-sm">{formatDbTimestamp(fund.start_date, true)}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-slate-100">
                     <span className="text-slate-600 text-sm">Fund Rating</span>
-                    <span className="flex items-center space-x-1">
-                      <span className="text-slate-900 font-medium text-sm">
-                        {fund.fund_rating ? fund.fund_rating : "--"}
-                      </span>
+                    <span className="text-slate-900 font-medium text-sm flex items-center gap-1">
+                      {fund.fund_rating ? fund.fund_rating : "--"}
                       {fund.fund_rating && (
                         <svg className="w-4 h-4 text-black fill-current" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
                       )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-slate-600 text-sm">Fund Managers</span>
+                    <span className="flex flex-col items-end gap-1 text-right">
+                      {(() => {
+                        let managers: string[] = []
+                        if (fund.fund_managers) {
+                          try {
+                            if (typeof fund.fund_managers === "string") {
+                              const parsed = JSON.parse(fund.fund_managers)
+                              if (Array.isArray(parsed))
+                                managers = parsed.map((m: string | { name: string }) =>
+                                  typeof m === "string" ? m : m.name,
+                                )
+                            } else if (Array.isArray(fund.fund_managers)) {
+                              managers = fund.fund_managers.map((m: string | { name: string }) =>
+                                typeof m === "string" ? m : m.name,
+                              )
+                            }
+                          } catch {
+                            managers = [fund.fund_managers.toString()]
+                          }
+                        }
+                        if (managers.length === 0) return <span className="text-slate-400">Not Available</span>
+                        return managers.map((name, idx) => (
+                          <span key={idx} className="text-slate-900 text-sm font-medium block text-right">
+                            {name}
+                          </span>
+                        ))
+                      })()}
                     </span>
                   </div>
                 </div>
@@ -468,7 +493,7 @@ export default function FundDetail() {
                 </div>
               </div>
 
-              {/* Mobile Risk Metrics */}
+              {/* Risk Metrics */}
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-4">
                 <h3 className="text-lg font-semibold text-slate-900 mb-4">Risk Metrics</h3>
                 <div className="grid grid-cols-2 gap-3">
@@ -481,15 +506,15 @@ export default function FundDetail() {
                     <div className="text-xs font-medium text-slate-600">Volatility</div>
                   </div>
                   <div className="text-center bg-slate-100 rounded-lg p-3">
-                    <div className="text-lg font-bold text-slate-900 mb-1">
-                      {formatValue(fund.expense_ratio, 2, "%")}
-                    </div>
+                    <div className="text-lg font-bold text-slate-900 mb-1">{formatValue(fund.portfolio_turnover, 2, "%")}</div>
+                    <div className="text-xs font-medium text-slate-600">Portfolio Turnover</div>
+                  </div>
+                  <div className="text-center bg-slate-100 rounded-lg p-3">
+                    <div className="text-lg font-bold text-slate-900 mb-1">{formatValue(fund.expense_ratio, 2, "%")}</div>
                     <div className="text-xs font-medium text-slate-600">Expense Ratio</div>
                   </div>
                   <div className="text-center bg-slate-100 rounded-lg p-3">
-                    <div className="text-lg font-bold text-slate-900 mb-1">
-                      {fund.lock_in_period ? `${fund.lock_in_period}` : "0"}
-                    </div>
+                    <div className="text-lg font-bold text-slate-900 mb-1">{fund.lock_in_period ? `${fund.lock_in_period}` : "0"}</div>
                     <div className="text-xs font-medium text-slate-600">Lock-in (Years)</div>
                   </div>
                 </div>
@@ -517,6 +542,8 @@ export default function FundDetail() {
                   </div>
                 </div>
               </div>
+
+              {/* Remove More Information Card (Mobile Only) */}
             </div>
 
             {/* Desktop Layout */}
@@ -525,19 +552,18 @@ export default function FundDetail() {
               <div className="flex items-start justify-between py-8">
                 <div className="flex items-start space-x-6 flex-1">
                   {/* Fund House Logo */}
-                  <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
+                  <div className="w-16 h-16 bg-white rounded-sm flex items-center justify-center flex-shrink-0 overflow-hidden relative">
                     <Image
                       src={getFundHouseLogoUrl() || "/placeholder.svg"}
                       alt={`${fund.fund_house_name} Logo`}
-                      width={64}
-                      height={64}
-                      className="w-full h-full object-cover rounded-xl"
+                      fill
+                      quality={100}
+                      className="object-cover rounded-sm"
+                      sizes="(max-width: 1024px) 64px, 96px"
                       onError={(e) => {
                         e.currentTarget.style.display = "none"
                         e.currentTarget.parentElement!.innerHTML = `
-                          <div class='w-full h-full bg-slate-100 rounded-lg flex items-center justify-center'>
-                            <span class='text-slate-500 text-xs font-medium'>${fund.fund_house}</span>
-                          </div>
+                          <div class='w-full h-full bg-slate-200 rounded-sm animate-pulse flex items-center justify-center'></div>
                         `
                       }}
                     />
@@ -588,7 +614,7 @@ export default function FundDetail() {
                     </div>
                     <div className="bg-slate-100 rounded-lg px-4 py-3 flex justify-between items-center w-full">
                       <span className="text-slate-600 font-medium">Fund Managers</span>
-                      <span className="flex flex-col items-end gap-1">
+                      <span className="text-slate-900 font-semibold">
                         {(() => {
                           let managers: string[] = []
                           if (fund.fund_managers) {
@@ -610,7 +636,7 @@ export default function FundDetail() {
                           }
                           if (managers.length === 0) return <span className="text-slate-400">Not Available</span>
                           return managers.map((name, idx) => (
-                            <span key={idx} className="text-slate-900 text-sm font-medium">
+                            <span key={idx} className="text-slate-900 text-sm font-medium block text-right">
                               {name}
                             </span>
                           ))

@@ -79,7 +79,7 @@ export default function LandingPage() {
                 <h3 className="text-base md:text-lg font-semibold text-slate-900 mb-2">Intelligent Fund Discovery</h3>
                 <p className="text-sm md:text-base text-slate-600">
                   Automatically finds and filters high-quality, investor-friendly funds from the Kuvera API, focusing on
-                  direct plans, growth options, and key equity/hybrid categories.
+                  direct plans, growth options, and key equity categories.
                 </p>
               </div>
               {/* Outperformance-Based Scoring - Green */}

@@ -40,13 +40,9 @@ export async function GET(request: NextRequest) {
     const params = [];
     
     if (category && category !== 'all') {
-      if (category === 'hybrid') {
-        query += ` AND fund_type ILIKE '%hybrid%'`;
-      } else {
-        // For equity categories: Large Cap, Mid Cap, Small Cap, Flexi Cap, ELSS
-        query += ` AND fund_type ILIKE '%equity%' AND fund_category = $1`;
-        params.push(category);
-      }
+      // Only support equity categories
+      query += ` AND fund_type ILIKE '%equity%' AND fund_category = $1`;
+      params.push(category);
     }
     
     query += ` ORDER BY total_score DESC`;

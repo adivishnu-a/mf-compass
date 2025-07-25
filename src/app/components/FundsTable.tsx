@@ -144,17 +144,18 @@ export default function FundsTable({ funds }: FundsTableProps) {
               <Link href={`/fund/${fund.kuvera_code}`} className="block p-4 hover:bg-slate-50 transition-colors">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-start space-x-3 flex-1 min-w-0">
-                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    <div className="w-10 h-10 bg-white rounded-sm flex items-center justify-center flex-shrink-0 overflow-hidden relative">
                       <Image
                         src={getFundHouseLogoUrl(fund) || "/placeholder.svg"}
                         alt={`${fund.fund_house_name} Logo`}
-                        width={40}
-                        height={40}
-                        className="w-full h-full object-cover rounded-lg"
+                        fill
+                        quality={70}
+                        className="object-cover rounded-sm"
+                        sizes="(max-width: 768px) 40px, (min-width: 769px) 48px"
                         onError={(e) => {
                           e.currentTarget.style.display = "none"
                           e.currentTarget.parentElement!.innerHTML = `
-                            <div class='w-full h-full bg-slate-100 rounded-lg flex items-center justify-center'>
+                            <div class='w-full h-full bg-slate-100 rounded-md flex items-center justify-center'>
                               <span class='text-slate-500 text-xs font-medium'>${fund.fund_house}</span>
                             </div>
                           `
@@ -332,17 +333,18 @@ export default function FundsTable({ funds }: FundsTableProps) {
                   <td className="px-6 py-5">
                     <Link href={`/fund/${fund.kuvera_code}`} className="block hover:text-[#0183ff] transition-colors">
                       <div className="flex items-center">
-                        <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden mr-2">
+                        <div className="w-8 h-8 bg-white rounded-sm flex items-center justify-center flex-shrink-0 overflow-hidden mr-2 relative">
                           <Image
                             src={getFundHouseLogoUrl(fund) || "/placeholder.svg"}
                             alt={`${fund.fund_house_name} Logo`}
-                            width={32}
-                            height={32}
-                            className="w-full h-full object-cover rounded-lg"
+                            fill
+                            quality={70}
+                            className="object-cover rounded-sm"
+                            sizes="(max-width: 768px) 40px, (min-width: 769px) 48px"
                             onError={(e) => {
                               e.currentTarget.style.display = "none"
                               e.currentTarget.parentElement!.innerHTML = `
-                                <div class='w-full h-full bg-slate-100 rounded-lg flex items-center justify-center'>
+                                <div class='w-full h-full bg-slate-100 rounded-md flex items-center justify-center'>
                                   <span class='text-slate-500 text-xs font-medium'>${fund.fund_house}</span>
                                 </div>
                               `

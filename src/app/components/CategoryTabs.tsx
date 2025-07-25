@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import { Listbox } from "@headlessui/react"
-import { Fragment } from "react"
+import { Fragment, useRef, useLayoutEffect, useState } from "react"
 
 interface CategoryTabsProps {
   activeCategory: string
@@ -13,29 +13,31 @@ const categories = [
   { id: "Large Cap Fund", label: "Large Cap" },
   { id: "Mid Cap Fund", label: "Mid Cap" },
   { id: "Small Cap Fund", label: "Small Cap" },
-  { id: "Flexi Cap Fund", label: "Flexi Cap" },
-  { id: "ELSS", label: "ELSS" },
-  { id: "hybrid", label: "Hybrid" },
+  { id: "Flexi Cap Fund", label: "Flexi Cap" }
 ]
 
 export default function CategoryTabs({ activeCategory, onCategoryChange }: CategoryTabsProps) {
   const activeIndex = categories.findIndex((c) => c.id === activeCategory)
-  const tabCount = categories.length
+  const tabListRef = useRef<HTMLDivElement>(null)
+  const [tabWidth, setTabWidth] = useState(0)
+
+  useLayoutEffect(() => {
+    if (tabListRef.current) {
+      const tabList = tabListRef.current
+      const tabCount = categories.length
+      setTabWidth(tabList.offsetWidth / tabCount)
+    }
+  }, []);
 
   return (
     <div className="flex justify-center mb-6 md:mb-8 px-4">
-      <div className="flex bg-slate-100 rounded-lg p-1 w-full max-w-3xl relative">
+      <div className="flex bg-slate-100 rounded-lg p-1 w-full max-w-3xl relative" ref={tabListRef}>
         {/* Sliding blue box indicator (desktop only) */}
         <motion.div
           className="absolute top-1 bottom-1 rounded-md shadow-sm bg-[#0183ff] z-0 hidden md:block"
-          style={{
-            width: `${100 / tabCount}%`,
-            left: 0,
-          }}
-          animate={{
-            x: `${activeIndex * 100}%`,
-          }}
-          transition={{ type: "tween", duration: 0.25, ease: "easeInOut" }}
+          style={{ width: tabWidth, left: 0 }}
+          animate={{ x: tabWidth * activeIndex }}
+          transition={{ type: "tween", duration: 0.3, ease: "easeInOut" }}
         />
 
         {/* Mobile: Modern Dropdown with Headless UI */}
