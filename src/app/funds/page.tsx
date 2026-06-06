@@ -49,9 +49,17 @@ function FundsExplorerContent() {
   // URL States
   const currentGroup = (searchParams.get("group") || "equity") as "equity" | "hybrid";
   const currentCategory = searchParams.get("category") || "Large Cap Fund";
-  const minScoreParam = searchParams.get("minScore") ? parseInt(searchParams.get("minScore")!) : 50;
-  const minRatingParam = searchParams.get("minRating") ? parseInt(searchParams.get("minRating")!) : 0;
-  const sortParam = searchParams.get("sort") || "score_desc";
+
+  // Local state initialized from URL search params
+  const [minScore, setMinScore] = useState(() => 
+    searchParams.get("minScore") ? parseInt(searchParams.get("minScore")!) : 50
+  );
+  const [minRating, setMinRating] = useState(() => 
+    searchParams.get("minRating") ? parseInt(searchParams.get("minRating")!) : 0
+  );
+  const [sort, setSort] = useState(() => 
+    searchParams.get("sort") || "score_desc"
+  );
 
   const [funds, setFunds] = useState<Fund[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,6 +67,17 @@ function FundsExplorerContent() {
 
   const [ratingDropdownOpen, setRatingDropdownOpen] = useState(false);
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+
+  // Sync URL search params back to local states
+  useEffect(() => {
+    const urlMinScore = searchParams.get("minScore") ? parseInt(searchParams.get("minScore")!) : 50;
+    const urlMinRating = searchParams.get("minRating") ? parseInt(searchParams.get("minRating")!) : 0;
+    const urlSort = searchParams.get("sort") || "score_desc";
+
+    setMinScore(urlMinScore);
+    setMinRating(urlMinRating);
+    setSort(urlSort);
+  }, [searchParams]);
 
   // Validate and default Category if invalid
   const activeCategory = useMemo(() => {
@@ -147,34 +166,34 @@ function FundsExplorerContent() {
     let result = [...funds];
 
     // Filter by Min Score
-    if (minScoreParam > 50) {
-      result = result.filter((f) => parseFloat(f.totalScore || "0") >= minScoreParam);
+    if (minScore > 50) {
+      result = result.filter((f) => parseFloat(f.totalScore || "0") >= minScore);
     }
 
     // Filter by Min Rating
-    if (minRatingParam > 0) {
-      result = result.filter((f) => (f.fundRating || 0) >= minRatingParam);
+    if (minRating > 0) {
+      result = result.filter((f) => (f.fundRating || 0) >= minRating);
     }
 
     // Sort Order
     result.sort((a, b) => {
-      if (sortParam === "score_desc") {
+      if (sort === "score_desc") {
         return parseFloat(b.totalScore || "0") - parseFloat(a.totalScore || "0");
       }
-      if (sortParam === "score_asc") {
+      if (sort === "score_asc") {
         return parseFloat(a.totalScore || "0") - parseFloat(b.totalScore || "0");
       }
-      if (sortParam === "returns1y_desc") {
+      if (sort === "returns1y_desc") {
         return parseFloat(b.returns1y || "-999999") - parseFloat(a.returns1y || "-999999");
       }
-      if (sortParam === "aum_desc") {
+      if (sort === "aum_desc") {
         return parseFloat(b.aum || "0") - parseFloat(a.aum || "0");
       }
       return 0;
     });
 
     return result;
-  }, [funds, minScoreParam, minRatingParam, sortParam]);
+  }, [funds, minScore, minRating, sort]);
 
   // Display name helpers for category buttons
   const getCategoryShortName = (name: string) => {
@@ -271,17 +290,21 @@ function FundsExplorerContent() {
           <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
             Min MFC Score
           </label>
-          <div className="grid grid-cols-3 gap-2 h-[34px]">
+          <div className="flex items-center gap-1.5 h-[34px]">
             {[50, 75, 90].map((score) => {
-              const isActive = minScoreParam === score;
+              const isActive = minScore === score;
               return (
                 <button
                   key={score}
-                  onClick={() => updateUrl({ minScore: score })}
+                  type="button"
+                  onClick={() => {
+                    setMinScore(score);
+                    updateUrl({ minScore: score });
+                  }}
                   className={cn(
-                    "flex items-center justify-center rounded-lg border text-xs font-bold font-data transition-all duration-150 select-none",
+                    "flex h-7 w-12 items-center justify-center rounded-full border text-xs font-bold font-data transition-all duration-150 select-none",
                     isActive
-                      ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                      ? "border-primary/50 bg-primary/10 text-primary shadow-sm"
                       : "border-border bg-background text-muted-foreground hover:border-muted-foreground/60 hover:text-foreground"
                   )}
                 >
@@ -304,7 +327,7 @@ function FundsExplorerContent() {
             }}
             className="flex w-full items-center justify-between rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground transition-colors hover:border-primary/50 focus:outline-none h-[34px]"
           >
-            <span className="truncate">{ratingOptions.find(o => o.value === minRatingParam)?.label || "Any Rating"}</span>
+            <span className="truncate">{ratingOptions.find(o => o.value === minRating)?.label || "Any Rating"}</span>
             <ChevronDown className="h-3.5 w-3.5 opacity-50 shrink-0 ml-2" />
           </button>
           
@@ -315,13 +338,15 @@ function FundsExplorerContent() {
                 {ratingOptions.map(opt => (
                   <button
                     key={opt.value}
+                    type="button"
                     onClick={() => {
+                      setMinRating(opt.value);
                       updateUrl({ minRating: opt.value });
                       setRatingDropdownOpen(false);
                     }}
                     className={cn(
                       "flex w-full items-center px-2 py-1.5 text-xs transition-colors hover:bg-accent hover:text-foreground rounded-lg",
-                      minRatingParam === opt.value ? "bg-accent/40 text-primary font-bold" : "text-muted-foreground"
+                      minRating === opt.value ? "bg-accent/40 text-primary font-bold" : "text-muted-foreground"
                     )}
                   >
                     {opt.label}
@@ -344,7 +369,7 @@ function FundsExplorerContent() {
             }}
             className="flex w-full items-center justify-between rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground transition-colors hover:border-primary/50 focus:outline-none h-[34px]"
           >
-            <span className="truncate">{sortOptions.find(o => o.value === sortParam)?.label || "MFC Score (High to Low)"}</span>
+            <span className="truncate">{sortOptions.find(o => o.value === sort)?.label || "MFC Score (High to Low)"}</span>
             <ChevronDown className="h-3.5 w-3.5 opacity-50 shrink-0 ml-2" />
           </button>
           
@@ -355,13 +380,15 @@ function FundsExplorerContent() {
                 {sortOptions.map(opt => (
                   <button
                     key={opt.value}
+                    type="button"
                     onClick={() => {
+                      setSort(opt.value);
                       updateUrl({ sort: opt.value });
                       setSortDropdownOpen(false);
                     }}
                     className={cn(
                       "flex w-full items-center px-2 py-1.5 text-xs transition-colors hover:bg-accent hover:text-foreground rounded-lg text-left",
-                      sortParam === opt.value ? "bg-accent/40 text-primary font-bold" : "text-muted-foreground"
+                      sort === opt.value ? "bg-accent/40 text-primary font-bold" : "text-muted-foreground"
                     )}
                   >
                     {opt.label}
@@ -376,10 +403,10 @@ function FundsExplorerContent() {
         <div className="flex items-end">
           <button
             onClick={handleClearFilters}
-            disabled={minScoreParam === 50 && minRatingParam === 0 && sortParam === "score_desc"}
+            disabled={minScore === 50 && minRating === 0 && sort === "score_desc"}
             className={cn(
               "flex w-full items-center justify-center gap-1.5 rounded-lg border px-4 py-1.5 text-xs font-semibold transition-all duration-150 h-[34px]",
-              (minScoreParam > 50 || minRatingParam > 0 || sortParam !== "score_desc")
+              (minScore > 50 || minRating > 0 || sort !== "score_desc")
                 ? "border-border hover:bg-accent text-foreground hover:text-foreground cursor-pointer"
                 : "border-border/40 text-muted-foreground/30 bg-muted/20 cursor-not-allowed"
             )}
