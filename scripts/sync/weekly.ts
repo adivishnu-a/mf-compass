@@ -125,12 +125,19 @@ async function main(): Promise<void> {
     );
 
     if (multiAssetFunds.length > 0) {
-      const fundReturns = multiAssetFunds.map((f: FundDetail) => ({
-        returns1w: f.returns?.week_1 ?? null,
-        returns1y: f.returns?.year_1 ?? null,
-        returns3y: f.returns?.year_3 ?? null,
-        returns5y: f.returns?.year_5 ?? null,
-      }));
+      const fundReturns = multiAssetFunds.map((f: FundDetail) => {
+        const r1w = f.returns?.week_1;
+        const r1y = f.returns?.year_1;
+        const r3y = f.returns?.year_3;
+        const r5y = f.returns?.year_5;
+
+        return {
+          returns1w: r1w === 0 || r1w === undefined ? null : r1w,
+          returns1y: r1y === 0 || r1y === undefined ? null : r1y,
+          returns3y: r3y === 0 || r3y === undefined ? null : r3y,
+          returns5y: r5y === 0 || r5y === undefined ? null : r5y,
+        };
+      });
 
       const synthetic = computeSyntheticBenchmark(fundReturns);
 

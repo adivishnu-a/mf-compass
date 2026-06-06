@@ -34,6 +34,11 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function parseReturn(val: number | null | undefined): string | null {
+  if (val === null || val === undefined || val === 0) return null;
+  return val.toFixed(4);
+}
+
 async function main(): Promise<void> {
   const startTime = Date.now();
 
@@ -130,11 +135,11 @@ async function main(): Promise<void> {
               t1Nav: t1Nav?.toFixed(5) ?? null,
               t1NavDate: detail.last_nav?.date ?? null,
               returns1d,
-              returns1w: detail.returns?.week_1?.toFixed(4) ?? null,
-              returns1y: detail.returns?.year_1?.toFixed(4) ?? null,
-              returns3y: detail.returns?.year_3?.toFixed(4) ?? null,
-              returns5y: detail.returns?.year_5?.toFixed(4) ?? null,
-              returnsInception: detail.returns?.inception?.toFixed(4) ?? null,
+              returns1w: parseReturn(detail.returns?.week_1),
+              returns1y: parseReturn(detail.returns?.year_1),
+              returns3y: parseReturn(detail.returns?.year_3),
+              returns5y: parseReturn(detail.returns?.year_5),
+              returnsInception: parseReturn(detail.returns?.inception),
               returnsDate: detail.returns?.date ?? null,
               aum: detail.aum !== null && detail.aum !== undefined
                 ? (detail.aum / 10).toFixed(2)

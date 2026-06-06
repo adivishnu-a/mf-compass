@@ -27,6 +27,11 @@ function computeReturns1d(currentNav: number | null, t1Nav: number | null): stri
   return (((currentNav - t1Nav) / t1Nav) * 100).toFixed(4);
 }
 
+function parseReturn(val: number | null | undefined): string | null {
+  if (val === null || val === undefined || val === 0) return null;
+  return val.toFixed(4);
+}
+
 export function transformFundDetail(detail: FundDetail): NewFund {
   const currentNav = detail.nav?.nav ?? null;
   const t1Nav = detail.last_nav?.nav ?? null;
@@ -52,11 +57,11 @@ export function transformFundDetail(detail: FundDetail): NewFund {
     t1Nav: t1Nav?.toFixed(5) ?? null,
     t1NavDate: detail.last_nav?.date ?? null,
     returns1d: computeReturns1d(currentNav, t1Nav),
-    returns1w: detail.returns?.week_1?.toFixed(4) ?? null,
-    returns1y: detail.returns?.year_1?.toFixed(4) ?? null,
-    returns3y: detail.returns?.year_3?.toFixed(4) ?? null,
-    returns5y: detail.returns?.year_5?.toFixed(4) ?? null,
-    returnsInception: detail.returns?.inception?.toFixed(4) ?? null,
+    returns1w: parseReturn(detail.returns?.week_1),
+    returns1y: parseReturn(detail.returns?.year_1),
+    returns3y: parseReturn(detail.returns?.year_3),
+    returns5y: parseReturn(detail.returns?.year_5),
+    returnsInception: parseReturn(detail.returns?.inception),
     returnsDate: detail.returns?.date ?? null,
     startDate: detail.start_date ?? null,
     expenseRatio: detail.expense_ratio?.toFixed(2) ?? null,
