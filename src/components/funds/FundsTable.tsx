@@ -163,7 +163,7 @@ export function FundsTable({ funds }: FundsTableProps) {
         <table className="w-full border-collapse text-left text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/40 transition-colors">
-              <th className="px-2 py-3 font-semibold text-muted-foreground w-12 text-center">Rank</th>
+              <th className="pl-6 pr-2 py-3 font-semibold text-muted-foreground w-16 text-center">Rank</th>
               <th 
                 className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors"
                 onClick={() => handleSort("schemeName")}
@@ -221,7 +221,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                 </div>
               </th>
               <th className="px-2 py-3 font-semibold text-muted-foreground w-12 text-center">Compare</th>
-              <th className="px-2 py-3 font-semibold text-muted-foreground w-12 text-center">Watch</th>
+              <th className="pl-2 pr-6 py-3 font-semibold text-muted-foreground w-16 text-center">Watch</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -236,7 +236,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                   className="hover:bg-muted/20 transition-all group duration-150"
                 >
                   {/* Rank */}
-                  <td className="px-2 py-3 text-center font-data font-bold text-muted-foreground/80">
+                  <td className="pl-6 pr-2 py-3 text-center font-data font-bold text-muted-foreground/80">
                     {rank}
                   </td>
                   
@@ -289,7 +289,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                   </td>
 
                   {/* Watchlist Heart */}
-                  <td className="px-2 py-3 text-center">
+                  <td className="pl-2 pr-6 py-3 text-center">
                     <button
                       onClick={() => toggleWatchlist(fund.kuveraCode)}
                       className="text-muted-foreground/40 hover:text-rose-500 transition-colors focus:outline-none"
