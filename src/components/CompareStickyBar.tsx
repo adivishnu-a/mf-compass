@@ -1,0 +1,65 @@
+"use client";
+
+import React from "react";
+import { useRouter } from "next/navigation";
+import { GitCompare, X } from "lucide-react";
+import { useCompare } from "@/hooks/useCompare";
+import { cn } from "@/lib/utils";
+
+export function CompareStickyBar() {
+  const router = useRouter();
+  const { compareList, clearCompare } = useCompare();
+
+  if (compareList.length === 0) return null;
+
+  const handleCompareClick = () => {
+    if (compareList.length >= 2) {
+      router.push(`/compare?codes=${compareList.join(",")}`);
+    }
+  };
+
+  return (
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-xl z-30 rounded-2xl border border-border bg-card/90 p-4 shadow-2xl backdrop-blur-md transition-all duration-200 animate-in slide-in-from-bottom-6">
+      <div className="flex items-center justify-between gap-4">
+        {/* Status Text */}
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary border border-primary/20">
+            <GitCompare className="h-4 w-4" />
+          </div>
+          <div className="text-xs sm:text-sm font-heading font-medium text-foreground">
+            Compare list <span className="font-data font-bold">({compareList.length}/3)</span>
+            <span className="hidden xs:inline text-muted-foreground ml-1.5 font-normal">
+              — Min 2 funds
+            </span>
+          </div>
+        </div>
+
+        {/* Buttons */}
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={clearCompare}
+            className="flex items-center gap-1 rounded-lg border border-border bg-transparent px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-all hover:bg-accent hover:text-foreground"
+          >
+            <X className="h-3.5 w-3.5" />
+            <span>Clear</span>
+          </button>
+          
+          <button
+            onClick={handleCompareClick}
+            disabled={compareList.length < 2}
+            className={cn(
+              "flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-bold transition-all shadow-sm",
+              compareList.length >= 2
+                ? "bg-primary text-primary-foreground hover:bg-primary/95 cursor-pointer"
+                : "bg-muted text-muted-foreground/50 border border-border cursor-not-allowed"
+            )}
+          >
+            <GitCompare className="h-3.5 w-3.5" />
+            <span>Compare</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+export default CompareStickyBar;

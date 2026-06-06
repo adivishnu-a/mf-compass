@@ -42,6 +42,7 @@ yarn-error.log*
 next-env.d.ts
 
 # Strict Local-Only Vibecode Hygiene (NEVER COMMIT OR PUSH)
+PRODUCT.md
 MFCOMPASS_PRODUCT.md
 SKILL.md
 AGENTS.md
