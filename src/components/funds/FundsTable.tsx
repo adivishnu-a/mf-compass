@@ -145,9 +145,9 @@ export function FundsTable({ funds }: FundsTableProps) {
         className={cn(
           "font-data font-semibold text-xs px-2 py-0.5 rounded",
           num > 0 
-            ? "text-emerald-700 dark:text-emerald-400 bg-emerald-500/10" 
+            ? "text-emerald-800 dark:text-emerald-400 bg-emerald-500/10" 
             : num < 0 
-              ? "text-rose-700 dark:text-rose-400 bg-rose-500/10" 
+              ? "text-rose-800 dark:text-rose-400 bg-rose-500/10" 
               : "text-muted-foreground"
         )}
       >
