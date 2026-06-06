@@ -6,7 +6,7 @@ import { funds, categoryAverages } from "@drizzle/schema";
 import { eq } from "drizzle-orm";
 import { formatPercent, formatINR, formatAUM } from "@/lib/format";
 import { FundDetailActions } from "@/components/funds/FundDetailActions";
-import { ArrowLeft, Calendar, Activity } from "lucide-react";
+import { ArrowLeft, Calendar, Activity, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ISR caching: revalidate every 5 minutes
@@ -112,6 +112,15 @@ export default async function FundDetailPage({ params }: PageProps) {
               <p className="text-xs text-muted-foreground mt-1">
                 ISIN: <span className="font-data font-semibold">{fund.isin || "--"}</span> • Kuvera: <span className="font-data font-semibold">{fund.kuveraCode}</span>
               </p>
+              {Array.isArray(fund.tags) && fund.tags.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {fund.tags.map((tag: string) => (
+                    <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary border border-primary/20 uppercase tracking-wide">
+                      {tag.replace(/_/g, " ")}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -261,6 +270,26 @@ export default async function FundDetailPage({ params }: PageProps) {
               </span>
             </div>
             <div>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Star Rating</span>
+              <div className="flex items-center mt-0.5">
+                {fund.fundRating ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className={cn(
+                        "h-4 w-4",
+                        i < fund.fundRating! 
+                          ? "fill-amber-400 text-amber-400" 
+                          : "fill-muted text-muted"
+                      )}
+                    />
+                  ))
+                ) : (
+                  <span className="font-bold text-foreground">--</span>
+                )}
+              </div>
+            </div>
+            <div>
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Lock-In Period</span>
               <span className="font-data font-bold text-foreground mt-0.5 block">
                 {fund.lockInPeriod ? `${fund.lockInPeriod} days` : "No Lock-in"}
@@ -306,6 +335,64 @@ export default async function FundDetailPage({ params }: PageProps) {
           {fund.investmentObjective || "No investment objective details provided by the AMC."}
         </p>
       </div>
+
+      {/* Similar Funds */}
+      {Array.isArray(fund.comparison) && fund.comparison.length > 0 && (
+        <div className="mt-8">
+          <h2 className="font-heading text-lg font-bold text-foreground mb-4">
+            Similar Funds
+          </h2>
+          <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
+            <table className="w-full border-collapse text-left text-sm">
+              <thead>
+                <tr className="border-b border-border bg-muted/40">
+                  <th className="px-4 py-3 font-semibold text-muted-foreground">Fund Name</th>
+                  <th className="px-4 py-3 font-semibold text-muted-foreground text-center">AUM (Cr)</th>
+                  <th className="px-4 py-3 font-semibold text-muted-foreground text-center">Exp. Ratio</th>
+                  <th className="px-4 py-3 font-semibold text-muted-foreground text-center">1Y</th>
+                  <th className="px-4 py-3 font-semibold text-muted-foreground text-center">3Y</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {fund.comparison.map((peer: any) => (
+                  <tr key={peer.code} className="hover:bg-muted/20 transition-colors">
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/fund/${peer.code}`}
+                        className="font-heading font-medium text-foreground hover:text-primary transition-colors"
+                      >
+                        {peer.short_name || peer.name}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-center font-data text-muted-foreground">
+                      {formatAUM(peer.aum?.toString() || "0")}
+                    </td>
+                    <td className="px-4 py-3 text-center font-data text-muted-foreground">
+                      {peer.expense_ratio ? `${peer.expense_ratio}%` : "--"}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span className={cn(
+                        "font-data font-semibold",
+                        peer["1y"] > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                      )}>
+                        {peer["1y"] ? formatPercent(peer["1y"]) : "--"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span className={cn(
+                        "font-data font-semibold",
+                        peer["3y"] > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                      )}>
+                        {peer["3y"] ? formatPercent(peer["3y"]) : "--"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
     </div>
   );

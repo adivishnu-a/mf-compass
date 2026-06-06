@@ -71,6 +71,23 @@ export const fundDetailSchema = z.object({
   fund_rating: z.coerce.number().optional().nullable(),
   fund_rating_date: z.string().optional().nullable(),
   crisil_rating: z.string().optional().nullable(),
+  tags: z.array(z.string()).optional().nullable(),
+  comparison: z.array(
+    z.object({
+      name: z.string(),
+      short_name: z.string().optional().nullable(),
+      code: z.string(),
+      slug: z.string().optional().nullable(),
+      "1y": z.coerce.number().optional().nullable(),
+      "3y": z.coerce.number().optional().nullable(),
+      "5y": z.coerce.number().optional().nullable(),
+      inception: z.coerce.number().optional().nullable(),
+      volatility: z.coerce.number().optional().nullable(),
+      expense_ratio: z.coerce.number().optional().nullable(),
+      aum: z.coerce.number().optional().nullable(),
+      info_ratio: z.coerce.number().optional().nullable(),
+    })
+  ).optional().nullable(),
 });
 
 export type FundDetail = z.infer<typeof fundDetailSchema>;

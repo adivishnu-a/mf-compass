@@ -126,6 +126,8 @@ export function transformFundDetail(detail: FundDetail): NewFund {
     fundRating: detail.fund_rating ?? null,
     fundRatingDate: detail.fund_rating_date ?? null,
     crisilRating: detail.crisil_rating ?? null,
+    tags: detail.tags ?? null,
+    comparison: detail.comparison ?? null,
     totalScore: null,
     scoreUpdated: null,
   };

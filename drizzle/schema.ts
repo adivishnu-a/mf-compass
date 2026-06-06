@@ -42,6 +42,8 @@ export const funds = pgTable(
     crisilRating: text("crisil_rating"),
     totalScore: decimal("total_score", { precision: 5, scale: 2 }),
     scoreUpdated: timestamp("score_updated"),
+    tags: jsonb("tags"),
+    comparison: jsonb("comparison"),
     lastUpdated: timestamp("last_updated").defaultNow(),
     createdAt: timestamp("created_at").defaultNow(),
   },
