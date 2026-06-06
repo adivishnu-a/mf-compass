@@ -55,9 +55,130 @@ export default function Home() {
               onClick={triggerSearch}
               className="w-full flex items-center justify-center gap-2 rounded-lg border border-border bg-background/50 px-8 py-3 text-sm font-bold text-foreground transition-all hover:bg-accent"
             >
-              <Search className="h-4 w-4 text-muted-foreground" />
-              <span>Search Funds</span>
+              <Search className="h-4 w-4" /> Search Funds
             </button>
+          </div>
+
+          {/* Interactive Floating Card Mockup */}
+          <div className="mt-16 w-full max-w-lg relative group">
+            {/* Ambient Glow behind the card */}
+            <div className="absolute -inset-1.5 rounded-2xl bg-gradient-to-r from-primary/20 to-emerald-500/20 opacity-40 blur-xl transition duration-1000 group-hover:opacity-60" />
+            
+            {/* The Card Surface */}
+            <div className="relative rounded-2xl border border-border/80 bg-card/70 backdrop-blur-xl p-6 shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:border-primary/40">
+              
+              {/* Header inside card */}
+              <div className="flex items-center justify-between gap-4 border-b border-border/40 pb-4">
+                <div className="text-left">
+                  <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-500 border border-emerald-500/20">
+                    Flexi Cap Fund
+                  </span>
+                  <h3 className="mt-2 font-heading font-bold text-lg text-foreground tracking-tight">
+                    Alpha Growth Direct-Growth
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Quantum Asset Management
+                  </p>
+                </div>
+                
+                {/* Total Score Badge */}
+                <div className="flex flex-col items-center justify-center rounded-xl bg-primary/10 border border-primary/20 px-3.5 py-2.5">
+                  <span className="text-2xl font-black text-primary font-mono tracking-tight">
+                    96.4
+                  </span>
+                  <span className="text-[10px] font-bold text-primary/80 uppercase tracking-wider mt-0.5">
+                    MF Score
+                  </span>
+                </div>
+              </div>
+              
+              {/* Mid section: Metrics */}
+              <div className="grid grid-cols-2 gap-4 py-4 text-left border-b border-border/40">
+                <div>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    Relative 3Y Return
+                  </span>
+                  <div className="flex items-baseline gap-1 mt-1">
+                    <span className="text-xl font-bold text-emerald-500 font-mono">
+                      +8.45%
+                    </span>
+                    <span className="text-xs text-muted-foreground">vs avg</span>
+                  </div>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    Expense Ratio
+                  </span>
+                  <div className="mt-1">
+                    <span className="text-xl font-bold text-foreground font-mono">
+                      0.38%
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    Total AUM
+                  </span>
+                  <div className="mt-1">
+                    <span className="text-base font-bold text-foreground font-mono">
+                      ₹4,820 Cr
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    Consistency Rating
+                  </span>
+                  <div className="flex items-center gap-0.5 mt-1 text-amber-500 text-sm">
+                    ★ ★ ★ ★ ★
+                  </div>
+                </div>
+              </div>
+              
+              {/* Footer: Sparkline / Trend */}
+              <div className="flex items-center justify-between pt-4">
+                <div className="text-left">
+                  <span className="text-[10px] text-muted-foreground block">
+                    Alpha Trend (5 Years)
+                  </span>
+                  <span className="text-xs font-bold text-emerald-500">
+                    Consistent Outperformance
+                  </span>
+                </div>
+                
+                {/* SVG Sparkline */}
+                <div className="w-24 h-8">
+                  <svg viewBox="0 0 100 30" className="w-full h-full">
+                    <defs>
+                      <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
+                        <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
+                      </linearGradient>
+                    </defs>
+                    <path
+                      d="M0,25 Q15,22 30,12 T60,15 T90,3 L100,2 L100,30 L0,30 Z"
+                      fill="url(#gradient)"
+                    />
+                    <path
+                      d="M0,25 Q15,22 30,12 T60,15 T90,3 L100,2"
+                      fill="none"
+                      stroke="#10b981"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            
+            {/* Small floating badges around the card for depth */}
+            <div className="absolute -top-4 -right-4 bg-background border border-border shadow-lg rounded-full px-3 py-1 flex items-center gap-1.5 text-[11px] font-bold text-foreground">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Rank #1 in Category
+            </div>
+            <div className="absolute -bottom-3 -left-4 bg-background border border-border shadow-lg rounded-full px-3 py-1 flex items-center gap-1 text-[11px] font-bold text-foreground">
+              🛡️ Direct & Commission-Free
+            </div>
           </div>
           
           <div className="mt-6 text-[10px] text-muted-foreground">
