@@ -266,20 +266,29 @@ function FundsExplorerContent() {
 
       {/* Filter Options Bar */}
       <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4 rounded-xl border border-border bg-card p-4 shadow-sm">
-        {/* Score Slider */}
+        {/* Score Buttons */}
         <div className="flex flex-col">
-          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">
-            Min MFC Score: <span className="font-data font-semibold text-foreground">{minScoreParam}</span>
+          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
+            Min MFC Score
           </label>
-          <div className="flex items-center gap-3 py-1">
-            <input
-              type="range"
-              min="50"
-              max="100"
-              value={minScoreParam}
-              onChange={(e) => updateUrl({ minScore: parseInt(e.target.value) })}
-              className="w-full bg-border cursor-pointer h-1.5 rounded-lg appearance-none"
-            />
+          <div className="grid grid-cols-3 gap-2 h-[34px]">
+            {[50, 75, 90].map((score) => {
+              const isActive = minScoreParam === score;
+              return (
+                <button
+                  key={score}
+                  onClick={() => updateUrl({ minScore: score })}
+                  className={cn(
+                    "flex items-center justify-center rounded-lg border text-xs font-bold font-data transition-all duration-150 select-none",
+                    isActive
+                      ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                      : "border-border bg-background text-muted-foreground hover:border-muted-foreground/60 hover:text-foreground"
+                  )}
+                >
+                  {score}
+                </button>
+              );
+            })}
           </div>
         </div>
 
