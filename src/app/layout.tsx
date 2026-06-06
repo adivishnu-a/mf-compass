@@ -40,7 +40,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground selection:bg-brand-gilt/20 selection:text-foreground">
         <Navbar />
-        <main className="flex-1 pb-16">
+        <main className="flex-1">
           {children}
         </main>
         <Footer />
