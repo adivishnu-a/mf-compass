@@ -76,13 +76,13 @@ export function FundsTable({ funds }: FundsTableProps) {
   const { toggleWatchlist, isWatched } = useWatchlist();
   const { toggleCompare, isComparing } = useCompare();
 
-  const [sortField, setSortField] = useState<SortField>("totalScore");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const [sortField, setSortField] = useState<SortField | null>(null);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
 
   // Reset sorting on fund count changes (i.e. category change)
   React.useEffect(() => {
-    setSortField("totalScore");
-    setSortOrder("desc");
+    setSortField(null);
+    setSortOrder(null);
   }, [funds.length]);
 
   const handleSort = (field: SortField) => {
@@ -94,8 +94,9 @@ export function FundsTable({ funds }: FundsTableProps) {
         setSortOrder("asc");
       } else if (sortOrder === "asc") {
         setSortOrder(null); // cycle to default
+        setSortField(null);
       } else {
-        setSortField("totalScore");
+        setSortField(field);
         setSortOrder("desc");
       }
     }
@@ -103,12 +104,8 @@ export function FundsTable({ funds }: FundsTableProps) {
 
   const sortedFunds = useMemo(() => {
     if (!sortOrder || !sortField) {
-      // Default: Sort by totalScore desc
-      return [...funds].sort((a, b) => {
-        const scoreA = parseFloat(a.totalScore || "0");
-        const scoreB = parseFloat(b.totalScore || "0");
-        return scoreB - scoreA;
-      });
+      // Default: respect the initial sort order passed down from the parent
+      return funds;
     }
 
     return [...funds].sort((a, b) => {
@@ -186,73 +183,65 @@ export function FundsTable({ funds }: FundsTableProps) {
         <table className="w-full border-collapse text-left text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/40 transition-colors">
-              <th className="p-4 font-semibold text-muted-foreground w-12 text-center">Rank</th>
-              <th className="p-4 font-semibold text-muted-foreground w-10 text-center">Compare</th>
-              <th className="p-4 font-semibold text-muted-foreground w-10 text-center">Watch</th>
+              <th className="px-2 py-3 font-semibold text-muted-foreground w-12 text-center">Rank</th>
               <th 
-                className="p-4 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors"
+                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors"
                 onClick={() => handleSort("schemeName")}
               >
                 <div className="flex items-center">
-                  Mutual Fund <SortIcon field="schemeName" sortField={sortField} sortOrder={sortOrder} />
+                  Mutual Fund <SortIcon field="schemeName" sortField={sortField as SortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
-                className="p-4 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-24"
+                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-24"
                 onClick={() => handleSort("totalScore")}
               >
                 <div className="flex items-center justify-center">
-                  MFC Score <SortIcon field="totalScore" sortField={sortField} sortOrder={sortOrder} />
+                  MFC Score <SortIcon field="totalScore" sortField={sortField as SortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
-                className="p-4 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-20"
+                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16"
                 onClick={() => handleSort("returns1d")}
               >
                 <div className="flex items-center justify-center">
-                  1D <SortIcon field="returns1d" sortField={sortField} sortOrder={sortOrder} />
+                  1D <SortIcon field="returns1d" sortField={sortField as SortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
-                className="p-4 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-20"
+                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16"
                 onClick={() => handleSort("returns1w")}
               >
                 <div className="flex items-center justify-center">
-                  1W <SortIcon field="returns1w" sortField={sortField} sortOrder={sortOrder} />
+                  1W <SortIcon field="returns1w" sortField={sortField as SortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
-                className="p-4 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-20"
+                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16"
                 onClick={() => handleSort("returns1y")}
               >
                 <div className="flex items-center justify-center">
-                  1Y <SortIcon field="returns1y" sortField={sortField} sortOrder={sortOrder} />
+                  1Y <SortIcon field="returns1y" sortField={sortField as SortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
-                className="p-4 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-20"
+                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16"
                 onClick={() => handleSort("returns3y")}
               >
                 <div className="flex items-center justify-center">
-                  3Y <SortIcon field="returns3y" sortField={sortField} sortOrder={sortOrder} />
+                  3Y <SortIcon field="returns3y" sortField={sortField as SortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
-                className="p-4 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-20"
+                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16"
                 onClick={() => handleSort("returns5y")}
               >
                 <div className="flex items-center justify-center">
-                  5Y <SortIcon field="returns5y" sortField={sortField} sortOrder={sortOrder} />
+                  5Y <SortIcon field="returns5y" sortField={sortField as SortField} sortOrder={sortOrder} />
                 </div>
               </th>
-              <th 
-                className="p-4 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-right w-28"
-                onClick={() => handleSort("aum")}
-              >
-                <div className="flex items-center justify-end">
-                  AUM <SortIcon field="aum" sortField={sortField} sortOrder={sortOrder} />
-                </div>
-              </th>
+              <th className="px-2 py-3 font-semibold text-muted-foreground w-12 text-center">Compare</th>
+              <th className="px-2 py-3 font-semibold text-muted-foreground w-12 text-center">Watch</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -267,12 +256,49 @@ export function FundsTable({ funds }: FundsTableProps) {
                   className="hover:bg-muted/20 transition-all group duration-150"
                 >
                   {/* Rank */}
-                  <td className="p-4 text-center font-data font-bold text-muted-foreground/80">
+                  <td className="px-2 py-3 text-center font-data font-bold text-muted-foreground/80">
                     {rank}
                   </td>
                   
+                  {/* Fund Name & House */}
+                  <td className="px-2 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg font-heading text-xs font-bold shadow-sm",
+                        getAmcColorClass(fund.fundHouseName)
+                      )}>
+                        {getAmcInitials(fund.fundHouseName)}
+                      </div>
+                      <div className="flex flex-col truncate max-w-[280px] lg:max-w-[400px]">
+                        <Link 
+                          href={`/fund/${fund.kuveraCode}`}
+                          className="font-heading font-medium text-foreground hover:text-primary transition-colors truncate"
+                        >
+                          {fund.schemeName}
+                        </Link>
+                        <span className="text-[10px] text-muted-foreground truncate mt-0.5">
+                          {fund.fundHouseName} • {fund.fundType}
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+ 
+                  {/* Score */}
+                  <td className="px-2 py-3 text-center">
+                    <span className="inline-flex items-center justify-center rounded-md bg-primary/10 px-2 py-1 text-xs font-bold text-primary font-data border border-primary/20">
+                      {parseFloat(fund.totalScore || "0").toFixed(1)}
+                    </span>
+                  </td>
+
+                  {/* Returns */}
+                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns1d)}</td>
+                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns1w)}</td>
+                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns1y)}</td>
+                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns3y)}</td>
+                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns5y)}</td>
+
                   {/* Compare Checkbox */}
-                  <td className="p-4 text-center">
+                  <td className="px-2 py-3 text-center">
                     <button
                       onClick={() => toggleCompare(fund.kuveraCode)}
                       className={cn(
@@ -288,7 +314,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                   </td>
 
                   {/* Watchlist Heart */}
-                  <td className="p-4 text-center">
+                  <td className="px-2 py-3 text-center">
                     <button
                       onClick={() => toggleWatchlist(fund.kuveraCode)}
                       className="text-muted-foreground/40 hover:text-rose-500 transition-colors focus:outline-none"
@@ -296,53 +322,11 @@ export function FundsTable({ funds }: FundsTableProps) {
                     >
                       <Heart 
                         className={cn(
-                          "h-4.5 w-4.5 transition-transform active:scale-125", 
+                          "h-4 w-4 transition-transform active:scale-125", 
                           isWatchChecked && "fill-rose-500 text-rose-500 opacity-100"
                         )} 
                       />
                     </button>
-                  </td>
-
-                  {/* Fund Name & House */}
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg font-heading text-xs font-bold shadow-sm",
-                        getAmcColorClass(fund.fundHouseName)
-                      )}>
-                        {getAmcInitials(fund.fundHouseName)}
-                      </div>
-                      <div className="flex flex-col truncate max-w-[280px] lg:max-w-[360px]">
-                        <Link 
-                          href={`/fund/${fund.kuveraCode}`}
-                          className="font-heading font-medium text-foreground hover:text-primary transition-colors truncate"
-                        >
-                          {fund.schemeName}
-                        </Link>
-                        <span className="text-[10px] text-muted-foreground truncate mt-0.5">
-                          {fund.fundHouseName} • {fund.fundType}
-                        </span>
-                      </div>
-                    </div>
-                  </td>
- 
-                  {/* Score */}
-                  <td className="p-4 text-center">
-                    <span className="inline-flex items-center justify-center rounded-md bg-primary/10 px-2 py-1 text-xs font-bold text-primary font-data border border-primary/20">
-                      {parseFloat(fund.totalScore || "0").toFixed(1)}
-                    </span>
-                  </td>
-
-                  {/* Returns */}
-                  <td className="p-4 text-center">{renderReturnCell(fund.returns1d)}</td>
-                  <td className="p-4 text-center">{renderReturnCell(fund.returns1w)}</td>
-                  <td className="p-4 text-center">{renderReturnCell(fund.returns1y)}</td>
-                  <td className="p-4 text-center">{renderReturnCell(fund.returns3y)}</td>
-                  <td className="p-4 text-center">{renderReturnCell(fund.returns5y)}</td>
-
-                  {/* AUM */}
-                  <td className="p-4 text-right font-data font-medium text-xs text-foreground/80">
-                    {formatAUM(fund.aum)}
                   </td>
                 </tr>
               );

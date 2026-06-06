@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { RefreshCw, X } from "lucide-react";
+import { RefreshCw, X, ChevronDown } from "lucide-react";
 import { FundsTable } from "@/components/funds/FundsTable";
 import { EQUITY_CATEGORIES, HYBRID_CATEGORIES } from "@/lib/kuvera/categories";
 import { cn } from "@/lib/utils";
@@ -53,10 +53,12 @@ function FundsExplorerContent() {
   const minRatingParam = searchParams.get("minRating") ? parseInt(searchParams.get("minRating")!) : 0;
   const sortParam = searchParams.get("sort") || "score_desc";
 
-  // Data fetching states
   const [funds, setFunds] = useState<Fund[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [ratingDropdownOpen, setRatingDropdownOpen] = useState(false);
+  const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
 
   // Validate and default Category if invalid
   const activeCategory = useMemo(() => {
@@ -186,8 +188,24 @@ function FundsExplorerContent() {
 
   const categories = currentGroup === "equity" ? EQUITY_CATEGORIES : HYBRID_CATEGORIES;
 
+  const ratingOptions = [
+    { value: 0, label: "Any Rating" },
+    { value: 5, label: "★★★★★ (5 Stars)" },
+    { value: 4, label: "★★★★☆ (4+ Stars)" },
+    { value: 3, label: "★★★☆☆ (3+ Stars)" },
+    { value: 2, label: "★★☆☆☆ (2+ Stars)" },
+    { value: 1, label: "★☆☆☆☆ (1+ Star)" },
+  ];
+
+  const sortOptions = [
+    { value: "score_desc", label: "MFC Score (High to Low)" },
+    { value: "score_asc", label: "MFC Score (Low to High)" },
+    { value: "returns1y_desc", label: "1Y Return (High to Low)" },
+    { value: "aum_desc", label: "Fund AUM (High to Low)" },
+  ];
+
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Title & Group Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b border-border pb-6">
         <div>
@@ -266,39 +284,83 @@ function FundsExplorerContent() {
         </div>
 
         {/* Rating Filter */}
-        <div className="flex flex-col">
+        <div className="flex flex-col relative z-20">
           <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
             Min Fund Rating
           </label>
-          <select
-            value={minRatingParam}
-            onChange={(e) => updateUrl({ minRating: parseInt(e.target.value) })}
-            className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+          <button
+            onClick={() => {
+              setRatingDropdownOpen(!ratingDropdownOpen);
+              setSortDropdownOpen(false);
+            }}
+            className="flex w-full items-center justify-between rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground transition-colors hover:border-primary/50 focus:outline-none h-[34px]"
           >
-            <option value="0">Any Rating</option>
-            <option value="5">★★★★★ (5 Stars)</option>
-            <option value="4">★★★★☆ (4+ Stars)</option>
-            <option value="3">★★★☆☆ (3+ Stars)</option>
-            <option value="2">★★☆☆☆ (2+ Stars)</option>
-            <option value="1">★☆☆☆☆ (1+ Star)</option>
-          </select>
+            <span className="truncate">{ratingOptions.find(o => o.value === minRatingParam)?.label || "Any Rating"}</span>
+            <ChevronDown className="h-3.5 w-3.5 opacity-50 shrink-0 ml-2" />
+          </button>
+          
+          {ratingDropdownOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setRatingDropdownOpen(false)} />
+              <div className="absolute top-[calc(100%+4px)] left-0 w-full rounded-xl border border-border bg-card/95 p-1 shadow-xl z-50 animate-in fade-in slide-in-from-top-1 duration-100 backdrop-blur-md">
+                {ratingOptions.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => {
+                      updateUrl({ minRating: opt.value });
+                      setRatingDropdownOpen(false);
+                    }}
+                    className={cn(
+                      "flex w-full items-center px-2 py-1.5 text-xs transition-colors hover:bg-accent hover:text-foreground rounded-lg",
+                      minRatingParam === opt.value ? "bg-accent/40 text-primary font-bold" : "text-muted-foreground"
+                    )}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Sorting option */}
-        <div className="flex flex-col">
+        <div className="flex flex-col relative z-10">
           <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
             Sort Universe By
           </label>
-          <select
-            value={sortParam}
-            onChange={(e) => updateUrl({ sort: e.target.value })}
-            className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+          <button
+            onClick={() => {
+              setSortDropdownOpen(!sortDropdownOpen);
+              setRatingDropdownOpen(false);
+            }}
+            className="flex w-full items-center justify-between rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground transition-colors hover:border-primary/50 focus:outline-none h-[34px]"
           >
-            <option value="score_desc">MFC Score (High to Low)</option>
-            <option value="score_asc">MFC Score (Low to High)</option>
-            <option value="returns1y_desc">1Y Return (High to Low)</option>
-            <option value="aum_desc">Fund AUM (High to Low)</option>
-          </select>
+            <span className="truncate">{sortOptions.find(o => o.value === sortParam)?.label || "MFC Score (High to Low)"}</span>
+            <ChevronDown className="h-3.5 w-3.5 opacity-50 shrink-0 ml-2" />
+          </button>
+          
+          {sortDropdownOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setSortDropdownOpen(false)} />
+              <div className="absolute top-[calc(100%+4px)] left-0 w-full rounded-xl border border-border bg-card/95 p-1 shadow-xl z-50 animate-in fade-in slide-in-from-top-1 duration-100 backdrop-blur-md">
+                {sortOptions.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => {
+                      updateUrl({ sort: opt.value });
+                      setSortDropdownOpen(false);
+                    }}
+                    className={cn(
+                      "flex w-full items-center px-2 py-1.5 text-xs transition-colors hover:bg-accent hover:text-foreground rounded-lg text-left",
+                      sortParam === opt.value ? "bg-accent/40 text-primary font-bold" : "text-muted-foreground"
+                    )}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Clear Filters Action */}
@@ -389,7 +451,7 @@ function SkeletonTable() {
 
 export default function FundsExplorerPage() {
   return (
-    <Suspense fallback={<div className="mx-auto max-w-6xl px-4 py-8"><SkeletonTable /></div>}>
+    <Suspense fallback={<div className="mx-auto max-w-7xl px-4 py-8 lg:px-8"><SkeletonTable /></div>}>
       <FundsExplorerContent />
     </Suspense>
   );
