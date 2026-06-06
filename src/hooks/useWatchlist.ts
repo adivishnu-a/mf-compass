@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 export function useWatchlist() {
   const [watchlist, setWatchlist] = useState<string[]>([]);
 
-  useEffect(() => {
+  const loadWatchlist = () => {
     const stored = localStorage.getItem("mfc:watchlist");
     if (stored) {
       try {
@@ -11,7 +11,15 @@ export function useWatchlist() {
       } catch (e) {
         console.error("Failed to parse watchlist", e);
       }
+    } else {
+      setWatchlist([]);
     }
+  };
+
+  useEffect(() => {
+    loadWatchlist();
+    window.addEventListener("mfc-watchlist-change", loadWatchlist);
+    return () => window.removeEventListener("mfc-watchlist-change", loadWatchlist);
   }, []);
 
   const toggleWatchlist = (code: string) => {

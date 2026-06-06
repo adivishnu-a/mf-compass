@@ -2,11 +2,9 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Heart, ArrowLeft, ShieldAlert, Sparkles, RefreshCw } from "lucide-react";
+import { Heart, ArrowLeft, ShieldAlert } from "lucide-react";
 import { useWatchlist } from "@/hooks/useWatchlist";
 import { FundsTable } from "@/components/funds/FundsTable";
-import { cn } from "@/lib/utils";
 
 interface Fund {
   id: number;
@@ -44,7 +42,6 @@ interface Fund {
 }
 
 export default function WatchlistPage() {
-  const router = useRouter();
   const { watchlist, toggleWatchlist } = useWatchlist();
 
   const [funds, setFunds] = useState<Fund[]>([]);
@@ -74,7 +71,7 @@ export default function WatchlistPage() {
             setError(data.error || "Failed to load watchlist details.");
           }
         }
-      } catch (err) {
+      } catch {
         if (active) {
           setError("Failed to fetch watchlist details.");
         }

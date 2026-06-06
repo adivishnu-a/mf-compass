@@ -24,7 +24,7 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { eq, notInArray, sql } from "drizzle-orm";
 import * as schema from "@drizzle/schema";
 import { funds, categoryAverages } from "@drizzle/schema";
-import type { NewFund, NewCategoryAverage } from "@drizzle/schema";
+import type { NewCategoryAverage } from "@drizzle/schema";
 import { fetchFundList, fetchFundDetailsBatched, fetchCategoryAverages } from "@scripts/sync/kuvera/client";
 import type { FundDetail } from "@scripts/sync/kuvera/schemas";
 import { discoverAllFunds } from "@scripts/sync/pipeline/discovery";
@@ -184,40 +184,51 @@ async function main(): Promise<void> {
       }
     }
 
-    // Step 7: Transform and upsert funds in batches
+    // Step 7: Transform and upsert funds in transactional batches of 25
     const transformedFunds = filteredFunds.map(transformFundDetail);
     const allUpsertedCodes: string[] = [];
 
     for (let i = 0; i < transformedFunds.length; i += BATCH_WRITE_SIZE) {
       const batch = transformedFunds.slice(i, i + BATCH_WRITE_SIZE);
 
-      for (const fund of batch) {
-        try {
-          const existing = await db
+      try {
+        const selectQueries = batch.map((fund) =>
+          db
             .select({ id: funds.id })
             .from(funds)
             .where(eq(funds.kuveraCode, fund.kuveraCode))
-            .limit(1);
+            .limit(1)
+        );
 
-          if (existing.length > 0) {
-            await db
+        const selectResults = await db.batch(selectQueries as [any, ...any[]]);
+
+        const writeQueries = batch.map((fund, idx) => {
+          const existing = selectResults[idx];
+          if (existing && existing.length > 0) {
+            summary.fundsUpdated++;
+            return db
               .update(funds)
               .set({ ...fund, lastUpdated: sql`NOW()` })
               .where(eq(funds.kuveraCode, fund.kuveraCode));
-            summary.fundsUpdated++;
           } else {
-            await db.insert(funds).values(fund);
             summary.fundsInserted++;
+            return db.insert(funds).values(fund);
           }
+        });
 
-          allUpsertedCodes.push(fund.kuveraCode);
-        } catch (err) {
-          summary.errors++;
-          logger.error("Fund upsert failed", {
-            code: fund.kuveraCode,
-            error: err instanceof Error ? err.message : String(err),
-          });
+        if (writeQueries.length > 0) {
+          await db.batch(writeQueries as [any, ...any[]]);
         }
+
+        for (const fund of batch) {
+          allUpsertedCodes.push(fund.kuveraCode);
+        }
+      } catch (err) {
+        summary.errors += batch.length;
+        logger.error("Batch upsert failed", {
+          batchStart: i,
+          error: err instanceof Error ? err.message : String(err),
+        });
       }
     }
 
@@ -276,14 +287,28 @@ async function main(): Promise<void> {
 
       const normalized = normalizeScores(rawScores);
 
-      for (let i = 0; i < categoryFunds.length; i++) {
-        await db
-          .update(funds)
-          .set({
-            totalScore: normalized[i].toFixed(2),
-            scoreUpdated: sql`NOW()`,
-          })
-          .where(eq(funds.id, categoryFunds[i].id));
+      for (let k = 0; k < categoryFunds.length; k += BATCH_WRITE_SIZE) {
+        const batch = categoryFunds.slice(k, k + BATCH_WRITE_SIZE);
+        const batchNormalized = normalized.slice(k, k + BATCH_WRITE_SIZE);
+        try {
+          const queries = batch.map((fund, idx) =>
+            db
+              .update(funds)
+              .set({
+                totalScore: batchNormalized[idx].toFixed(2),
+                scoreUpdated: sql`NOW()`,
+              })
+              .where(eq(funds.id, fund.id))
+          );
+          if (queries.length > 0) {
+            await db.batch(queries as [any, ...any[]]);
+          }
+        } catch (err) {
+          summary.errors += batch.length;
+          logger.error("Batch score update failed", {
+            error: err instanceof Error ? err.message : String(err),
+          });
+        }
       }
 
       logger.info("Scores computed", {

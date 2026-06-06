@@ -59,6 +59,19 @@ type SortField =
 
 type SortOrder = "asc" | "desc" | null;
 
+interface SortIconProps {
+  field: SortField;
+  sortField: SortField;
+  sortOrder: SortOrder;
+}
+
+function SortIcon({ field, sortField, sortOrder }: SortIconProps) {
+  if (sortField !== field) return <ArrowUpDown className="ml-1 h-3.5 w-3.5 opacity-40 hover:opacity-100 transition-opacity" />;
+  if (sortOrder === "desc") return <ArrowDown className="ml-1 h-3.5 w-3.5 text-primary font-bold" />;
+  if (sortOrder === "asc") return <ArrowUp className="ml-1 h-3.5 w-3.5 text-primary font-bold" />;
+  return <ArrowUpDown className="ml-1 h-3.5 w-3.5 opacity-40" />;
+}
+
 export function FundsTable({ funds }: FundsTableProps) {
   const { toggleWatchlist, isWatched } = useWatchlist();
   const { toggleCompare, isComparing } = useCompare();
@@ -166,13 +179,6 @@ export function FundsTable({ funds }: FundsTableProps) {
     );
   };
 
-  const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) return <ArrowUpDown className="ml-1 h-3.5 w-3.5 opacity-40 hover:opacity-100 transition-opacity" />;
-    if (sortOrder === "desc") return <ArrowDown className="ml-1 h-3.5 w-3.5 text-primary font-bold" />;
-    if (sortOrder === "asc") return <ArrowUp className="ml-1 h-3.5 w-3.5 text-primary font-bold" />;
-    return <ArrowUpDown className="ml-1 h-3.5 w-3.5 opacity-40" />;
-  };
-
   return (
     <div className="w-full">
       {/* Desktop Table View */}
@@ -188,7 +194,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                 onClick={() => handleSort("schemeName")}
               >
                 <div className="flex items-center">
-                  Mutual Fund <SortIcon field="schemeName" />
+                  Mutual Fund <SortIcon field="schemeName" sortField={sortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
@@ -196,7 +202,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                 onClick={() => handleSort("totalScore")}
               >
                 <div className="flex items-center justify-center">
-                  MFC Score <SortIcon field="totalScore" />
+                  MFC Score <SortIcon field="totalScore" sortField={sortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
@@ -204,7 +210,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                 onClick={() => handleSort("returns1d")}
               >
                 <div className="flex items-center justify-center">
-                  1D <SortIcon field="returns1d" />
+                  1D <SortIcon field="returns1d" sortField={sortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
@@ -212,7 +218,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                 onClick={() => handleSort("returns1w")}
               >
                 <div className="flex items-center justify-center">
-                  1W <SortIcon field="returns1w" />
+                  1W <SortIcon field="returns1w" sortField={sortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
@@ -220,7 +226,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                 onClick={() => handleSort("returns1y")}
               >
                 <div className="flex items-center justify-center">
-                  1Y <SortIcon field="returns1y" />
+                  1Y <SortIcon field="returns1y" sortField={sortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
@@ -228,7 +234,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                 onClick={() => handleSort("returns3y")}
               >
                 <div className="flex items-center justify-center">
-                  3Y <SortIcon field="returns3y" />
+                  3Y <SortIcon field="returns3y" sortField={sortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
@@ -236,7 +242,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                 onClick={() => handleSort("returns5y")}
               >
                 <div className="flex items-center justify-center">
-                  5Y <SortIcon field="returns5y" />
+                  5Y <SortIcon field="returns5y" sortField={sortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
@@ -244,7 +250,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                 onClick={() => handleSort("aum")}
               >
                 <div className="flex items-center justify-end">
-                  AUM <SortIcon field="aum" />
+                  AUM <SortIcon field="aum" sortField={sortField} sortOrder={sortOrder} />
                 </div>
               </th>
             </tr>

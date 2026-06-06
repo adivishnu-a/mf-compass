@@ -1,6 +1,5 @@
 import { MetadataRoute } from "next";
 import { db } from "@/lib/db";
-import { funds } from "@drizzle/schema";
 import { FUND_CATEGORIES } from "@/lib/kuvera/categories";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

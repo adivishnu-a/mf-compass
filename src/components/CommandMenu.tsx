@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Search, X, TrendingUp, History } from "lucide-react";
+import { Search, X, History } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SearchResult {

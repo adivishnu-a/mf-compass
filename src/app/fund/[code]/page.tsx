@@ -4,9 +4,9 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { funds, categoryAverages } from "@drizzle/schema";
 import { eq } from "drizzle-orm";
-import { formatPercent, formatINR, formatAUM, formatIST } from "@/lib/format";
+import { formatPercent, formatINR, formatAUM } from "@/lib/format";
 import { FundDetailActions } from "@/components/funds/FundDetailActions";
-import { ArrowLeft, Award, ShieldAlert, Zap, Calendar, DollarSign, Activity } from "lucide-react";
+import { ArrowLeft, Calendar, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ISR caching: revalidate every 5 minutes
@@ -46,7 +46,7 @@ function parseFundManagers(managers: any): string[] {
     try {
       const parsed = JSON.parse(managers);
       if (Array.isArray(parsed)) return parsed.map(String);
-    } catch (_) {}
+    } catch {}
     return managers.split(";").map((m: string) => m.trim()).filter(Boolean);
   }
   return [];
@@ -139,7 +139,7 @@ export default async function FundDetailPage({ params }: PageProps) {
 
         {/* Action Buttons (Watchlist & Compare) */}
         <div className="mt-6 pt-6 border-t border-border/60 flex items-center justify-between gap-4">
-          <FundDetailActions kuveraCode={fund.kuveraCode} schemeName={fund.schemeName} />
+          <FundDetailActions kuveraCode={fund.kuveraCode} />
           {inflowsPaused && (
             <span className="inline-flex items-center gap-1 rounded bg-rose-500/10 px-2.5 py-1 text-[10px] font-bold text-rose-600 dark:text-rose-400 border border-rose-500/15 uppercase tracking-wide">
               Inflows Paused

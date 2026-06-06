@@ -106,6 +106,8 @@ async function main(): Promise<void> {
     const codes = existingFunds.map((f) => f.kuveraCode);
     logger.info("Refreshing existing funds", { count: codes.length });
 
+    const pendingUpdates: { code: string; data: any }[] = [];
+
     for (let i = 0; i < codes.length; i += BATCH_SIZE) {
       const batch = codes.slice(i, i + BATCH_SIZE);
 
@@ -127,47 +129,61 @@ async function main(): Promise<void> {
 
         const cleaned = cleanReturns(detail.returns);
 
-        try {
-          await db
-            .update(funds)
-            .set({
-              currentNav: currentNav?.toFixed(5) ?? null,
-              currentNavDate: detail.nav?.date ?? null,
-              t1Nav: t1Nav?.toFixed(5) ?? null,
-              t1NavDate: detail.last_nav?.date ?? null,
-              returns1d,
-              returns1w: cleaned.returns1w,
-              returns1y: cleaned.returns1y,
-              returns3y: cleaned.returns3y,
-              returns5y: cleaned.returns5y,
-              returnsInception: cleaned.returnsInception,
-              returnsDate: detail.returns?.date ?? null,
-              aum: detail.aum !== null && detail.aum !== undefined
-                ? (detail.aum / 10).toFixed(2)
-                : null,
-              expenseRatio: detail.expense_ratio?.toFixed(2) ?? null,
-              expenseRatioDate: detail.expense_ratio_date ?? null,
-              fundRating: detail.fund_rating ?? null,
-              fundRatingDate: detail.fund_rating_date ?? null,
-              crisilRating: detail.crisil_rating ?? null,
-              volatility: detail.volatility?.toFixed(4) ?? null,
-              portfolioTurnover: detail.portfolio_turnover?.toFixed(4) ?? null,
-              lastUpdated: sql`NOW()`,
-            })
-            .where(eq(funds.kuveraCode, detail.code));
-
-          summary.fundsUpdated++;
-        } catch (err) {
-          summary.errors++;
-          logger.error("Fund update failed", {
-            code: detail.code,
-            error: err instanceof Error ? err.message : String(err),
-          });
-        }
+        pendingUpdates.push({
+          code: detail.code,
+          data: {
+            currentNav: currentNav?.toFixed(5) ?? null,
+            currentNavDate: detail.nav?.date ?? null,
+            t1Nav: t1Nav?.toFixed(5) ?? null,
+            t1NavDate: detail.last_nav?.date ?? null,
+            returns1d,
+            returns1w: cleaned.returns1w,
+            returns1y: cleaned.returns1y,
+            returns3y: cleaned.returns3y,
+            returns5y: cleaned.returns5y,
+            returnsInception: cleaned.returnsInception,
+            returnsDate: detail.returns?.date ?? null,
+            aum: detail.aum !== null && detail.aum !== undefined
+              ? (detail.aum / 10).toFixed(2)
+              : null,
+            expenseRatio: detail.expense_ratio?.toFixed(2) ?? null,
+            expenseRatioDate: detail.expense_ratio_date ?? null,
+            fundRating: detail.fund_rating ?? null,
+            fundRatingDate: detail.fund_rating_date ?? null,
+            crisilRating: detail.crisil_rating ?? null,
+            volatility: detail.volatility?.toFixed(4) ?? null,
+            portfolioTurnover: detail.portfolio_turnover?.toFixed(4) ?? null,
+          }
+        });
       }
 
       if (i + BATCH_SIZE < codes.length) {
         await delay(BATCH_DELAY_MS);
+      }
+    }
+
+    // Now write the accumulated updates in transactions of 25
+    logger.info("Flushing daily updates to DB in transactional batches of 25", { total: pendingUpdates.length });
+    const BATCH_WRITE_SIZE = 25;
+    for (let i = 0; i < pendingUpdates.length; i += BATCH_WRITE_SIZE) {
+      const batch = pendingUpdates.slice(i, i + BATCH_WRITE_SIZE);
+      try {
+        const queries = batch.map((item) =>
+          db
+            .update(funds)
+            .set({ ...item.data, lastUpdated: sql`NOW()` })
+            .where(eq(funds.kuveraCode, item.code))
+        );
+        if (queries.length > 0) {
+          await db.batch(queries as [any, ...any[]]);
+          summary.fundsUpdated += batch.length;
+        }
+      } catch (err) {
+        summary.errors += batch.length;
+        logger.error("Batch update failed", {
+          batchStart: i,
+          error: err instanceof Error ? err.message : String(err),
+        });
       }
     }
 
@@ -252,14 +268,28 @@ async function main(): Promise<void> {
 
       const normalized = normalizeScores(rawScores);
 
-      for (let j = 0; j < categoryFunds.length; j++) {
-        await db
-          .update(funds)
-          .set({
-            totalScore: normalized[j].toFixed(2),
-            scoreUpdated: sql`NOW()`,
-          })
-          .where(eq(funds.id, categoryFunds[j].id));
+      for (let k = 0; k < categoryFunds.length; k += BATCH_WRITE_SIZE) {
+        const batch = categoryFunds.slice(k, k + BATCH_WRITE_SIZE);
+        const batchNormalized = normalized.slice(k, k + BATCH_WRITE_SIZE);
+        try {
+          const queries = batch.map((fund, idx) =>
+            db
+              .update(funds)
+              .set({
+                totalScore: batchNormalized[idx].toFixed(2),
+                scoreUpdated: sql`NOW()`,
+              })
+              .where(eq(funds.id, fund.id))
+          );
+          if (queries.length > 0) {
+            await db.batch(queries as [any, ...any[]]);
+          }
+        } catch (err) {
+          summary.errors += batch.length;
+          logger.error("Batch score update failed", {
+            error: err instanceof Error ? err.message : String(err),
+          });
+        }
       }
     }
 

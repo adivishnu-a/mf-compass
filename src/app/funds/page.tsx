@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { SlidersHorizontal, RefreshCw, X, Award, Percent, TrendingUp } from "lucide-react";
+import { RefreshCw, X } from "lucide-react";
 import { FundsTable } from "@/components/funds/FundsTable";
-import { EQUITY_CATEGORIES, HYBRID_CATEGORIES, FUND_CATEGORIES } from "@/lib/kuvera/categories";
+import { EQUITY_CATEGORIES, HYBRID_CATEGORIES } from "@/lib/kuvera/categories";
 import { cn } from "@/lib/utils";
 
 interface Fund {
@@ -83,7 +83,7 @@ function FundsExplorerContent() {
             setError(data.error || "Failed to load funds");
           }
         }
-      } catch (err) {
+      } catch {
         if (active) {
           setError("Failed to fetch data. Please check your connection.");
         }

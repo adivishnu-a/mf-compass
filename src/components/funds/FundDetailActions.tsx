@@ -8,10 +8,9 @@ import { cn } from "@/lib/utils";
 
 interface FundDetailActionsProps {
   kuveraCode: string;
-  schemeName: string;
 }
 
-export function FundDetailActions({ kuveraCode, schemeName }: FundDetailActionsProps) {
+export function FundDetailActions({ kuveraCode }: FundDetailActionsProps) {
   const { toggleWatchlist, isWatched } = useWatchlist();
   const { toggleCompare, isComparing } = useCompare();
 

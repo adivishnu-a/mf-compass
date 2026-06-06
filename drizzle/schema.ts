@@ -49,7 +49,7 @@ export const funds = pgTable(
     index("idx_funds_fund_category").on(table.fundCategory),
     index("idx_funds_fund_house").on(table.fundHouse),
     index("idx_funds_fund_type").on(table.fundType),
-    index("idx_funds_total_score").on(table.totalScore),
+    index("idx_funds_total_score").on(table.totalScore.desc()),
   ]
 );
 

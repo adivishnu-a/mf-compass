@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { GitCompare, Trash2, ArrowLeft, ShieldAlert, CheckCircle, HelpCircle } from "lucide-react";
+import { GitCompare, Trash2, ArrowLeft, ShieldAlert } from "lucide-react";
 import { formatPercent, formatINR, formatAUM } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -86,7 +86,7 @@ function CompareContent() {
             setError(data.error || "Failed to load comparison data.");
           }
         }
-      } catch (err) {
+      } catch {
         if (active) {
           setError("Failed to fetch comparison details.");
         }

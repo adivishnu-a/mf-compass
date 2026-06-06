@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { funds } from "@drizzle/schema";
 import Fuse from "fuse.js";
 
 // Cache the search universe in-memory to keep response times under 5ms
