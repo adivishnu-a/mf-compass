@@ -1,0 +1,48 @@
+name: Daily Incremental Sync (J-001)
+
+on:
+  schedule:
+    # 11:00 IST (05:30 UTC) Tuesday through Saturday
+    - cron: "30 5 * * 2-6"
+  workflow_dispatch:
+
+jobs:
+  sync:
+    name: Run Daily Sync
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Execute Daily Sync Script
+        run: npm run sync:daily
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NODE_ENV: production
+
+      - name: Upload Sync Summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-daily-summary-${{ github.run_number }}
+          path: summary.json
+          retention-days: 7
+
+      - name: Upload Sync Logs (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-daily-failure-logs-${{ github.run_number }}
+          path: "*.log"
+          retention-days: 7

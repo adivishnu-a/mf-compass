@@ -120,7 +120,6 @@ export function normalizeScores(rawScores: number[]): number[] {
 export function computeSyntheticBenchmark(
   funds: FundReturns[]
 ): CategoryReturns {
-  const periods: (keyof FundReturns)[] = ["returns1w", "returns1y", "returns3y", "returns5y"];
 
   function meanForPeriod(period: keyof FundReturns): number | null {
     const values = funds

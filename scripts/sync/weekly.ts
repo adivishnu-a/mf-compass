@@ -18,6 +18,7 @@
 import * as dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 dotenv.config();
+import * as fs from "fs";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { eq, notInArray, sql } from "drizzle-orm";
@@ -297,6 +298,7 @@ async function main(): Promise<void> {
 
     summary.durationMs = Date.now() - startTime;
     logger.info("Weekly full rebuild complete", summary);
+    fs.writeFileSync("summary.json", JSON.stringify(summary, null, 2));
   } catch (err) {
     summary.durationMs = Date.now() - startTime;
     summary.errors++;
@@ -304,6 +306,7 @@ async function main(): Promise<void> {
       ...summary,
       error: err instanceof Error ? err.message : String(err),
     });
+    fs.writeFileSync("summary.json", JSON.stringify({ ...summary, error: err instanceof Error ? err.message : String(err) }, null, 2));
     process.exit(1);
   }
 }

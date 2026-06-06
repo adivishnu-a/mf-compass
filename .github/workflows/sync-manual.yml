@@ -1,0 +1,94 @@
+name: Manual Database Operations (J-003)
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: "Select database operation to execute"
+        required: true
+        default: "test"
+        type: choice
+        options:
+          - test
+          - daily
+          - weekly
+          - flush
+      confirmation:
+        description: "Type 'FLUSH' to confirm database truncation (required for flush operation)"
+        required: false
+        type: string
+        default: ""
+
+jobs:
+  run-operation:
+    name: Run Database Operation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      # 1. Test operation
+      - name: Run connection and health check (test)
+        if: ${{ github.event.inputs.operation == 'test' }}
+        run: npm run sync:test
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NODE_ENV: production
+
+      # 2. Daily operation
+      - name: Run daily incremental sync
+        if: ${{ github.event.inputs.operation == 'daily' }}
+        run: npm run sync:daily
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NODE_ENV: production
+
+      # 3. Weekly operation
+      - name: Run weekly full rebuild
+        if: ${{ github.event.inputs.operation == 'weekly' }}
+        run: npm run sync:weekly
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NODE_ENV: production
+
+      # 4. Flush operation (requires confirmation check)
+      - name: Validate Flush Confirmation
+        if: ${{ github.event.inputs.operation == 'flush' && github.event.inputs.confirmation != 'FLUSH' }}
+        run: |
+          echo "ERROR: Flush operation requires confirmation. Please set confirmation to 'FLUSH'."
+          exit 1
+
+      - name: Run database flush (flush)
+        if: ${{ github.event.inputs.operation == 'flush' && github.event.inputs.confirmation == 'FLUSH' }}
+        run: npm run sync:flush
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          CONFIRM_FLUSH: "FLUSH"
+          NODE_ENV: production
+
+      - name: Upload Sync Summary
+        if: ${{ always() && (github.event.inputs.operation == 'daily' || github.event.inputs.operation == 'weekly') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: manual-sync-summary-${{ github.event.inputs.operation }}-${{ github.run_number }}
+          path: summary.json
+          retention-days: 7
+
+      - name: Upload Failure Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: manual-op-failure-logs-${{ github.event.inputs.operation }}-${{ github.run_number }}
+          path: "*.log"
+          retention-days: 7
