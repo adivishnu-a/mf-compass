@@ -4,7 +4,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { funds, categoryAverages } from "@drizzle/schema";
 import { eq } from "drizzle-orm";
-import { formatPercent, formatINR, formatAUM, formatNAV } from "@/lib/format";
+import { formatPercent, formatINR, formatAUM, formatNAV, isReturnGenuine } from "@/lib/format";
 import { FundDetailActions } from "@/components/funds/FundDetailActions";
 import { ArrowLeft, Calendar, Activity, Star } from "lucide-react";
 import { AmcLogo } from "@/components/ui/AmcLogo";
@@ -145,6 +145,26 @@ export default async function FundDetailPage({ params }: PageProps) {
 
           const outperformance = (fundReturn !== null && catReturn !== null) ? (fundReturn - catReturn) : null;
 
+          const displayKeyMap: Record<string, "1d" | "1w" | "1y" | "3y" | "5y"> = {
+            returns1d: "1d",
+            returns1w: "1w",
+            returns1y: "1y",
+            returns3y: "3y",
+            returns5y: "5y",
+          };
+          const periodCode = displayKeyMap[period.key];
+          const isGenuine = periodCode
+            ? isReturnGenuine(fundReturn, periodCode, {
+                returns1d: fund.returns1d,
+                returns1w: fund.returns1w,
+                returns1y: fund.returns1y,
+                returns3y: fund.returns3y,
+                returns5y: fund.returns5y,
+              })
+            : fundReturn !== null;
+
+          const displayValue = isGenuine ? formatPercent(fundReturn, true, true) : "--";
+
           return (
             <div key={period.key} className="rounded-xl border border-border bg-card p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
               <div>
@@ -152,7 +172,7 @@ export default async function FundDetailPage({ params }: PageProps) {
                   {period.label}
                 </span>
                 <div className="mt-2 font-data font-extrabold text-lg text-foreground">
-                  {formatPercent(fundReturn, true)}
+                  {displayValue}
                 </div>
               </div>
 

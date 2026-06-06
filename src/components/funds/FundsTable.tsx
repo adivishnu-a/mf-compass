@@ -6,7 +6,7 @@ import { ArrowUpDown, ArrowUp, ArrowDown, Heart, GitCompare } from "lucide-react
 import { AmcLogo } from "@/components/ui/AmcLogo";
 import { useWatchlist } from "@/hooks/useWatchlist";
 import { useCompare } from "@/hooks/useCompare";
-import { formatPercent, formatAUM } from "@/lib/format";
+import { formatPercent, formatAUM, isReturnGenuine } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 interface Fund {
@@ -135,10 +135,17 @@ export function FundsTable({ funds }: FundsTableProps) {
     });
   }, [funds, sortField, sortOrder]);
 
-  const renderReturnCell = (val: string | null) => {
+  const renderReturnCell = (
+    val: string | null,
+    period: "1d" | "1w" | "1y" | "3y" | "5y",
+    fund: Fund
+  ) => {
     if (val === null || val === undefined) return <span className="text-muted-foreground/40 font-data">--</span>;
     const num = parseFloat(val);
-    if (isNaN(num) || num === 0) return <span className="text-muted-foreground/40 font-data">--</span>;
+    if (isNaN(num)) return <span className="text-muted-foreground/40 font-data">--</span>;
+
+    const genuine = isReturnGenuine(val, period, fund);
+    if (!genuine) return <span className="text-muted-foreground/40 font-data">--</span>;
 
     return (
       <span
@@ -151,7 +158,7 @@ export function FundsTable({ funds }: FundsTableProps) {
               : "text-muted-foreground"
         )}
       >
-        {formatPercent(num)}
+        {formatPercent(num, true, true)}
       </span>
     );
   };
@@ -266,11 +273,11 @@ export function FundsTable({ funds }: FundsTableProps) {
                   </td>
 
                   {/* Returns */}
-                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns1d)}</td>
-                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns1w)}</td>
-                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns1y)}</td>
-                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns3y)}</td>
-                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns5y)}</td>
+                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns1d, "1d", fund)}</td>
+                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns1w, "1w", fund)}</td>
+                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns1y, "1y", fund)}</td>
+                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns3y, "3y", fund)}</td>
+                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns5y, "5y", fund)}</td>
 
                   {/* Compare Checkbox */}
                   <td className="px-2 py-3 text-center">
@@ -352,15 +359,15 @@ export function FundsTable({ funds }: FundsTableProps) {
               <div className="grid grid-cols-3 gap-2 mt-4 text-center bg-muted/20 rounded-lg p-2">
                 <div>
                   <span className="text-[9px] font-semibold text-muted-foreground block uppercase">1D</span>
-                  <div className="mt-1">{renderReturnCell(fund.returns1d)}</div>
+                  <div className="mt-1">{renderReturnCell(fund.returns1d, "1d", fund)}</div>
                 </div>
                 <div>
                   <span className="text-[9px] font-semibold text-muted-foreground block uppercase">1Y</span>
-                  <div className="mt-1">{renderReturnCell(fund.returns1y)}</div>
+                  <div className="mt-1">{renderReturnCell(fund.returns1y, "1y", fund)}</div>
                 </div>
                 <div>
                   <span className="text-[9px] font-semibold text-muted-foreground block uppercase">3Y</span>
-                  <div className="mt-1">{renderReturnCell(fund.returns3y)}</div>
+                  <div className="mt-1">{renderReturnCell(fund.returns3y, "3y", fund)}</div>
                 </div>
               </div>
 

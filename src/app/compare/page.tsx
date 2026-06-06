@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { GitCompare, Trash2, ArrowLeft, ShieldAlert } from "lucide-react";
-import { formatPercent, formatINR, formatAUM } from "@/lib/format";
+import { formatPercent, formatINR, formatAUM, isReturnGenuine } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 interface Fund {
@@ -178,7 +178,7 @@ function CompareContent() {
   const renderCompareRow = (
     label: string,
     getValue: (fund: Fund) => string | number | null,
-    formatValue: (val: any) => React.ReactNode,
+    formatValue: (val: any, fund: Fund) => React.ReactNode,
     lowerIsBetter = false,
     isNumeric = true
   ) => {
@@ -206,7 +206,7 @@ function CompareContent() {
                 getHighlightClass(cellType)
               )}
             >
-              {formatValue(raw)}
+              {formatValue(raw, fund)}
             </td>
           );
         })}
@@ -380,27 +380,27 @@ function CompareContent() {
               {renderCompareRow(
                 "1D Return",
                 (f) => f.returns1d,
-                (v) => formatPercent(v)
+                (v, f) => isReturnGenuine(v, "1d", f) ? formatPercent(v, true, true) : "--"
               )}
               {renderCompareRow(
                 "1W Return",
                 (f) => f.returns1w,
-                (v) => formatPercent(v)
+                (v, f) => isReturnGenuine(v, "1w", f) ? formatPercent(v, true, true) : "--"
               )}
               {renderCompareRow(
                 "1Y Return",
                 (f) => f.returns1y,
-                (v) => formatPercent(v)
+                (v, f) => isReturnGenuine(v, "1y", f) ? formatPercent(v, true, true) : "--"
               )}
               {renderCompareRow(
                 "3Y Return",
                 (f) => f.returns3y,
-                (v) => formatPercent(v)
+                (v, f) => isReturnGenuine(v, "3y", f) ? formatPercent(v, true, true) : "--"
               )}
               {renderCompareRow(
                 "5Y Return",
                 (f) => f.returns5y,
-                (v) => formatPercent(v)
+                (v, f) => isReturnGenuine(v, "5y", f) ? formatPercent(v, true, true) : "--"
               )}
               {renderCompareRow(
                 "Inception Return",
