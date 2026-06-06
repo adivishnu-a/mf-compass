@@ -24,18 +24,7 @@ export default function Home() {
         <div className="mx-auto max-w-6xl relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center px-4 sm:px-6">
           {/* Left Column: Text & CTAs */}
           <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
-            {/* Logo */}
-            <div className="mt-2">
-              <img 
-                src="/logo-96.png" 
-                alt="MF Compass Logo" 
-                width={64} 
-                height={64} 
-                className="h-16 w-16 object-contain"
-              />
-            </div>
-            
-            <h1 className="mt-6 font-heading text-4xl font-extrabold tracking-tight text-foreground sm:text-6xl leading-[1.15]">
+            <h1 className="mt-2 font-heading text-4xl font-extrabold tracking-tight text-foreground sm:text-6xl leading-[1.15]">
               Discover Indian Mutual Funds <br className="hidden sm:inline" />
               that <span className="text-primary">Truly Outperform</span>
             </h1>
@@ -271,6 +260,33 @@ export default function Home() {
                 Regular plans with commission loads are excluded. We show only Direct Growth plans to evaluate compounding potential cleanly.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Bottom CTA Banner */}
+      <section className="w-full bg-background px-4 pb-20 sm:px-6">
+        <div className="mx-auto max-w-6xl relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary to-primary-container p-8 sm:p-12 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 group">
+          {/* Subtle background circles for depth */}
+          <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-white/10 blur-2xl pointer-events-none group-hover:scale-110 transition-transform duration-700" />
+          <div className="absolute -left-16 -bottom-16 w-48 h-48 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none" />
+
+          <div className="text-center md:text-left relative z-10">
+            <h2 className="font-heading text-2xl font-extrabold sm:text-3xl text-primary-foreground tracking-tight">
+              Ready to optimize your portfolio?
+            </h2>
+            <p className="mt-2 max-w-xl text-sm sm:text-base text-primary-foreground/90 leading-relaxed">
+              Explore the complete outperformance database and compare funds with institutional-grade relative metrics. 100% free.
+            </p>
+          </div>
+
+          <div className="relative z-10 w-full md:w-auto flex-shrink-0">
+            <Link
+              href="/funds"
+              className="inline-block w-full md:w-auto rounded-lg bg-background text-primary px-8 py-3.5 text-sm font-extrabold shadow-md transition-all hover:bg-background/95 text-center active:scale-[0.98]"
+            >
+              Get Started Free
+            </Link>
           </div>
         </div>
       </section>
