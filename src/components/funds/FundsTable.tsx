@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { ArrowUpDown, ArrowUp, ArrowDown, Heart, GitCompare } from "lucide-react";
+import { AmcLogo } from "@/components/ui/AmcLogo";
 import { useWatchlist } from "@/hooks/useWatchlist";
 import { useCompare } from "@/hooks/useCompare";
 import { formatPercent, formatAUM } from "@/lib/format";
@@ -133,8 +134,6 @@ export function FundsTable({ funds }: FundsTableProps) {
       return 0;
     });
   }, [funds, sortField, sortOrder]);
-
-import { AmcLogo } from "@/components/ui/AmcLogo";
 
   const renderReturnCell = (val: string | null) => {
     if (val === null || val === undefined) return <span className="text-muted-foreground/40 font-data">--</span>;

@@ -17,9 +17,6 @@ interface PageProps {
   params: Promise<{ code: string }>;
 }
 
-  return null;
-}
-
 function parseFundManagers(managers: any): string[] {
   if (!managers) return [];
   if (Array.isArray(managers)) return managers.map(String);
