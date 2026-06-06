@@ -22,12 +22,8 @@ export default function Home() {
         />
         
         <div className="mx-auto max-w-4xl text-center relative z-10 flex flex-col items-center">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary tracking-wide uppercase">
-            <Award className="h-3.5 w-3.5" /> Relative Alpha Leaderboard
-          </div>
-          
           {/* Centered Logo */}
-          <div className="mt-8">
+          <div className="mt-2">
             <img 
               src="/logo-96.png" 
               alt="MF Compass Logo" 
