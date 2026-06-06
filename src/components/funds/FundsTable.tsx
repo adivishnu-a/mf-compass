@@ -277,10 +277,10 @@ export function FundsTable({ funds }: FundsTableProps) {
                     <button
                       onClick={() => toggleCompare(fund.kuveraCode, fund.shortName || fund.schemeName)}
                       className={cn(
-                        "inline-flex h-4 w-4 items-center justify-center rounded-md border transition-all hover:border-primary",
+                        "inline-flex h-4 w-4 items-center justify-center rounded-full border transition-all hover:border-primary",
                         isCompareChecked 
                           ? "border-primary bg-primary text-primary-foreground" 
-                          : "border-border bg-transparent text-transparent"
+                          : "border-muted-foreground/40 bg-transparent text-transparent"
                       )}
                       aria-label={`Compare ${fund.schemeName}`}
                     >
