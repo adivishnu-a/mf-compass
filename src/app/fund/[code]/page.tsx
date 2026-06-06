@@ -4,9 +4,10 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { funds, categoryAverages } from "@drizzle/schema";
 import { eq } from "drizzle-orm";
-import { formatPercent, formatINR, formatAUM } from "@/lib/format";
+import { formatPercent, formatINR, formatAUM, formatNAV } from "@/lib/format";
 import { FundDetailActions } from "@/components/funds/FundDetailActions";
 import { ArrowLeft, Calendar, Activity, Star } from "lucide-react";
+import { AmcLogo } from "@/components/ui/AmcLogo";
 import { cn } from "@/lib/utils";
 
 // ISR caching: revalidate every 5 minutes
@@ -16,27 +17,7 @@ interface PageProps {
   params: Promise<{ code: string }>;
 }
 
-function getAmcInitials(name: string | null) {
-  if (!name) return "MF";
-  const clean = name.replace(/mutual\s+fund/i, "").trim();
-  const words = clean.split(/\s+/).filter(Boolean);
-  if (words.length >= 2) {
-    return (words[0][0] + words[1][0]).toUpperCase();
-  }
-  return clean.slice(0, 2).toUpperCase();
-}
-
-function getAmcColorClass(name: string | null) {
-  if (!name) return "bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300";
-  const hash = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const colors = [
-    "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/50 dark:border-amber-900/40",
-    "bg-teal-100 text-teal-800 dark:bg-teal-950/40 dark:text-teal-300 border border-teal-200/50 dark:border-teal-900/40",
-    "bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200/50 dark:border-blue-900/40",
-    "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-900/40",
-    "bg-orange-100 text-orange-800 dark:bg-orange-950/40 dark:text-orange-300 border border-orange-200/50 dark:border-orange-900/40",
-  ];
-  return colors[hash % colors.length];
+  return null;
 }
 
 function parseFundManagers(managers: any): string[] {
@@ -96,13 +77,8 @@ export default async function FundDetailPage({ params }: PageProps) {
       <div className="rounded-xl border border-border bg-card p-6 shadow-sm animate-in fade-in duration-200">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
           <div className="flex items-start gap-4">
-            <div className={cn(
-              "flex h-14 w-14 items-center justify-center rounded-xl font-heading text-lg font-bold shadow-sm shrink-0",
-              getAmcColorClass(fund.fundHouseName)
-            )}>
-              {getAmcInitials(fund.fundHouseName)}
-            </div>
-            <div>
+            <AmcLogo fundHouse={fund.fundHouse} fundHouseName={fund.fundHouseName} size="lg" className="mt-1 hidden sm:flex" />
+            <div className="flex-1">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wide">
                 {fund.fundCategory} • {fund.fundType}
               </span>
@@ -137,7 +113,7 @@ export default async function FundDetailPage({ params }: PageProps) {
             <div className="text-left sm:text-right">
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">NAV</span>
               <span className="font-data font-bold text-lg text-foreground">
-                {formatINR(fund.currentNav)}
+                {formatNAV(fund.currentNav)}
               </span>
               <span className="text-[9px] text-muted-foreground block mt-0.5 font-data">
                 As of {fund.currentNavDate ? new Date(fund.currentNavDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "--"}

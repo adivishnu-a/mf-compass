@@ -64,6 +64,23 @@ export function formatINR(value: number | string | null, includeSymbol = true): 
 }
 
 /**
+ * Formats NAV with 2 decimal points in INR format.
+ * Example: 115.2 -> "₹115.20"
+ */
+export function formatNAV(value: number | string | null, includeSymbol = true): string {
+  if (value === null || value === undefined) return "--";
+  const num = typeof value === "string" ? parseFloat(value) : value;
+  if (isNaN(num)) return "--";
+  
+  const formatted = new Intl.NumberFormat("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(num);
+  
+  return includeSymbol ? "₹" + formatted : formatted;
+}
+
+/**
  * Formats AUM in Crores.
  * Example: 1234.56 -> "₹1,234.56 Cr"
  */

@@ -134,28 +134,7 @@ export function FundsTable({ funds }: FundsTableProps) {
     });
   }, [funds, sortField, sortOrder]);
 
-  const getAmcInitials = (name: string | null) => {
-    if (!name) return "MF";
-    const clean = name.replace(/mutual\s+fund/i, "").trim();
-    const words = clean.split(/\s+/).filter(Boolean);
-    if (words.length >= 2) {
-      return (words[0][0] + words[1][0]).toUpperCase();
-    }
-    return clean.slice(0, 2).toUpperCase();
-  };
-
-  const getAmcColorClass = (name: string | null) => {
-    if (!name) return "bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300";
-    const hash = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const colors = [
-      "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/50 dark:border-amber-900/40",
-      "bg-teal-100 text-teal-800 dark:bg-teal-950/40 dark:text-teal-300 border border-teal-200/50 dark:border-teal-900/40",
-      "bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200/50 dark:border-blue-900/40",
-      "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-900/40",
-      "bg-orange-100 text-orange-800 dark:bg-orange-950/40 dark:text-orange-300 border border-orange-200/50 dark:border-orange-900/40",
-    ];
-    return colors[hash % colors.length];
-  };
+import { AmcLogo } from "@/components/ui/AmcLogo";
 
   const renderReturnCell = (val: string | null) => {
     if (val === null || val === undefined) return <span className="text-muted-foreground/40 font-data">--</span>;
@@ -265,12 +244,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                   {/* Fund Name & House */}
                   <td className="px-2 py-3">
                     <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg font-heading text-xs font-bold shadow-sm",
-                        getAmcColorClass(fund.fundHouseName)
-                      )}>
-                        {getAmcInitials(fund.fundHouseName)}
-                      </div>
+                      <AmcLogo fundHouse={fund.fundHouse} fundHouseName={fund.fundHouseName} size="md" />
                       <div className="flex flex-col truncate max-w-[280px] lg:max-w-[400px]">
                         <Link 
                           href={`/fund/${fund.kuveraCode}`}
@@ -355,12 +329,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                   <span className="font-data font-bold text-muted-foreground text-sm">
                     #{rank}
                   </span>
-                  <div className={cn(
-                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-heading text-[10px] font-bold",
-                    getAmcColorClass(fund.fundHouseName)
-                  )}>
-                    {getAmcInitials(fund.fundHouseName)}
-                  </div>
+                  <AmcLogo fundHouse={fund.fundHouse} fundHouseName={fund.fundHouseName} size="sm" />
                   <div className="min-w-0">
                     <Link 
                       href={`/fund/${fund.kuveraCode}`}
