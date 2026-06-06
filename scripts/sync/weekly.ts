@@ -28,7 +28,7 @@ import { fetchFundList, fetchFundDetailsBatched, fetchCategoryAverages } from "@
 import type { FundDetail } from "@scripts/sync/kuvera/schemas";
 import { discoverAllFunds } from "@scripts/sync/pipeline/discovery";
 import { filterFunds } from "@scripts/sync/pipeline/filter";
-import { transformFundDetail } from "@scripts/sync/pipeline/transform";
+import { transformFundDetail, cleanReturns } from "@scripts/sync/pipeline/transform";
 import { computeRawScore, normalizeScores, computeSyntheticBenchmark } from "@/lib/scoring";
 import { FUND_CATEGORIES, SYNTHETIC_BENCHMARK_CATEGORY } from "@/lib/kuvera/categories";
 import { logger } from "@scripts/sync/shared/logger";
@@ -126,16 +126,12 @@ async function main(): Promise<void> {
 
     if (multiAssetFunds.length > 0) {
       const fundReturns = multiAssetFunds.map((f: FundDetail) => {
-        const r1w = f.returns?.week_1;
-        const r1y = f.returns?.year_1;
-        const r3y = f.returns?.year_3;
-        const r5y = f.returns?.year_5;
-
+        const cleaned = cleanReturns(f.returns);
         return {
-          returns1w: r1w === 0 || r1w === undefined ? null : r1w,
-          returns1y: r1y === 0 || r1y === undefined ? null : r1y,
-          returns3y: r3y === 0 || r3y === undefined ? null : r3y,
-          returns5y: r5y === 0 || r5y === undefined ? null : r5y,
+          returns1w: cleaned.returns1w ? parseFloat(cleaned.returns1w) : null,
+          returns1y: cleaned.returns1y ? parseFloat(cleaned.returns1y) : null,
+          returns3y: cleaned.returns3y ? parseFloat(cleaned.returns3y) : null,
+          returns5y: cleaned.returns5y ? parseFloat(cleaned.returns5y) : null,
         };
       });
 

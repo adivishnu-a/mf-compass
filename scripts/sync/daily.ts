@@ -23,6 +23,7 @@ import * as schema from "@drizzle/schema";
 import { funds, categoryAverages } from "@drizzle/schema";
 import type { NewCategoryAverage } from "@drizzle/schema";
 import { fetchFundDetail, fetchCategoryAverages } from "@scripts/sync/kuvera/client";
+import { cleanReturns } from "@scripts/sync/pipeline/transform";
 import { computeRawScore, normalizeScores, computeSyntheticBenchmark } from "@/lib/scoring";
 import { FUND_CATEGORIES, SYNTHETIC_BENCHMARK_CATEGORY } from "@/lib/kuvera/categories";
 import { logger } from "@scripts/sync/shared/logger";
@@ -34,10 +35,7 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function parseReturn(val: number | null | undefined): string | null {
-  if (val === null || val === undefined || val === 0) return null;
-  return val.toFixed(4);
-}
+
 
 async function main(): Promise<void> {
   const startTime = Date.now();
@@ -126,6 +124,8 @@ async function main(): Promise<void> {
           returns1d = (((currentNav - t1Nav) / t1Nav) * 100).toFixed(4);
         }
 
+        const cleaned = cleanReturns(detail.returns);
+
         try {
           await db
             .update(funds)
@@ -135,11 +135,11 @@ async function main(): Promise<void> {
               t1Nav: t1Nav?.toFixed(5) ?? null,
               t1NavDate: detail.last_nav?.date ?? null,
               returns1d,
-              returns1w: parseReturn(detail.returns?.week_1),
-              returns1y: parseReturn(detail.returns?.year_1),
-              returns3y: parseReturn(detail.returns?.year_3),
-              returns5y: parseReturn(detail.returns?.year_5),
-              returnsInception: parseReturn(detail.returns?.inception),
+              returns1w: cleaned.returns1w,
+              returns1y: cleaned.returns1y,
+              returns3y: cleaned.returns3y,
+              returns5y: cleaned.returns5y,
+              returnsInception: cleaned.returnsInception,
               returnsDate: detail.returns?.date ?? null,
               aum: detail.aum !== null && detail.aum !== undefined
                 ? (detail.aum / 10).toFixed(2)

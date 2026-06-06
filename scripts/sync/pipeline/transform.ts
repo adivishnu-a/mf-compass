@@ -27,9 +27,57 @@ function computeReturns1d(currentNav: number | null, t1Nav: number | null): stri
   return (((currentNav - t1Nav) / t1Nav) * 100).toFixed(4);
 }
 
-function parseReturn(val: number | null | undefined): string | null {
-  if (val === null || val === undefined || val === 0) return null;
-  return val.toFixed(4);
+export function cleanReturns(returns: {
+  week_1?: number | null;
+  year_1?: number | null;
+  year_3?: number | null;
+  year_5?: number | null;
+  inception?: number | null;
+} | null | undefined) {
+  const result = {
+    returns1w: null as string | null,
+    returns1y: null as string | null,
+    returns3y: null as string | null,
+    returns5y: null as string | null,
+    returnsInception: null as string | null,
+  };
+
+  if (!returns) return result;
+
+  const periods = [
+    { key: "returns1w", val: returns.week_1 },
+    { key: "returns1y", val: returns.year_1 },
+    { key: "returns3y", val: returns.year_3 },
+    { key: "returns5y", val: returns.year_5 },
+  ];
+
+  for (let i = 0; i < periods.length; i++) {
+    const current = periods[i];
+    const val = current.val;
+
+    if (val === null || val === undefined) {
+      continue;
+    }
+
+    if (val === 0) {
+      // Treat as missing ONLY if all subsequent historical periods are also zero/missing
+      const hasNonZeroRight = periods.slice(i + 1).some(
+        (p) => p.val !== null && p.val !== undefined && p.val !== 0
+      );
+
+      if (!hasNonZeroRight) {
+        continue;
+      }
+    }
+
+    (result as any)[current.key] = val.toFixed(4);
+  }
+
+  if (returns.inception !== null && returns.inception !== undefined && returns.inception !== 0) {
+    result.returnsInception = returns.inception.toFixed(4);
+  }
+
+  return result;
 }
 
 export function transformFundDetail(detail: FundDetail): NewFund {
@@ -38,6 +86,8 @@ export function transformFundDetail(detail: FundDetail): NewFund {
   const aumCrore = detail.aum !== null && detail.aum !== undefined
     ? (detail.aum / 10).toFixed(2)
     : null;
+
+  const cleaned = cleanReturns(detail.returns);
 
   return {
     kuveraCode: detail.code,
@@ -57,11 +107,11 @@ export function transformFundDetail(detail: FundDetail): NewFund {
     t1Nav: t1Nav?.toFixed(5) ?? null,
     t1NavDate: detail.last_nav?.date ?? null,
     returns1d: computeReturns1d(currentNav, t1Nav),
-    returns1w: parseReturn(detail.returns?.week_1),
-    returns1y: parseReturn(detail.returns?.year_1),
-    returns3y: parseReturn(detail.returns?.year_3),
-    returns5y: parseReturn(detail.returns?.year_5),
-    returnsInception: parseReturn(detail.returns?.inception),
+    returns1w: cleaned.returns1w,
+    returns1y: cleaned.returns1y,
+    returns3y: cleaned.returns3y,
+    returns5y: cleaned.returns5y,
+    returnsInception: cleaned.returnsInception,
     returnsDate: detail.returns?.date ?? null,
     startDate: detail.start_date ?? null,
     expenseRatio: detail.expense_ratio?.toFixed(2) ?? null,
