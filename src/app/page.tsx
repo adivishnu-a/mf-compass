@@ -265,7 +265,7 @@ export default function Home() {
       </section>
 
       {/* Bottom CTA Banner */}
-      <section className="w-full bg-background px-4 pb-16 sm:px-6">
+      <section className="w-full bg-background px-4 py-16 lg:py-24 sm:px-6">
         <div className="mx-auto max-w-6xl">
           <div className="rounded-xl bg-primary px-8 py-10 sm:px-12 sm:py-12 flex flex-col md:flex-row items-center justify-between gap-6 border border-primary/10">
             <div className="text-center md:text-left">
