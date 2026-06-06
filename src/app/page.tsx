@@ -58,7 +58,7 @@ export default function Home() {
           {/* Right Column: Interactive Floating Card Mockup */}
           <div className="lg:col-span-5 flex justify-center w-full relative group">
             {/* Ambient Glow behind the card */}
-            <div className="absolute -inset-1.5 rounded-2xl bg-gradient-to-r from-primary/20 to-emerald-500/20 opacity-40 blur-xl transition duration-1000 group-hover:opacity-60" />
+            <div className="absolute -inset-1.5 rounded-2xl bg-primary/20 opacity-40 blur-xl transition duration-1000 group-hover:opacity-60" />
             
             {/* The Card Surface */}
             <div className="w-full max-w-md relative rounded-2xl border border-border/80 bg-card/70 backdrop-blur-xl p-6 shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:border-primary/40">
@@ -172,8 +172,8 @@ export default function Home() {
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Rank #1 in Category
             </div>
-            <div className="absolute -bottom-3 -left-4 bg-background border border-border shadow-lg rounded-full px-3 py-1 flex items-center gap-1 text-[11px] font-bold text-foreground">
-              🛡️ Direct & Commission-Free
+            <div className="absolute -bottom-3 -left-4 bg-background border border-border shadow-lg rounded-full px-3 py-1 flex items-center gap-1.5 text-[11px] font-bold text-foreground">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" /> Direct & Commission-Free
             </div>
           </div>
         </div>
@@ -210,7 +210,7 @@ export default function Home() {
       </section>
 
       {/* Value Propositions */}
-      <section className="w-full bg-card px-4 py-16 sm:px-6 lg:py-24">
+      <section className="w-full bg-card px-4 pt-16 pb-8 sm:px-6 lg:pt-24 lg:pb-12">
         <div className="mx-auto max-w-6xl">
           <div className="text-center">
             <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -265,7 +265,7 @@ export default function Home() {
       </section>
 
       {/* Bottom CTA Banner */}
-      <section className="w-full bg-background px-4 py-16 lg:py-24 sm:px-6">
+      <section className="w-full bg-background px-4 py-8 lg:py-12 sm:px-6">
         <div className="mx-auto max-w-6xl">
           <div className="rounded-xl bg-primary px-8 py-10 sm:px-12 sm:py-12 flex flex-col md:flex-row items-center justify-between gap-6 border border-primary/10">
             <div className="text-center md:text-left">
