@@ -284,7 +284,7 @@ function FundsExplorerContent() {
       </div>
 
       {/* Filter Options Bar */}
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4 rounded-xl border border-border bg-card p-4 shadow-sm">
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-[auto_1fr_1fr_auto] gap-4 rounded-xl border border-border bg-card p-4 shadow-sm">
         {/* Score Buttons */}
         <div className="flex flex-col">
           <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
