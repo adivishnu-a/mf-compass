@@ -127,7 +127,12 @@ export function transformFundDetail(detail: FundDetail): NewFund {
     fundRatingDate: detail.fund_rating_date ?? null,
     crisilRating: detail.crisil_rating ?? null,
     tags: detail.tags ?? null,
-    comparison: detail.comparison ?? null,
+    comparison: detail.comparison
+      ? detail.comparison.map((peer) => ({
+          ...peer,
+          aum: peer.aum !== null && peer.aum !== undefined ? peer.aum / 10 : peer.aum,
+        }))
+      : null,
     totalScore: null,
     scoreUpdated: null,
   };
