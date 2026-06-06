@@ -150,21 +150,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* SEBI Warning Callout */}
-      <section className="w-full bg-background px-4 py-12 sm:px-6">
-        <div className="mx-auto max-w-3xl rounded-xl border border-border bg-card p-6 text-center shadow-sm">
-          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <ShieldAlert className="h-5 w-5" />
-          </div>
-          <h3 className="mt-4 font-heading font-bold text-sm tracking-wide text-foreground uppercase">
-            Disclaimer & Safety Callout
-          </h3>
-          <p className="mt-2 text-xs text-muted-foreground leading-relaxed max-w-xl mx-auto">
-            Mutual fund investments are subject to market risks. Past outperformance does not guarantee future results. Rankings are mathematical comparisons of past returns and do not represent advisory recommendations.
-          </p>
-        </div>
-      </section>
     </div>
   );
 }

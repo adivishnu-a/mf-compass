@@ -114,7 +114,7 @@ export async function Footer() {
               Mutual Fund investments are subject to market risks, read all scheme related documents carefully. Past performance is not an indicator or guarantee of future returns. 
             </p>
             <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-              MF Compass is an independent research and discovery platform. The scores and rankings shown on this website are mathematically calculated based on historical NAVs relative to category averages, and are intended for educational and discovery purposes only. MF Compass does not provide investment advice, financial planning, brokerage services, or transaction execution. We do not charge fees, collect personal information, or sell user data.
+              MF Compass is a free, independent discovery platform. We are not a SEBI-registered advisor and do not provide investment advice, financial planning, or brokerage services. All rankings are mathematical calculations based on historical NAVs for educational purposes only.
             </p>
           </div>
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
