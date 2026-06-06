@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 export function CompareStickyBar() {
   const router = useRouter();
-  const { compareList, clearCompare } = useCompare();
+  const { compareList, compareNames, clearCompare } = useCompare();
 
   if (compareList.length === 0) return null;
 
@@ -19,18 +19,33 @@ export function CompareStickyBar() {
   };
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-xl z-30 rounded-2xl border border-border bg-card/90 p-4 shadow-2xl backdrop-blur-md transition-all duration-200 animate-in slide-in-from-bottom-6">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-3xl z-30 rounded-2xl border border-border bg-card/90 p-4 shadow-2xl backdrop-blur-md transition-all duration-200 animate-in slide-in-from-bottom-6">
       <div className="flex items-center justify-between gap-4">
         {/* Status Text */}
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary border border-primary/20">
             <GitCompare className="h-4 w-4" />
           </div>
-          <div className="text-xs sm:text-sm font-heading font-medium text-foreground">
-            Compare list <span className="font-data font-bold">({compareList.length}/3)</span>
-            <span className="hidden xs:inline text-muted-foreground ml-1.5 font-normal">
-              — Min 2 funds
-            </span>
+          <div className="flex flex-col">
+            <div className="text-xs sm:text-sm font-heading font-medium text-foreground">
+              Compare list <span className="font-data font-bold">({compareList.length}/3)</span>
+              <span className="hidden xs:inline text-muted-foreground ml-1.5 font-normal">
+                — Min 2 funds
+              </span>
+            </div>
+            
+            <div className="hidden md:flex items-center mt-1 text-[11px] text-muted-foreground max-w-md">
+              {compareList.map((code, index) => (
+                <React.Fragment key={code}>
+                  <span className="truncate max-w-[140px] font-medium text-foreground/80" title={compareNames[code] || code}>
+                    {compareNames[code] || code}
+                  </span>
+                  {index < compareList.length - 1 && (
+                    <span className="px-1.5 text-[9px] font-bold text-muted-foreground/40 uppercase">vs</span>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
           </div>
         </div>
 

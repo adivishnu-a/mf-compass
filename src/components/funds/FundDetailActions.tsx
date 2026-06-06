@@ -8,9 +8,10 @@ import { cn } from "@/lib/utils";
 
 interface FundDetailActionsProps {
   kuveraCode: string;
+  schemeName?: string;
 }
 
-export function FundDetailActions({ kuveraCode }: FundDetailActionsProps) {
+export function FundDetailActions({ kuveraCode, schemeName }: FundDetailActionsProps) {
   const { toggleWatchlist, isWatched } = useWatchlist();
   const { toggleCompare, isComparing } = useCompare();
 
@@ -35,7 +36,7 @@ export function FundDetailActions({ kuveraCode }: FundDetailActionsProps) {
 
       {/* Compare Toggle */}
       <button
-        onClick={() => toggleCompare(kuveraCode)}
+        onClick={() => toggleCompare(kuveraCode, schemeName)}
         className={cn(
           "flex items-center gap-1.5 rounded border px-4 py-2 text-xs font-bold transition-all duration-150 cursor-pointer",
           isCompareChecked
