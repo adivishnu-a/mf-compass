@@ -116,7 +116,7 @@ export function transformFundDetail(detail: FundDetail): NewFund {
     startDate: detail.start_date ?? null,
     expenseRatio: detail.expense_ratio?.toFixed(2) ?? null,
     expenseRatioDate: detail.expense_ratio_date ?? null,
-    fundManagers: parseFundManagers(detail.fund_managers),
+    fundManagers: parseFundManagers(detail.fund_manager),
     investmentObjective: detail.investment_objective ?? null,
     volatility: detail.volatility?.toFixed(4) ?? null,
     portfolioTurnover: detail.portfolio_turnover?.toFixed(4) ?? null,

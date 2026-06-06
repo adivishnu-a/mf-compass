@@ -61,7 +61,7 @@ export const fundDetailSchema = z.object({
   start_date: z.string().optional().nullable(),
   expense_ratio: z.coerce.number().optional().nullable(),
   expense_ratio_date: z.string().optional().nullable(),
-  fund_managers: z.string().optional().nullable(),
+  fund_manager: z.string().optional().nullable(),
   investment_objective: z.string().optional().nullable(),
   volatility: z.coerce.number().optional().nullable(),
   portfolio_turnover: z.coerce.number().optional().nullable(),
