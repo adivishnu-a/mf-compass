@@ -21,51 +21,58 @@ export default function Home() {
              }} 
         />
         
-        <div className="mx-auto max-w-4xl text-center relative z-10 flex flex-col items-center">
-          {/* Centered Logo */}
-          <div className="mt-2">
-            <img 
-              src="/logo-96.png" 
-              alt="MF Compass Logo" 
-              width={64} 
-              height={64} 
-              className="h-16 w-16 object-contain"
-            />
-          </div>
-          
-          <h1 className="mt-6 font-heading text-4xl font-extrabold tracking-tight text-foreground sm:text-6xl leading-[1.15]">
-            Discover Indian Mutual Funds <br className="hidden sm:inline" />
-            that <span className="text-primary">Truly Outperform</span>
-          </h1>
-          
-          <p className="mx-auto mt-6 max-w-2xl text-base sm:text-lg text-muted-foreground leading-relaxed">
-            MF Compass answers one question fast. We rank funds by relative outperformance over category averages (relative alpha) instead of absolute returns. Direct and growth plans only. Refreshed daily.
-          </p>
-
-          {/* Action CTAs */}
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md mx-auto">
-            <Link
-              href="/funds"
-              className="w-full rounded-lg bg-primary px-8 py-3 text-sm font-bold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 text-center"
-            >
-              Explore Rankings
-            </Link>
+        <div className="mx-auto max-w-6xl relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center px-4 sm:px-6">
+          {/* Left Column: Text & CTAs */}
+          <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
+            {/* Logo */}
+            <div className="mt-2">
+              <img 
+                src="/logo-96.png" 
+                alt="MF Compass Logo" 
+                width={64} 
+                height={64} 
+                className="h-16 w-16 object-contain"
+              />
+            </div>
             
-            <button
-              onClick={triggerSearch}
-              className="w-full flex items-center justify-center gap-2 rounded-lg border border-border bg-background/50 px-8 py-3 text-sm font-bold text-foreground transition-all hover:bg-accent"
-            >
-              <Search className="h-4 w-4" /> Search Funds
-            </button>
+            <h1 className="mt-6 font-heading text-4xl font-extrabold tracking-tight text-foreground sm:text-6xl leading-[1.15]">
+              Discover Indian Mutual Funds <br className="hidden sm:inline" />
+              that <span className="text-primary">Truly Outperform</span>
+            </h1>
+            
+            <p className="mt-6 max-w-2xl text-base sm:text-lg text-muted-foreground leading-relaxed">
+              MF Compass answers one question fast. We rank funds by relative outperformance over category averages (relative alpha) instead of absolute returns. Direct and growth plans only. Refreshed daily.
+            </p>
+
+            {/* Action CTAs */}
+            <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full max-w-md">
+              <Link
+                href="/funds"
+                className="w-full rounded-lg bg-primary px-8 py-3 text-sm font-bold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 text-center"
+              >
+                Explore Rankings
+              </Link>
+              
+              <button
+                onClick={triggerSearch}
+                className="w-full flex items-center justify-center gap-2 rounded-lg border border-border bg-background/50 px-8 py-3 text-sm font-bold text-foreground transition-all hover:bg-accent"
+              >
+                <Search className="h-4 w-4" /> Search Funds
+              </button>
+            </div>
+            
+            <div className="mt-6 text-[10px] text-muted-foreground hidden lg:block">
+              Press <kbd className="rounded border border-border bg-muted px-1 font-data">⌘K</kbd> or <kbd className="rounded border border-border bg-muted px-1 font-data">Ctrl+K</kbd> to search from anywhere
+            </div>
           </div>
 
-          {/* Interactive Floating Card Mockup */}
-          <div className="mt-16 w-full max-w-lg relative group">
+          {/* Right Column: Interactive Floating Card Mockup */}
+          <div className="lg:col-span-5 flex justify-center w-full relative group">
             {/* Ambient Glow behind the card */}
             <div className="absolute -inset-1.5 rounded-2xl bg-gradient-to-r from-primary/20 to-emerald-500/20 opacity-40 blur-xl transition duration-1000 group-hover:opacity-60" />
             
             {/* The Card Surface */}
-            <div className="relative rounded-2xl border border-border/80 bg-card/70 backdrop-blur-xl p-6 shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:border-primary/40">
+            <div className="w-full max-w-md relative rounded-2xl border border-border/80 bg-card/70 backdrop-blur-xl p-6 shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:border-primary/40">
               
               {/* Header inside card */}
               <div className="flex items-center justify-between gap-4 border-b border-border/40 pb-4">
@@ -129,7 +136,7 @@ export default function Home() {
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                     Consistency Rating
                   </span>
-                  <div className="flex items-center gap-0.5 mt-1 text-amber-500 text-sm">
+                  <div className="flex items-center gap-0.5 mt-1 text-emerald-500 text-sm">
                     ★ ★ ★ ★ ★
                   </div>
                 </div>
@@ -179,10 +186,6 @@ export default function Home() {
             <div className="absolute -bottom-3 -left-4 bg-background border border-border shadow-lg rounded-full px-3 py-1 flex items-center gap-1 text-[11px] font-bold text-foreground">
               🛡️ Direct & Commission-Free
             </div>
-          </div>
-          
-          <div className="mt-6 text-[10px] text-muted-foreground">
-            Press <kbd className="rounded border border-border bg-muted px-1 font-data">⌘K</kbd> or <kbd className="rounded border border-border bg-muted px-1 font-data">Ctrl+K</kbd> to search from anywhere
           </div>
         </div>
       </section>
