@@ -19,6 +19,7 @@ async function getSearchFunds() {
       id: true,
       kuveraCode: true,
       schemeName: true,
+      shortName: true,
       fundHouseName: true,
       fundCategory: true,
       totalScore: true,

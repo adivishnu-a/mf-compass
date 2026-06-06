@@ -28,6 +28,8 @@ export async function GET(request: NextRequest) {
         id: true,
         kuveraCode: true,
         schemeName: true,
+        shortName: true,
+        smallScreenName: true,
         isin: true,
         fundHouse: true,
         fundHouseName: true,

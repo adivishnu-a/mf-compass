@@ -12,6 +12,8 @@ interface Fund {
   id: number;
   kuveraCode: string;
   schemeName: string;
+  shortName?: string | null;
+  smallScreenName?: string | null;
   isin: string | null;
   fundHouse: string | null;
   fundHouseName: string | null;
@@ -300,7 +302,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                   {/* Compare Checkbox */}
                   <td className="px-2 py-3 text-center">
                     <button
-                      onClick={() => toggleCompare(fund.kuveraCode, fund.schemeName)}
+                      onClick={() => toggleCompare(fund.kuveraCode, fund.shortName || fund.schemeName)}
                       className={cn(
                         "inline-flex h-4 w-4 items-center justify-center rounded-md border transition-all hover:border-primary",
                         isCompareChecked 
@@ -403,7 +405,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                 <div className="flex items-center gap-4">
                   {/* Compare Toggle */}
                   <button
-                    onClick={() => toggleCompare(fund.kuveraCode, fund.schemeName)}
+                    onClick={() => toggleCompare(fund.kuveraCode, fund.shortName || fund.schemeName)}
                     className={cn(
                       "flex items-center gap-1 text-[11px] font-medium transition-colors hover:text-primary",
                       isCompareChecked ? "text-primary" : "text-muted-foreground"

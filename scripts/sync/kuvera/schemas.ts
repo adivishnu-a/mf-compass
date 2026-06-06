@@ -29,6 +29,8 @@ export const fundListResponseSchema = z.array(fundListItemSchema);
 export const fundDetailSchema = z.object({
   code: z.string(),
   name: z.string(),
+  short_name: z.string().optional().nullable(),
+  small_screen_name: z.string().optional().nullable(),
   ISIN: z.string().optional().nullable(),
   fund_house: z.string().optional().nullable(),
   fund_name: z.string().optional().nullable(),

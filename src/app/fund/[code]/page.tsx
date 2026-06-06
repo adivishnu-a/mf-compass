@@ -139,7 +139,7 @@ export default async function FundDetailPage({ params }: PageProps) {
 
         {/* Action Buttons (Watchlist & Compare) */}
         <div className="mt-6 pt-6 border-t border-border/60 flex items-center justify-between gap-4">
-          <FundDetailActions kuveraCode={fund.kuveraCode} />
+          <FundDetailActions kuveraCode={fund.kuveraCode} schemeName={fund.shortName || fund.schemeName} />
           {inflowsPaused && (
             <span className="inline-flex items-center gap-1 rounded bg-rose-500/10 px-2.5 py-1 text-[10px] font-bold text-rose-600 dark:text-rose-400 border border-rose-500/15 uppercase tracking-wide">
               Inflows Paused

@@ -6,6 +6,8 @@ export const funds = pgTable(
     id: serial("id").primaryKey(),
     kuveraCode: text("kuvera_code").unique().notNull(),
     schemeName: text("scheme_name").notNull(),
+    shortName: text("short_name"),
+    smallScreenName: text("small_screen_name"),
     isin: text("isin"),
     fundHouse: text("fund_house"),
     fundHouseName: text("fund_house_name"),

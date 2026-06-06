@@ -92,6 +92,8 @@ export function transformFundDetail(detail: FundDetail): NewFund {
   return {
     kuveraCode: detail.code,
     schemeName: detail.name,
+    shortName: detail.short_name ?? null,
+    smallScreenName: detail.small_screen_name ?? null,
     isin: detail.ISIN ?? null,
     fundHouse: detail.fund_house ?? null,
     fundHouseName: detail.fund_name ?? null,
