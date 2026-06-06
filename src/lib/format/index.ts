@@ -37,10 +37,15 @@ export function formatIST(date: Date | string | null): string {
  * Formats a percentage value with sign.
  * Example: 15.25 -> "+15.25%", -3.4 -> "-3.40%", 0 -> "0.00%"
  */
-export function formatPercent(value: number | string | null, showSign = true): string {
+export function formatPercent(
+  value: number | string | null,
+  showSign = true,
+  allowZero = false
+): string {
   if (value === null || value === undefined) return "--";
   const num = typeof value === "string" ? parseFloat(value) : value;
   if (isNaN(num)) return "--";
+  if (num === 0 && !allowZero) return "--";
   
   const formatted = num.toFixed(2) + "%";
   if (!showSign || num === 0) return formatted;

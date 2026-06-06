@@ -171,7 +171,7 @@ export default async function FundDetailPage({ params }: PageProps) {
                             ? "text-rose-600 dark:text-rose-400" 
                             : "text-muted-foreground"
                       )}>
-                        {formatPercent(outperformance, true)}
+                        {formatPercent(outperformance, true, true)}
                       </span>
                     </div>
                   </>

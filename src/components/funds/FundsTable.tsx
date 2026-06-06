@@ -138,7 +138,7 @@ export function FundsTable({ funds }: FundsTableProps) {
   const renderReturnCell = (val: string | null) => {
     if (val === null || val === undefined) return <span className="text-muted-foreground/40 font-data">--</span>;
     const num = parseFloat(val);
-    if (isNaN(num)) return <span className="text-muted-foreground/40 font-data">--</span>;
+    if (isNaN(num) || num === 0) return <span className="text-muted-foreground/40 font-data">--</span>;
 
     return (
       <span

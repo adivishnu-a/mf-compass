@@ -59,21 +59,10 @@ export function cleanReturns(returns: {
       continue;
     }
 
-    if (val === 0) {
-      // Treat as missing ONLY if all subsequent historical periods are also zero/missing
-      const hasNonZeroRight = periods.slice(i + 1).some(
-        (p) => p.val !== null && p.val !== undefined && p.val !== 0
-      );
-
-      if (!hasNonZeroRight) {
-        continue;
-      }
-    }
-
     (result as any)[current.key] = val.toFixed(4);
   }
 
-  if (returns.inception !== null && returns.inception !== undefined && returns.inception !== 0) {
+  if (returns.inception !== null && returns.inception !== undefined) {
     result.returnsInception = returns.inception.toFixed(4);
   }
 
