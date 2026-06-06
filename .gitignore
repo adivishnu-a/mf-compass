@@ -54,3 +54,4 @@ DESIGN.md
 .claude/
 .cursor/
 .gemini/
+/summary.json
