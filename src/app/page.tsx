@@ -73,7 +73,7 @@ export default function Home() {
                     Alpha Growth Direct-Growth
                   </h3>
                   <p className="text-xs text-muted-foreground">
-                    Quantum Asset Management
+                    Alpha Asset Management
                   </p>
                 </div>
                 
