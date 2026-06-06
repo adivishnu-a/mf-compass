@@ -60,7 +60,7 @@ export function AmcLogo({ fundHouse, fundHouseName, className, size = "md" }: Am
   return (
     <div
       className={cn(
-        "flex shrink-0 items-center justify-center rounded-lg shadow-sm bg-white overflow-hidden p-1 border border-border/40",
+        "flex shrink-0 items-center justify-center rounded-lg shadow-sm overflow-hidden",
         sizeClasses[size],
         className
       )}
@@ -68,7 +68,7 @@ export function AmcLogo({ fundHouse, fundHouseName, className, size = "md" }: Am
       <img
         src={`/logos/amc/${fundHouse}.png`}
         alt={fundHouseName || "AMC Logo"}
-        className="w-full h-full object-contain"
+        className="w-full h-full object-cover"
         onError={() => setHasError(true)}
       />
     </div>
