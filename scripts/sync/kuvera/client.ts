@@ -5,6 +5,7 @@
 
 import {
   fundListResponseSchema,
+  fundListItemRawSchema,
   fundDetailSchema,
   categoryAveragesResponseSchema,
   type FundListItem,
@@ -51,13 +52,49 @@ export async function fetchFundList(): Promise<FundListItem[]> {
   }
 
   const raw = await response.json();
-  const parsed = fundListResponseSchema.safeParse(raw);
+  if (typeof raw !== "object" || raw === null) {
+    throw new Error("Invalid response from fund list API: expected object");
+  }
+
+  const flattened: any[] = [];
+  for (const assetClass of Object.keys(raw)) {
+    const categoriesObj = (raw as Record<string, any>)[assetClass];
+    if (!categoriesObj || typeof categoriesObj !== "object") continue;
+
+    for (const categoryName of Object.keys(categoriesObj)) {
+      const fundHousesObj = categoriesObj[categoryName];
+      if (!fundHousesObj || typeof fundHousesObj !== "object") continue;
+
+      for (const fundHouseName of Object.keys(fundHousesObj)) {
+        const fundsList = fundHousesObj[fundHouseName];
+        if (!Array.isArray(fundsList)) continue;
+
+        for (const rawFund of fundsList) {
+          const parsedFund = fundListItemRawSchema.safeParse(rawFund);
+          if (!parsedFund.success) {
+            continue;
+          }
+
+          const fund = parsedFund.data;
+          flattened.push({
+            code: fund.c,
+            name: fund.n,
+            fund_category: categoryName,
+            fund_house: fundHouseName,
+            re: fund.re,
+          });
+        }
+      }
+    }
+  }
+
+  const parsed = fundListResponseSchema.safeParse(flattened);
 
   if (!parsed.success) {
     throw new Error(`Fund list schema validation failed: ${parsed.error.message}`);
   }
 
-  logger.info("Fund universe fetched", { count: parsed.data.length });
+  logger.info("Fund universe fetched and flattened", { count: parsed.data.length });
   return parsed.data;
 }
 
@@ -73,7 +110,8 @@ export async function fetchFundDetail(code: string): Promise<FundDetail | null> 
     }
 
     const raw = await response.json();
-    const parsed = fundDetailSchema.safeParse(raw);
+    const detailObj = Array.isArray(raw) ? raw[0] : raw;
+    const parsed = fundDetailSchema.safeParse(detailObj);
 
     if (!parsed.success) {
       logger.warn("Fund detail schema validation failed", {

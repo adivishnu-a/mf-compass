@@ -15,7 +15,9 @@
  * Target runtime: under 3 minutes.
  */
 
-import "dotenv/config";
+import * as dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+dotenv.config();
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { eq, notInArray, sql } from "drizzle-orm";
@@ -81,17 +83,17 @@ async function main(): Promise<void> {
 
     // Upsert category averages
     for (const cat of kuveraCategoryAverages) {
-      const matchingCategory = FUND_CATEGORIES.find((c) => c === cat.category);
+      const matchingCategory = FUND_CATEGORIES.find((c) => c === cat.category_name);
       if (!matchingCategory) continue;
 
       const row: NewCategoryAverage = {
-        categoryName: cat.category,
-        reportDate: cat.returns?.date ?? new Date().toISOString().split("T")[0],
-        returns1w: cat.returns?.week_1?.toFixed(4) ?? null,
-        returns1y: cat.returns?.year_1?.toFixed(4) ?? null,
-        returns3y: cat.returns?.year_3?.toFixed(4) ?? null,
-        returns5y: cat.returns?.year_5?.toFixed(4) ?? null,
-        returnsInception: cat.returns?.inception?.toFixed(4) ?? null,
+        categoryName: cat.category_name,
+        reportDate: cat.report_date ?? new Date().toISOString().split("T")[0],
+        returns1w: cat.week_1?.toFixed(4) ?? null,
+        returns1y: cat.year_1?.toFixed(4) ?? null,
+        returns3y: cat.year_3?.toFixed(4) ?? null,
+        returns5y: cat.year_5?.toFixed(4) ?? null,
+        returnsInception: cat.inception?.toFixed(4) ?? null,
         isSynthetic: false,
         sourceCount: null,
       };

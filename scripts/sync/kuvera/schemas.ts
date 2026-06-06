@@ -1,5 +1,16 @@
 import { z } from "zod";
 
+/** Schema for a raw fund entry in the nested list.json response. */
+export const fundListItemRawSchema = z.object({
+  c: z.string(),
+  n: z.string().optional().default(""),
+  re: z.string().optional().default(""),
+  v: z.coerce.number().optional().nullable(),
+  kc: z.string().optional().default(""),
+});
+
+export type FundListItemRaw = z.infer<typeof fundListItemRawSchema>;
+
 /** Schema for a single fund entry in the list.json response. */
 export const fundListItemSchema = z.object({
   code: z.string(),
@@ -64,15 +75,13 @@ export type FundDetail = z.infer<typeof fundDetailSchema>;
 
 /** Schema for a single category in fund_categories.json response. */
 export const categoryAverageItemSchema = z.object({
-  category: z.string(),
-  returns: z.object({
-    week_1: z.coerce.number().optional().nullable(),
-    year_1: z.coerce.number().optional().nullable(),
-    year_3: z.coerce.number().optional().nullable(),
-    year_5: z.coerce.number().optional().nullable(),
-    inception: z.coerce.number().optional().nullable(),
-    date: z.string().optional().nullable(),
-  }).optional().nullable(),
+  category_name: z.string(),
+  report_date: z.string().optional().nullable(),
+  week_1: z.coerce.number().optional().nullable(),
+  year_1: z.coerce.number().optional().nullable(),
+  year_3: z.coerce.number().optional().nullable(),
+  year_5: z.coerce.number().optional().nullable(),
+  inception: z.coerce.number().optional().nullable(),
 });
 
 export type CategoryAverageItem = z.infer<typeof categoryAverageItemSchema>;
