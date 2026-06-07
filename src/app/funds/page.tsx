@@ -189,6 +189,12 @@ function FundsExplorerContent() {
       if (sort === "returns1y_desc") {
         return parseFloat(b.returns1y || "-999999") - parseFloat(a.returns1y || "-999999");
       }
+      if (sort === "returns3y_desc") {
+        return parseFloat(b.returns3y || "-999999") - parseFloat(a.returns3y || "-999999");
+      }
+      if (sort === "returns5y_desc") {
+        return parseFloat(b.returns5y || "-999999") - parseFloat(a.returns5y || "-999999");
+      }
       if (sort === "aum_desc") {
         return parseFloat(b.aum || "0") - parseFloat(a.aum || "0");
       }
@@ -223,6 +229,8 @@ function FundsExplorerContent() {
     { value: "score_desc", label: "Score (High to Low)" },
     { value: "score_asc", label: "Score (Low to High)" },
     { value: "returns1y_desc", label: "1Y Return (High to Low)" },
+    { value: "returns3y_desc", label: "3Y Return (High to Low)" },
+    { value: "returns5y_desc", label: "5Y Return (High to Low)" },
     { value: "aum_desc", label: "Fund AUM (High to Low)" },
   ];
 
@@ -307,7 +315,7 @@ function FundsExplorerContent() {
                     updateUrl({ minScore: score });
                   }}
                   className={cn(
-                    "flex h-7 w-12 items-center justify-center rounded-full border text-xs font-bold font-data transition-all duration-150 select-none",
+                    "flex h-7 w-12 items-center justify-center rounded-lg border text-xs font-bold font-data transition-all duration-150 select-none",
                     isActive
                       ? "border-primary/50 bg-primary/10 text-primary shadow-sm"
                       : "border-border bg-background text-muted-foreground hover:border-muted-foreground/60 hover:text-foreground"
