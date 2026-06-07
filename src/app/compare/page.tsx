@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { GitCompare, Trash2, ArrowLeft, ShieldAlert } from "lucide-react";
-import { formatPercent, formatINR, formatAUM, isReturnGenuine } from "@/lib/format";
+import { formatPercent, formatNAV, formatAUM, isReturnGenuine } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 interface Fund {
@@ -346,7 +346,12 @@ function CompareContent() {
                       </div>
                       
                       <h3 className="text-sm font-extrabold text-foreground truncate w-full mt-1.5 leading-snug">
-                        {fund.schemeName}
+                        <Link 
+                          href={`/fund/${fund.kuveraCode}`}
+                          className="hover:text-primary transition-colors block truncate"
+                        >
+                          {fund.schemeName}
+                        </Link>
                       </h3>
                       
                       <span className="text-[10px] text-muted-foreground font-data mt-1">
@@ -373,7 +378,7 @@ function CompareContent() {
               {renderCompareRow(
                 "Current NAV",
                 (f) => f.currentNav,
-                (v) => formatINR(v),
+                (v) => formatNAV(v),
                 false,
                 true
               )}
