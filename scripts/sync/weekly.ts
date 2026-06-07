@@ -127,7 +127,7 @@ async function main(): Promise<void> {
 
     if (multiAssetFunds.length > 0) {
       const fundReturns = multiAssetFunds.map((f: FundDetail) => {
-        const cleaned = cleanReturns(f.returns);
+        const cleaned = cleanReturns(f.returns, true);
         return {
           returns1w: cleaned.returns1w ? parseFloat(cleaned.returns1w) : null,
           returns1y: cleaned.returns1y ? parseFloat(cleaned.returns1y) : null,

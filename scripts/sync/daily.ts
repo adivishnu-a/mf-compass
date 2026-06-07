@@ -194,12 +194,25 @@ async function main(): Promise<void> {
       .where(eq(funds.fundCategory, SYNTHETIC_BENCHMARK_CATEGORY));
 
     if (multiAssetFunds.length > 0) {
-      const fundReturns = multiAssetFunds.map((f) => ({
-        returns1w: f.returns1w ? parseFloat(f.returns1w) : null,
-        returns1y: f.returns1y ? parseFloat(f.returns1y) : null,
-        returns3y: f.returns3y ? parseFloat(f.returns3y) : null,
-        returns5y: f.returns5y ? parseFloat(f.returns5y) : null,
-      }));
+      const fundReturns = multiAssetFunds.map((f) => {
+        let r1w = f.returns1w ? parseFloat(f.returns1w) : null;
+        let r1y = f.returns1y ? parseFloat(f.returns1y) : null;
+        let r3y = f.returns3y ? parseFloat(f.returns3y) : null;
+        let r5y = f.returns5y ? parseFloat(f.returns5y) : null;
+
+        let hasNonZero = false;
+        if (r5y === 0 && !hasNonZero) r5y = null; else if (r5y !== null && r5y !== 0) hasNonZero = true;
+        if (r3y === 0 && !hasNonZero) r3y = null; else if (r3y !== null && r3y !== 0) hasNonZero = true;
+        if (r1y === 0 && !hasNonZero) r1y = null; else if (r1y !== null && r1y !== 0) hasNonZero = true;
+        if (r1w === 0 && !hasNonZero) r1w = null; else if (r1w !== null && r1w !== 0) hasNonZero = true;
+
+        return {
+          returns1w: r1w,
+          returns1y: r1y,
+          returns3y: r3y,
+          returns5y: r5y,
+        };
+      });
 
       const synthetic = computeSyntheticBenchmark(fundReturns);
 

@@ -33,7 +33,7 @@ export function cleanReturns(returns: {
   year_3?: number | null;
   year_5?: number | null;
   inception?: number | null;
-} | null | undefined) {
+} | null | undefined, stripTrailingZeros: boolean = false) {
   const result = {
     returns1w: null as string | null,
     returns1y: null as string | null,
@@ -51,9 +51,19 @@ export function cleanReturns(returns: {
     { key: "returns5y", val: returns.year_5 },
   ];
 
-  for (let i = 0; i < periods.length; i++) {
+  let hasNonZero = false;
+
+  for (let i = periods.length - 1; i >= 0; i--) {
     const current = periods[i];
-    const val = current.val;
+    let val = current.val;
+
+    if (stripTrailingZeros) {
+      if (val === 0 && !hasNonZero) {
+        val = null;
+      } else if (val !== null && val !== undefined && val !== 0) {
+        hasNonZero = true;
+      }
+    }
 
     if (val === null || val === undefined) {
       continue;
@@ -62,8 +72,13 @@ export function cleanReturns(returns: {
     (result as any)[current.key] = val.toFixed(4);
   }
 
-  if (returns.inception !== null && returns.inception !== undefined) {
-    result.returnsInception = returns.inception.toFixed(4);
+  let inceptionVal = returns.inception;
+  if (stripTrailingZeros && inceptionVal === 0 && !hasNonZero) {
+    inceptionVal = null;
+  }
+
+  if (inceptionVal !== null && inceptionVal !== undefined) {
+    result.returnsInception = inceptionVal.toFixed(4);
   }
 
   return result;
