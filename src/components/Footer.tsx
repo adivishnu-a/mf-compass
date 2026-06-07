@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { funds } from "@drizzle/schema";
 import { sql } from "drizzle-orm";
 import { formatIST } from "@/lib/format";
+import { CompareFooterLink } from "./CompareFooterLink";
 
 async function getLastUpdatedTimestamp(): Promise<string> {
   try {
@@ -91,9 +92,7 @@ export async function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/compare" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Compare Funds
-                </Link>
+                <CompareFooterLink />
               </li>
               <li>
                 <Link href="/watchlist" className="text-muted-foreground hover:text-foreground transition-colors">

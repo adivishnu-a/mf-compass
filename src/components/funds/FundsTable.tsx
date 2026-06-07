@@ -390,7 +390,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                 </div>
 
                 {/* Score */}
-                <span className="inline-flex items-center justify-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary font-data border border-primary/20 shrink-0">
+                <span className="inline-flex items-center justify-center rounded-md bg-primary/10 px-2.5 py-1 text-sm font-extrabold text-primary font-data border border-primary/20 shrink-0">
                   {parseFloat(fund.totalScore || "0").toFixed(1)}
                 </span>
               </div>
