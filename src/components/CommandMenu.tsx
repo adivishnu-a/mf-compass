@@ -30,6 +30,7 @@ export function CommandMenu() {
   
   const modalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   // Load recent searches
   const loadRecentSearches = () => {
@@ -130,6 +131,16 @@ export function CommandMenu() {
     return () => clearTimeout(delayDebounceFn);
   }, [query]);
 
+  // Scroll active item into view inside Command Menu
+  useEffect(() => {
+    if (listRef.current) {
+      const activeEl = listRef.current.querySelector('[data-active="true"]');
+      if (activeEl) {
+        activeEl.scrollIntoView({ block: "nearest" });
+      }
+    }
+  }, [selectedIndex]);
+
   // Keyboard navigation inside modal
   const handleModalKeyDown = (e: React.KeyboardEvent) => {
     const itemsCount = query.trim().length < 2 ? recentSearches.length : results.length;
@@ -189,6 +200,7 @@ export function CommandMenu() {
             placeholder="Search mutual funds (e.g. moti mid)..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleModalKeyDown}
             className="w-full bg-transparent text-sm text-foreground placeholder-muted-foreground focus:outline-none"
             aria-label="Search mutual funds"
           />
@@ -202,7 +214,7 @@ export function CommandMenu() {
         </div>
 
         {/* Results List */}
-        <div className="max-h-[350px] overflow-y-auto p-2">
+        <div ref={listRef} className="max-h-[350px] overflow-y-auto p-2">
           {loading && (
             <div className="flex items-center justify-center py-6 text-sm text-muted-foreground">
               Searching data...
@@ -224,6 +236,7 @@ export function CommandMenu() {
                     <button
                       key={item.kuveraCode}
                       onClick={() => handleSelectFund(item.kuveraCode, item.schemeName)}
+                      data-active={selectedIndex === idx}
                       className={cn(
                         "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition-colors",
                         selectedIndex === idx
@@ -255,6 +268,7 @@ export function CommandMenu() {
                 <button
                   key={fund.kuveraCode}
                   onClick={() => handleSelectFund(fund.kuveraCode, fund.schemeName)}
+                  data-active={selectedIndex === idx}
                   className={cn(
                     "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left transition-colors",
                     selectedIndex === idx

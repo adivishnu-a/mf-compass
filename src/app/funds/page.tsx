@@ -275,15 +275,15 @@ function FundsExplorerContent() {
       </div>
 
       {/* Category Selection Tabs */}
-      <div className="mt-6 overflow-x-auto pb-2 scrollbar-none">
-        <div className="flex gap-2 min-w-max">
+      <div className="mt-6 overflow-x-auto pb-2.5 scrollbar-none">
+        <div className="flex gap-2.5 min-w-max">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => handleCategoryChange(cat)}
               disabled={isPending}
               className={cn(
-                "rounded-full px-4 py-2 text-xs font-semibold border transition-all duration-150 select-none",
+                "rounded-full px-4 sm:px-5 py-2.5 sm:py-2 text-xs font-semibold border transition-all duration-150 select-none cursor-pointer active:scale-[0.98]",
                 activeCategory === cat
                   ? "border-primary/50 bg-primary/10 text-primary"
                   : "border-border bg-card text-muted-foreground hover:border-muted-foreground hover:text-foreground",
@@ -293,6 +293,23 @@ function FundsExplorerContent() {
               {getCategoryShortName(cat)}
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Score Explanation Info Card */}
+      <div className="mt-6 rounded-xl border border-primary/10 bg-primary/[0.02] p-4 text-muted-foreground">
+        <div className="flex items-start gap-3">
+          <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary mt-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div className="flex-1 space-y-1">
+            <h4 className="font-heading text-xs font-bold text-foreground">How Outperformance Score works</h4>
+            <p className="text-xs leading-relaxed text-muted-foreground/90">
+              The score measures a fund's outperformance relative to its category average. It is computed across three return horizons: <span className="font-semibold text-foreground">3Y (40%)</span>, <span className="font-semibold text-foreground">1Y (35%)</span>, and <span className="font-semibold text-foreground">5Y (25%)</span>. To penalize downside volatility, an <span className="font-semibold text-foreground">asymmetric 1.5x penalty</span> is applied to negative returns. Finally, raw scores are normalized within the category to a <span className="font-semibold text-foreground">50 (lowest) to 100 (highest)</span> scale.
+            </p>
+          </div>
         </div>
       </div>
 
