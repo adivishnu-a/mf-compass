@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { FUND_CATEGORIES } from "@/lib/kuvera/categories";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mf-compass.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mf-compass.vercel.app";
 
   // Base routes
   const routes = [
