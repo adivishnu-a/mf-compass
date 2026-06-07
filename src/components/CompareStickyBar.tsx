@@ -65,12 +65,13 @@ export function CompareStickyBar() {
           </button>
           
           <button
+            key={compareList.length >= 2 ? "enabled" : "disabled"}
             onClick={handleCompareClick}
             disabled={compareList.length < 2}
             className={cn(
               "flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-bold transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
               compareList.length >= 2
-                ? "bg-primary text-primary-foreground hover:bg-primary/95 cursor-pointer"
+                ? "bg-primary text-primary-foreground hover:bg-primary/95 cursor-pointer animate-button-pop"
                 : "bg-muted text-muted-foreground/50 border border-border cursor-not-allowed"
             )}
           >

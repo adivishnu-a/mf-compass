@@ -189,7 +189,7 @@ export function CommandMenu() {
       <div
         ref={modalRef}
         onKeyDown={handleModalKeyDown}
-        className="relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-card shadow-2xl animate-in fade-in zoom-in-95 duration-150"
+        className="relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-card shadow-2xl animate-modal-enter"
       >
         {/* Search Input Box */}
         <div className="flex items-center border-b border-border px-4 py-3">
@@ -238,7 +238,7 @@ export function CommandMenu() {
                       onClick={() => handleSelectFund(item.kuveraCode, item.schemeName)}
                       data-active={selectedIndex === idx}
                       className={cn(
-                        "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition-colors animate-in fade-in slide-in-from-top-1 duration-200 select-none cursor-pointer",
+                        "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition-colors animate-item-enter select-none cursor-pointer",
                         selectedIndex === idx
                           ? "bg-accent text-foreground font-medium"
                           : "text-muted-foreground hover:bg-accent/40"
@@ -274,7 +274,7 @@ export function CommandMenu() {
                   onClick={() => handleSelectFund(fund.kuveraCode, fund.schemeName)}
                   data-active={selectedIndex === idx}
                   className={cn(
-                    "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left transition-colors animate-in fade-in slide-in-from-top-1 duration-200 select-none cursor-pointer",
+                    "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left transition-colors animate-item-enter select-none cursor-pointer",
                     selectedIndex === idx
                       ? "bg-accent text-foreground font-medium"
                       : "text-muted-foreground hover:bg-accent/40"

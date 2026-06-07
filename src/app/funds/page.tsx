@@ -468,7 +468,7 @@ function FundsExplorerContent() {
         {loading && <SkeletonTable />}
 
         {!loading && error && (
-          <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-8 text-center animate-in fade-in duration-200">
+          <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-8 text-center animate-fade-in">
             <p className="text-sm text-destructive font-medium">{error}</p>
             <button
               onClick={() => router.refresh()}
@@ -480,7 +480,7 @@ function FundsExplorerContent() {
         )}
 
         {!loading && !error && filteredFunds.length === 0 && (
-          <div className="rounded-xl border border-border bg-card p-12 text-center animate-in fade-in duration-200 shadow-sm">
+          <div className="rounded-xl border border-border bg-card p-12 text-center animate-fade-in shadow-sm">
             <h3 className="font-heading font-bold text-sm text-foreground">No funds match your filters</h3>
             <p className="mt-1 text-xs text-muted-foreground max-w-sm mx-auto">
               Your filter thresholds might be too restrictive. Try resetting filters to view the full leaderboard.
@@ -495,7 +495,10 @@ function FundsExplorerContent() {
         )}
 
         {!loading && !error && filteredFunds.length > 0 && (
-          <div className="animate-in fade-in duration-200">
+          <div
+            key={`${currentGroup}-${activeCategory}-${minScore}-${minRating}-${sort}`}
+            className="animate-fade-in"
+          >
             <FundsTable funds={filteredFunds} />
           </div>
         )}
