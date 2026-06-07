@@ -72,69 +72,80 @@ export default async function FundDetailPage({ params }: PageProps) {
 
       {/* Header Container */}
       <div className="rounded-xl border border-border bg-card p-6 shadow-sm animate-in fade-in duration-200">
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-          <div className="flex items-start gap-4">
-            <AmcLogo fundHouse={fund.fundHouse} fundHouseName={fund.fundHouseName} size="lg" className="mt-1.5 shrink-0 flex" />
-            <div className="space-y-2">
-              <div>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wide">
-                  {fund.fundCategory} • {fund.fundType}
-                </span>
-              </div>
-              <h1 className="font-heading text-xl font-extrabold text-foreground sm:text-2xl leading-tight">
-                {fund.schemeName}
-              </h1>
-              {Array.isArray(fund.tags) && fund.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-0.5">
-                  {fund.tags.map((tag: string) => (
-                    <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary border border-primary/20 uppercase tracking-wide">
-                      {tag.replace(/_/g, " ")}
-                    </span>
-                  ))}
-                </div>
-              )}
-              <p className="text-xs text-muted-foreground pt-0.5">
-                ISIN: <span className="font-data font-semibold text-foreground/80">{fund.isin || "--"}</span>
-                <span className="mx-2 text-border">•</span>
-                Kuvera: <span className="font-data font-semibold text-foreground/80">{fund.kuveraCode}</span>
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-start md:items-end gap-4 shrink-0 md:text-right">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                MFC Score
+        {/* Main info row */}
+        <div className="flex items-start gap-4">
+          <AmcLogo fundHouse={fund.fundHouse} fundHouseName={fund.fundHouseName} size="lg" className="mt-1.5 shrink-0 flex" />
+          <div className="flex-1 min-w-0 space-y-2">
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wide">
+                {fund.fundCategory} • {fund.fundType}
               </span>
+            </div>
+            <h1 className="font-heading text-xl font-extrabold text-foreground sm:text-2xl leading-tight">
+              {fund.schemeName}
+            </h1>
+            {Array.isArray(fund.tags) && fund.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {fund.tags.map((tag: string) => (
+                  <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary border border-primary/20 uppercase tracking-wide">
+                    {tag.replace(/_/g, " ")}
+                  </span>
+                ))}
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              ISIN: <span className="font-data font-semibold text-foreground/80">{fund.isin || "--"}</span>
+              <span className="mx-2 text-border">•</span>
+              Kuvera: <span className="font-data font-semibold text-foreground/80">{fund.kuveraCode}</span>
+            </p>
+          </div>
+          {/* Score + NAV: desktop only – sits beside the content */}
+          <div className="hidden md:flex flex-col items-end gap-3 shrink-0 pl-6 border-l border-border/60">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">MFC Score</span>
               <span className="inline-flex items-center justify-center rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-extrabold text-primary font-data border border-primary/20">
                 {parseFloat(fund.totalScore || "0").toFixed(1)}
               </span>
             </div>
-            
-            <div className="space-y-1">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block text-left md:text-right">NAV</span>
-              <div className="text-left md:text-right">
-                <span className="font-data font-extrabold text-xl text-foreground block leading-none">
-                  {formatNAV(fund.currentNav)}
-                </span>
-                <span className="text-[9px] text-muted-foreground block font-data pt-1">
-                  {fund.currentNavDate ? new Date(fund.currentNavDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "--"}
-                </span>
-              </div>
+            <div className="text-right space-y-0.5">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">NAV</span>
+              <span className="font-data font-extrabold text-xl text-foreground block leading-none">
+                {formatNAV(fund.currentNav)}
+              </span>
+              <span className="text-[9px] text-muted-foreground block font-data">
+                {fund.currentNavDate ? new Date(fund.currentNavDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "--"}
+              </span>
             </div>
           </div>
         </div>
 
+        {/* Score + NAV: mobile only – compact horizontal row */}
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/60 md:hidden">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">MFC Score</span>
+            <span className="inline-flex items-center justify-center rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-extrabold text-primary font-data border border-primary/20">
+              {parseFloat(fund.totalScore || "0").toFixed(1)}
+            </span>
+          </div>
+          <div className="text-right">
+            <div className="flex items-baseline gap-1.5 justify-end">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">NAV</span>
+              <span className="font-data font-extrabold text-lg text-foreground leading-none">{formatNAV(fund.currentNav)}</span>
+            </div>
+            <span className="text-[9px] text-muted-foreground block font-data">
+              {fund.currentNavDate ? new Date(fund.currentNavDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "--"}
+            </span>
+          </div>
+        </div>
+
         {/* Action Buttons (Watchlist & Compare) */}
-        <div className="mt-5 pt-5 border-t border-border/60 flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="mt-4 pt-4 border-t border-border/60 flex items-center justify-end gap-3">
           {inflowsPaused && (
-            <span className="inline-flex items-center gap-1 rounded bg-rose-500/10 px-2.5 py-1 text-[10px] font-bold text-rose-600 dark:text-rose-400 border border-rose-500/15 uppercase tracking-wide self-start sm:self-auto">
+            <span className="inline-flex items-center gap-1 rounded bg-rose-500/10 px-2.5 py-1 text-[10px] font-bold text-rose-600 dark:text-rose-400 border border-rose-500/15 uppercase tracking-wide">
               Inflows Paused
             </span>
           )}
-          <div className="flex items-center gap-2 sm:ml-auto w-full sm:w-auto justify-start sm:justify-end">
-            <FundDetailActions kuveraCode={fund.kuveraCode} schemeName={fund.shortName || fund.schemeName} />
-          </div>
+          <FundDetailActions kuveraCode={fund.kuveraCode} schemeName={fund.shortName || fund.schemeName} />
         </div>
       </div>
 
@@ -353,10 +364,10 @@ export default async function FundDetailPage({ params }: PageProps) {
               <thead>
                 <tr className="border-b border-border bg-muted/40">
                   <th className="pl-6 pr-4 py-3 font-semibold text-muted-foreground">Fund Name</th>
-                  <th className="px-4 py-3 font-semibold text-muted-foreground text-center">1Y</th>
+                  <th className="px-4 py-3 font-semibold text-muted-foreground text-center hidden sm:table-cell">1Y</th>
                   <th className="px-4 py-3 font-semibold text-muted-foreground text-center">3Y</th>
-                  <th className="px-4 py-3 font-semibold text-muted-foreground text-center">Exp. Ratio</th>
-                  <th className="pl-4 pr-6 py-3 font-semibold text-muted-foreground text-center">AUM (Cr)</th>
+                  <th className="px-4 py-3 font-semibold text-muted-foreground text-center hidden sm:table-cell">Exp. Ratio</th>
+                  <th className="pl-4 pr-6 py-3 font-semibold text-muted-foreground text-center hidden sm:table-cell">AUM (Cr)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -370,7 +381,7 @@ export default async function FundDetailPage({ params }: PageProps) {
                         {peer.short_name || peer.name}
                       </Link>
                     </td>
-                    <td className="px-4 py-3 text-center text-xs sm:text-sm">
+                    <td className="px-4 py-3 text-center text-xs sm:text-sm hidden sm:table-cell">
                       <span className={cn(
                         "font-data font-semibold",
                         peer["1y"] > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
@@ -386,10 +397,10 @@ export default async function FundDetailPage({ params }: PageProps) {
                         {peer["3y"] ? formatPercent(peer["3y"]) : "--"}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center font-data text-muted-foreground text-xs sm:text-sm">
+                    <td className="px-4 py-3 text-center font-data text-muted-foreground text-xs sm:text-sm hidden sm:table-cell">
                       {peer.expense_ratio ? `${peer.expense_ratio}%` : "--"}
                     </td>
-                    <td className="pl-4 pr-6 py-3 text-center font-data text-muted-foreground text-xs sm:text-sm">
+                    <td className="pl-4 pr-6 py-3 text-center font-data text-muted-foreground text-xs sm:text-sm hidden sm:table-cell">
                       {formatAUM(peer.aum?.toString() || "0")}
                     </td>
                   </tr>
