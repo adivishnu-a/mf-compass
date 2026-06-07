@@ -182,7 +182,7 @@ export function Navbar() {
 
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-border bg-background animate-in slide-in-from-top duration-200">
+        <div className="md:hidden absolute top-full left-0 right-0 w-full border-b border-border bg-background/95 backdrop-blur-lg shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200">
           <nav className="flex flex-col gap-2 p-4">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
@@ -192,7 +192,7 @@ export function Navbar() {
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
-                    "flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-foreground",
+                    "flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent hover:text-foreground",
                     isActive ? "bg-accent/60 text-foreground font-semibold" : "text-muted-foreground"
                   )}
                 >
