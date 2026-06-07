@@ -339,26 +339,23 @@ export default async function FundDetailPage({ params }: PageProps) {
             <table className="w-full border-collapse text-left text-sm">
               <thead>
                 <tr className="border-b border-border bg-muted/40">
-                  <th className="px-4 py-3 font-semibold text-muted-foreground">Fund Name</th>
-                  <th className="px-4 py-3 font-semibold text-muted-foreground text-center">AUM (Cr)</th>
+                  <th className="pl-6 pr-4 py-3 font-semibold text-muted-foreground">Fund Name</th>
                   <th className="px-4 py-3 font-semibold text-muted-foreground text-center">Exp. Ratio</th>
                   <th className="px-4 py-3 font-semibold text-muted-foreground text-center">1Y</th>
                   <th className="px-4 py-3 font-semibold text-muted-foreground text-center">3Y</th>
+                  <th className="pl-4 pr-6 py-3 font-semibold text-muted-foreground text-center">AUM (Cr)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {fund.comparison.map((peer: any) => (
                   <tr key={peer.code} className="hover:bg-muted/20 transition-colors">
-                    <td className="px-4 py-3">
+                    <td className="pl-6 pr-4 py-3">
                       <Link
                         href={`/fund/${peer.code}`}
                         className="font-heading font-medium text-foreground hover:text-primary transition-colors"
                       >
                         {peer.short_name || peer.name}
                       </Link>
-                    </td>
-                    <td className="px-4 py-3 text-center font-data text-muted-foreground">
-                      {formatAUM(peer.aum?.toString() || "0")}
                     </td>
                     <td className="px-4 py-3 text-center font-data text-muted-foreground">
                       {peer.expense_ratio ? `${peer.expense_ratio}%` : "--"}
@@ -378,6 +375,9 @@ export default async function FundDetailPage({ params }: PageProps) {
                       )}>
                         {peer["3y"] ? formatPercent(peer["3y"]) : "--"}
                       </span>
+                    </td>
+                    <td className="pl-4 pr-6 py-3 text-center font-data text-muted-foreground">
+                      {formatAUM(peer.aum?.toString() || "0")}
                     </td>
                   </tr>
                 ))}
