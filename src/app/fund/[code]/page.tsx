@@ -61,7 +61,7 @@ export default async function FundDetailPage({ params }: PageProps) {
   const inflowsPaused = fund.lumpAvailable === "N" && fund.sipAvailable === "N";
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       {/* Back button */}
       <Link
         href="/funds"
@@ -72,55 +72,57 @@ export default async function FundDetailPage({ params }: PageProps) {
 
       {/* Header Container */}
       <div className="rounded-xl border border-border bg-card p-6 shadow-sm animate-in fade-in duration-200">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="flex items-start gap-4">
-            <AmcLogo fundHouse={fund.fundHouse} fundHouseName={fund.fundHouseName} size="lg" className="mt-1 hidden sm:flex" />
-            <div className="flex-1">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wide">
-                {fund.fundCategory} • {fund.fundType}
-              </span>
-              <h1 className="mt-2 font-heading text-xl font-extrabold text-foreground sm:text-2xl leading-snug">
+            <AmcLogo fundHouse={fund.fundHouse} fundHouseName={fund.fundHouseName} size="lg" className="mt-1 shrink-0 flex" />
+            <div className="space-y-1.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wide">
+                  {fund.fundCategory} • {fund.fundType}
+                </span>
+                {Array.isArray(fund.tags) && fund.tags.length > 0 && fund.tags.map((tag: string) => (
+                  <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary border border-primary/20 uppercase tracking-wide">
+                    {tag.replace(/_/g, " ")}
+                  </span>
+                ))}
+              </div>
+              <h1 className="font-heading text-xl font-extrabold text-foreground sm:text-2xl leading-tight">
                 {fund.schemeName}
               </h1>
-              <p className="text-xs text-muted-foreground mt-1">
-                ISIN: <span className="font-data font-semibold">{fund.isin || "--"}</span> • Kuvera: <span className="font-data font-semibold">{fund.kuveraCode}</span>
+              <p className="text-xs text-muted-foreground">
+                ISIN: <span className="font-data font-semibold text-foreground/85">{fund.isin || "--"}</span>
+                <span className="mx-2 text-border">•</span>
+                Kuvera: <span className="font-data font-semibold text-foreground/85">{fund.kuveraCode}</span>
               </p>
-              {Array.isArray(fund.tags) && fund.tags.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {fund.tags.map((tag: string) => (
-                    <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary border border-primary/20 uppercase tracking-wide">
-                      {tag.replace(/_/g, " ")}
-                    </span>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 
-          <div className="flex flex-col items-start sm:items-end gap-3 shrink-0">
+          <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-4 md:gap-3 shrink-0 pt-4 md:pt-0 border-t md:border-t-0 border-border/60">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                MFC Score:
+                MFC Score
               </span>
-              <span className="inline-flex items-center justify-center rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-extrabold text-primary font-data border border-primary/20">
+              <span className="inline-flex items-center justify-center rounded-lg bg-primary/10 px-2.5 py-1 text-sm font-extrabold text-primary font-data border border-primary/20">
                 {parseFloat(fund.totalScore || "0").toFixed(1)}
               </span>
             </div>
             
-            <div className="text-left sm:text-right">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">NAV</span>
-              <span className="font-data font-bold text-lg text-foreground">
-                {formatNAV(fund.currentNav)}
-              </span>
-              <span className="text-[9px] text-muted-foreground block mt-0.5 font-data">
-                As of {fund.currentNavDate ? new Date(fund.currentNavDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "--"}
-              </span>
+            <div className="text-right flex items-center md:flex-col gap-x-3 gap-y-0.5">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block text-left md:text-right">NAV</span>
+              <div className="text-right">
+                <span className="font-data font-bold text-base md:text-lg text-foreground">
+                  {formatNAV(fund.currentNav)}
+                </span>
+                <span className="text-[9px] text-muted-foreground block font-data">
+                  {fund.currentNavDate ? new Date(fund.currentNavDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "--"}
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Action Buttons (Watchlist & Compare) */}
-        <div className="mt-6 pt-6 border-t border-border/60 flex items-center justify-between gap-4">
+        <div className="mt-5 pt-5 border-t border-border/60 flex items-center justify-between gap-4">
           <FundDetailActions kuveraCode={fund.kuveraCode} schemeName={fund.shortName || fund.schemeName} />
           {inflowsPaused && (
             <span className="inline-flex items-center gap-1 rounded bg-rose-500/10 px-2.5 py-1 text-[10px] font-bold text-rose-600 dark:text-rose-400 border border-rose-500/15 uppercase tracking-wide">
@@ -138,7 +140,7 @@ export default async function FundDetailPage({ params }: PageProps) {
         {returnPeriods.map((period) => {
           const fundReturn = fund[period.key as keyof typeof fund] ? parseFloat(fund[period.key as keyof typeof fund] as string) : null;
           
-          // Category averages don't have 1D or Inception return values (inception varies by fund)
+          // Category averages don't have 1D or Inception return values
           const catReturn = (period.catKey !== "returns1d" && period.catKey !== "returnsInception" && categoryAvg)
             ? (categoryAvg[period.catKey as keyof typeof categoryAvg] ? parseFloat(categoryAvg[period.catKey as keyof typeof categoryAvg] as string) : null)
             : null;
@@ -166,23 +168,26 @@ export default async function FundDetailPage({ params }: PageProps) {
           const displayValue = isGenuine ? formatPercent(fundReturn, true, true) : "--";
 
           return (
-            <div key={period.key} className="rounded-xl border border-border bg-card p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+            <div key={period.key} className="rounded-xl border border-border bg-card p-3.5 flex flex-col justify-between shadow-sm hover:shadow-md transition-all">
               <div>
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                   {period.label}
                 </span>
-                <div className="mt-2 font-data font-extrabold text-lg text-foreground">
+                <div className="mt-1 font-data font-extrabold text-lg text-foreground">
                   {displayValue}
                 </div>
               </div>
 
               {/* Peer average comparison info */}
-              <div className="mt-4 pt-3 border-t border-border/40 text-[10px] text-muted-foreground leading-relaxed">
+              <div className="mt-4 pt-3 border-t border-border/40 text-[10px] text-muted-foreground min-h-[42px] flex flex-col justify-center">
                 {catReturn !== null ? (
-                  <>
-                    <div>Cat. Average: <span className="font-data text-foreground/80">{formatPercent(catReturn, false)}</span></div>
-                    <div className="mt-1">
-                      MFC Alpha:{" "}
+                  <div className="space-y-0.5">
+                    <div className="flex justify-between items-center">
+                      <span>Cat. Average</span>
+                      <span className="font-data text-foreground/80">{formatPercent(catReturn, false)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>MFC Alpha</span>
                       <span className={cn(
                         "font-data font-bold",
                         outperformance! > 0 
@@ -194,9 +199,9 @@ export default async function FundDetailPage({ params }: PageProps) {
                         {formatPercent(outperformance, true, true)}
                       </span>
                     </div>
-                  </>
+                  </div>
                 ) : (
-                  <div className="italic text-muted-foreground/60">No peer benchmark</div>
+                  <div className="italic text-muted-foreground/50 text-center py-1">No peer benchmark</div>
                 )}
               </div>
             </div>
@@ -205,16 +210,18 @@ export default async function FundDetailPage({ params }: PageProps) {
       </div>
 
       {/* Detailed Parameters */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10 items-stretch">
         {/* Left Column: Fund Metadata */}
-        <div className="rounded-xl border border-border bg-card p-6 flex flex-col gap-4 shadow-sm">
+        <div className="rounded-xl border border-border bg-card p-6 flex flex-col gap-5 shadow-sm">
           <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-1.5 border-b border-border/60 pb-2.5">
             <Calendar className="h-4 w-4 text-primary" /> Fund Statistics
           </h3>
-          <div className="grid grid-cols-2 gap-4 text-xs">
+          <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-xs">
             <div>
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Fund House</span>
-              <span className="font-medium text-foreground mt-0.5 block">{fund.fundHouseName || "--"}</span>
+              <span className="font-medium text-foreground mt-0.5 block truncate" title={fund.fundHouseName || ""}>
+                {fund.fundHouseName || "--"}
+              </span>
             </div>
             <div>
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Total AUM</span>
@@ -234,28 +241,28 @@ export default async function FundDetailPage({ params }: PageProps) {
             </div>
           </div>
 
-          <div className="mt-2 text-xs">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Fund Managers</span>
+          <div className="mt-auto pt-4 border-t border-border/40 text-xs">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Fund Managers</span>
             {managers.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5 mt-1">
+              <div className="flex flex-wrap gap-1.5">
                 {managers.map((manager) => (
-                  <span key={manager} className="rounded-full bg-accent px-3 py-1 text-[10px] font-medium text-foreground border border-border/40">
+                  <span key={manager} className="rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-medium text-foreground border border-border/40">
                     {manager}
                   </span>
                 ))}
               </div>
             ) : (
-              <span className="text-muted-foreground italic">No manager details listed</span>
+              <span className="text-muted-foreground italic text-[11px]">No manager details listed</span>
             )}
           </div>
         </div>
 
         {/* Right Column: Risk & Options */}
-        <div className="rounded-xl border border-border bg-card p-6 flex flex-col gap-4 shadow-sm">
+        <div className="rounded-xl border border-border bg-card p-6 flex flex-col gap-5 shadow-sm">
           <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-1.5 border-b border-border/60 pb-2.5">
             <Activity className="h-4 w-4 text-primary" /> Risk & Purchase parameters
           </h3>
-          <div className="grid grid-cols-2 gap-4 text-xs">
+          <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-xs">
             <div>
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">CRISIL Rating</span>
               <span className="font-bold text-foreground mt-0.5 block">
@@ -264,15 +271,15 @@ export default async function FundDetailPage({ params }: PageProps) {
             </div>
             <div>
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Star Rating</span>
-              <div className="flex items-center mt-0.5">
+              <div className="flex items-center mt-0.5 h-4">
                 {fund.fundRating ? (
                   Array.from({ length: 5 }).map((_, i) => (
                     <Star
                       key={i}
                       className={cn(
-                        "h-4 w-4",
+                        "h-3.5 w-3.5",
                         i < fund.fundRating! 
-                          ? "fill-amber-400 text-amber-400" 
+                          ? "fill-foreground text-foreground" 
                           : "fill-muted text-muted"
                       )}
                     />
@@ -294,7 +301,7 @@ export default async function FundDetailPage({ params }: PageProps) {
                 {fund.volatility ? parseFloat(fund.volatility).toFixed(2) : "--"}
               </span>
             </div>
-            <div>
+            <div className="col-span-2">
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Portfolio Turnover</span>
               <span className="font-data font-medium text-foreground mt-0.5 block">
                 {fund.portfolioTurnover ? `${(parseFloat(fund.portfolioTurnover) * 100).toFixed(0)}%` : "--"}
@@ -302,7 +309,7 @@ export default async function FundDetailPage({ params }: PageProps) {
             </div>
           </div>
 
-          <div className="mt-2 pt-2 border-t border-border/40 grid grid-cols-2 gap-4 text-xs">
+          <div className="mt-auto pt-4 border-t border-border/40 grid grid-cols-2 gap-4 text-xs">
             <div>
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Min Lump Sum</span>
               <span className="font-data font-bold text-foreground mt-0.5 block">
@@ -320,7 +327,7 @@ export default async function FundDetailPage({ params }: PageProps) {
       </div>
 
       {/* Investment Objective */}
-      <div className="rounded-xl border border-border bg-card p-6 mt-8 shadow-sm">
+      <div className="rounded-xl border border-border bg-card p-6 mt-10 shadow-sm">
         <h3 className="font-heading font-bold text-sm text-foreground border-b border-border/60 pb-2.5 mb-4">
           Investment Objective
         </h3>
@@ -331,7 +338,7 @@ export default async function FundDetailPage({ params }: PageProps) {
 
       {/* Similar Funds */}
       {Array.isArray(fund.comparison) && fund.comparison.length > 0 && (
-        <div className="mt-8">
+        <div className="mt-10">
           <h2 className="font-heading text-lg font-bold text-foreground mb-4">
             Similar Funds
           </h2>
@@ -352,15 +359,15 @@ export default async function FundDetailPage({ params }: PageProps) {
                     <td className="pl-6 pr-4 py-3">
                       <Link
                         href={`/fund/${peer.code}`}
-                        className="font-heading font-medium text-foreground hover:text-primary transition-colors"
+                        className="font-heading font-medium text-foreground hover:text-primary transition-colors text-xs sm:text-sm"
                       >
                         {peer.short_name || peer.name}
                       </Link>
                     </td>
-                    <td className="px-4 py-3 text-center font-data text-muted-foreground">
+                    <td className="px-4 py-3 text-center font-data text-muted-foreground text-xs sm:text-sm">
                       {peer.expense_ratio ? `${peer.expense_ratio}%` : "--"}
                     </td>
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-4 py-3 text-center text-xs sm:text-sm">
                       <span className={cn(
                         "font-data font-semibold",
                         peer["1y"] > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
@@ -368,7 +375,7 @@ export default async function FundDetailPage({ params }: PageProps) {
                         {peer["1y"] ? formatPercent(peer["1y"]) : "--"}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-4 py-3 text-center text-xs sm:text-sm">
                       <span className={cn(
                         "font-data font-semibold",
                         peer["3y"] > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
@@ -376,7 +383,7 @@ export default async function FundDetailPage({ params }: PageProps) {
                         {peer["3y"] ? formatPercent(peer["3y"]) : "--"}
                       </span>
                     </td>
-                    <td className="pl-4 pr-6 py-3 text-center font-data text-muted-foreground">
+                    <td className="pl-4 pr-6 py-3 text-center font-data text-muted-foreground text-xs sm:text-sm">
                       {formatAUM(peer.aum?.toString() || "0")}
                     </td>
                   </tr>
@@ -386,7 +393,6 @@ export default async function FundDetailPage({ params }: PageProps) {
           </div>
         </div>
       )}
-
     </div>
   );
 }

@@ -32,7 +32,7 @@ export function useCompare() {
 
   const toggleCompare = (code: string, name?: string) => {
     let nextList = [...compareList];
-    let nextNames = { ...compareNames };
+    const nextNames = { ...compareNames };
 
     if (compareList.includes(code)) {
       nextList = nextList.filter((c) => c !== code);
