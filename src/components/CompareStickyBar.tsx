@@ -10,8 +10,6 @@ export function CompareStickyBar() {
   const router = useRouter();
   const { compareList, compareNames, clearCompare } = useCompare();
 
-  if (compareList.length === 0) return null;
-
   const handleCompareClick = () => {
     if (compareList.length >= 2) {
       router.push(`/compare?codes=${compareList.join(",")}`);
@@ -19,7 +17,14 @@ export function CompareStickyBar() {
   };
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 transform-gpu w-[92%] max-w-3xl z-30 rounded-2xl border border-border bg-card/90 p-4 shadow-2xl backdrop-blur-md transition-all duration-200 animate-in slide-in-from-bottom-6">
+    <div 
+      className={cn(
+        "fixed bottom-6 left-1/2 z-30 w-[92%] max-w-3xl rounded-2xl border border-border bg-card/90 p-4 shadow-2xl backdrop-blur-md transition-all duration-300 ease-out transform-gpu -translate-x-1/2",
+        compareList.length === 0
+          ? "translate-y-[calc(100%+24px)] opacity-0 pointer-events-none"
+          : "translate-y-0 opacity-100"
+      )}
+    >
       <div className="flex items-center justify-between gap-4">
         {/* Status Text */}
         <div className="flex items-center gap-2">

@@ -259,13 +259,22 @@ function FundsExplorerContent() {
         </div>
 
         {/* Group Tab Switcher (Equity / Hybrid) */}
-        <div className="inline-flex rounded-xl border border-border bg-card p-1 self-start sm:self-center">
+        <div className="relative inline-flex rounded-xl border border-border bg-card p-1 self-start sm:self-center">
+          {/* Sliding active pill indicator */}
+          <span
+            className={cn(
+              "absolute inset-y-1 rounded-lg bg-primary transition-all duration-200 ease-out shadow-sm",
+              currentGroup === "equity"
+                ? "left-1 right-1/2"
+                : "left-1/2 right-1"
+            )}
+          />
           <button
             onClick={() => handleGroupChange("equity")}
             className={cn(
-              "rounded-lg px-4 py-1.5 text-xs font-bold transition-all",
+              "relative rounded-lg px-4 py-1.5 text-xs font-bold transition-colors duration-200 z-10 select-none cursor-pointer",
               currentGroup === "equity"
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "text-primary-foreground"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -274,9 +283,9 @@ function FundsExplorerContent() {
           <button
             onClick={() => handleGroupChange("hybrid")}
             className={cn(
-              "rounded-lg px-4 py-1.5 text-xs font-bold transition-all",
+              "relative rounded-lg px-4 py-1.5 text-xs font-bold transition-colors duration-200 z-10 select-none cursor-pointer",
               currentGroup === "hybrid"
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "text-primary-foreground"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
