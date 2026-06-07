@@ -39,37 +39,37 @@
 }
 
 .dark {
-  --background: #0b0b0f; /* Premium deep near-black charcoal background */
+  --background: #0f0f13; /* Premium soft dark charcoal background */
   --foreground: #f8fafc;
   
-  --card: #121217; /* Crisp, slightly lighter card background */
+  --card: #16161b; /* Crisp, slightly lighter card background */
   --card-foreground: #f8fafc;
   
-  --popover: #121217;
+  --popover: #16161b;
   --popover-foreground: #f8fafc;
   
   --primary: #3da8ff; /* Vibrant bright blue for dark mode readability */
-  --primary-foreground: #0b0b0f;
+  --primary-foreground: #0f0f13;
   
-  --secondary: #18181c;
+  --secondary: #1b1b21;
   --secondary-foreground: #f8fafc;
   
-  --muted: #18181c;
+  --muted: #1b1b21;
   --muted-foreground: #94a3b8;
   
-  --accent: #1c1c22;
+  --accent: #212129;
   --accent-foreground: #f8fafc;
   
   --destructive: #f87171;
   --destructive-foreground: #ffffff;
   
-  --border: #1d1d24;
-  --input: #1d1d24;
+  --border: #23232b;
+  --input: #23232b;
   --ring: #3da8ff;
   
   --brand: #3da8ff;
   --brand-gilt: #3da8ff;
-  --brand-foreground: #0b0b0f;
+  --brand-foreground: #0f0f13;
 }
 
 @theme {
