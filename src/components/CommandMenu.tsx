@@ -61,18 +61,20 @@ export function CommandMenu() {
     }
   };
 
-  // Listen to keyboard shortcut (Cmd+K or Ctrl+K)
+  // Listen to keyboard shortcut (Cmd+K or Ctrl+K) and Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setOpen((prev) => !prev);
+      } else if (e.key === "Escape" && open) {
+        setOpen(false);
       }
     };
     
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [open]);
 
   // Listen to custom open event
   useEffect(() => {
@@ -187,7 +189,7 @@ export function CommandMenu() {
             placeholder="Search mutual funds (e.g. moti mid)..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full bg-transparent text-sm text-foreground placeholder-muted-foreground focus:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded-sm"
+            className="w-full bg-transparent text-sm text-foreground placeholder-muted-foreground focus:outline-none"
             aria-label="Search mutual funds"
           />
           <button
