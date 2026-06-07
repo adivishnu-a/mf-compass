@@ -180,7 +180,8 @@ function CompareContent() {
     getValue: (fund: Fund) => string | number | null,
     formatValue: (val: any, fund: Fund) => React.ReactNode,
     lowerIsBetter = false,
-    isNumeric = true
+    isNumeric = true,
+    isMonospace = true
   ) => {
     const rowValues = funds.map((f) => {
       const v = getValue(f);
@@ -202,7 +203,8 @@ function CompareContent() {
             <td
               key={fund.kuveraCode}
               className={cn(
-                "p-4 text-center font-data text-xs border-r border-border transition-colors",
+                "p-4 text-center text-xs border-r border-border transition-colors",
+                isMonospace ? "font-data" : "font-sans",
                 getHighlightClass(cellType)
               )}
             >
@@ -467,7 +469,8 @@ function CompareContent() {
                 (f) => f.fundManagers,
                 (v) => parseManagers(v),
                 false,
-                false // not numeric
+                false, // not numeric
+                false // not monospace
               )}
             </tbody>
           </table>
