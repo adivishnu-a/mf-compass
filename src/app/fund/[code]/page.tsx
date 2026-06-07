@@ -269,7 +269,12 @@ export default async function FundDetailPage({ params }: PageProps) {
           <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-xs">
             <div>
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Fund House</span>
-              <span className="font-medium text-foreground mt-0.5 block truncate" title={fund.fundHouseName || ""}>
+              <span className={cn(
+                "mt-0.5 block truncate",
+                fund.fundHouseName 
+                  ? "font-medium text-foreground" 
+                  : "font-sans text-muted-foreground/45"
+              )} title={fund.fundHouseName || ""}>
                 {fund.fundHouseName || "--"}
               </span>
             </div>
@@ -279,13 +284,23 @@ export default async function FundDetailPage({ params }: PageProps) {
             </div>
             <div>
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Launch Date</span>
-              <span className="font-data font-medium text-foreground mt-0.5 block">
+              <span className={cn(
+                "mt-0.5 block",
+                fund.startDate 
+                  ? "font-data font-medium text-foreground" 
+                  : "font-sans text-muted-foreground/45"
+              )}>
                 {fund.startDate ? new Date(fund.startDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "--"}
               </span>
             </div>
             <div>
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Expense Ratio</span>
-              <span className="font-data font-bold text-foreground mt-0.5 block">
+              <span className={cn(
+                "mt-0.5 block",
+                fund.expenseRatio 
+                  ? "font-data font-bold text-foreground" 
+                  : "font-sans text-muted-foreground/45"
+              )}>
                 {fund.expenseRatio ? `${fund.expenseRatio}%` : "--"}
               </span>
             </div>
@@ -315,7 +330,12 @@ export default async function FundDetailPage({ params }: PageProps) {
           <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-xs">
             <div>
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">CRISIL Rating</span>
-              <span className="font-bold text-foreground mt-0.5 block">
+              <span className={cn(
+                "mt-0.5 block font-bold",
+                fund.crisilRating 
+                  ? "text-foreground" 
+                  : "font-sans text-muted-foreground/45"
+              )}>
                 {fund.crisilRating ? `★ ${fund.crisilRating}` : "--"}
               </span>
             </div>
@@ -335,7 +355,7 @@ export default async function FundDetailPage({ params }: PageProps) {
                     />
                   ))
                 ) : (
-                  <span className="font-bold text-foreground">--</span>
+                  <span className="font-sans font-bold text-muted-foreground/45">--</span>
                 )}
               </div>
             </div>
@@ -347,13 +367,23 @@ export default async function FundDetailPage({ params }: PageProps) {
             </div>
             <div>
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Volatility (Std Dev)</span>
-              <span className="font-data font-bold text-foreground mt-0.5 block">
+              <span className={cn(
+                "mt-0.5 block",
+                fund.volatility 
+                  ? "font-data font-bold text-foreground" 
+                  : "font-sans text-muted-foreground/45"
+              )}>
                 {fund.volatility ? parseFloat(fund.volatility).toFixed(2) : "--"}
               </span>
             </div>
             <div className="col-span-2">
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Portfolio Turnover</span>
-              <span className="font-data font-medium text-foreground mt-0.5 block">
+              <span className={cn(
+                "mt-0.5 block",
+                fund.portfolioTurnover 
+                  ? "font-data font-medium text-foreground" 
+                  : "font-sans text-muted-foreground/45"
+              )}>
                 {fund.portfolioTurnover ? `${(parseFloat(fund.portfolioTurnover) * 100).toFixed(0)}%` : "--"}
               </span>
             </div>

@@ -358,7 +358,7 @@ export function FundsTable({ funds }: FundsTableProps) {
       </div>
 
       {/* Mobile Card Layout */}
-      <div className="md:hidden space-y-4">
+      <div className="md:hidden space-y-2.5">
         {sortedFunds.map((fund, index) => {
           const rank = index + 1;
           const isCompareChecked = isComparing(fund.kuveraCode);
@@ -367,7 +367,7 @@ export function FundsTable({ funds }: FundsTableProps) {
           return (
             <div 
               key={fund.id}
-              className="rounded-xl border border-border bg-card p-4 transition-all shadow-sm"
+              className="rounded-xl border border-border bg-card p-3 transition-all shadow-sm"
             >
               {/* Header */}
               <div className="flex items-start justify-between gap-3">
@@ -379,7 +379,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                   <div className="min-w-0">
                     <Link 
                       href={`/fund/${fund.kuveraCode}`}
-                      className="font-heading font-semibold text-sm text-foreground hover:text-primary transition-colors block truncate"
+                      className="font-heading font-semibold text-base text-foreground hover:text-primary transition-colors block truncate"
                     >
                       {fund.shortName || fund.schemeName}
                     </Link>
@@ -396,23 +396,23 @@ export function FundsTable({ funds }: FundsTableProps) {
               </div>
 
               {/* Top 3 returns grid */}
-              <div className="grid grid-cols-3 gap-2 mt-4 text-center bg-muted/20 rounded-lg p-2">
+              <div className="grid grid-cols-3 gap-2 mt-2.5 text-center bg-muted/20 rounded-lg py-1.5 px-2">
                 <div>
                   <span className="text-[9px] font-semibold text-muted-foreground block uppercase">1D</span>
-                  <div className="mt-1">{renderReturnCell(fund.returns1d, "1d", fund)}</div>
+                  <div className="mt-0.5">{renderReturnCell(fund.returns1d, "1d", fund)}</div>
                 </div>
                 <div>
                   <span className="text-[9px] font-semibold text-muted-foreground block uppercase">1Y</span>
-                  <div className="mt-1">{renderReturnCell(fund.returns1y, "1y", fund)}</div>
+                  <div className="mt-0.5">{renderReturnCell(fund.returns1y, "1y", fund)}</div>
                 </div>
                 <div>
                   <span className="text-[9px] font-semibold text-muted-foreground block uppercase">3Y</span>
-                  <div className="mt-1">{renderReturnCell(fund.returns3y, "3y", fund)}</div>
+                  <div className="mt-0.5">{renderReturnCell(fund.returns3y, "3y", fund)}</div>
                 </div>
               </div>
 
               {/* Action bar */}
-              <div className="flex items-center justify-between mt-4 pt-3 border-t border-border/60">
+              <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-border/60">
                 <div className="text-[10px] text-muted-foreground font-data">
                   AUM: {formatAUM(fund.aum)}
                 </div>
