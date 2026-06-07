@@ -7,6 +7,7 @@ import { Footer } from "@/components/Footer";
 import { CommandMenu } from "@/components/CommandMenu";
 import { CompareStickyBar } from "@/components/CompareStickyBar";
 import "./globals.css";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   variable: "--font-sans-default",
@@ -50,6 +51,7 @@ export default function RootLayout({
         <CommandMenu />
         <CompareStickyBar />
         <ToastProvider />
+        <SpeedInsights />
       </body>
     </html>
   );
