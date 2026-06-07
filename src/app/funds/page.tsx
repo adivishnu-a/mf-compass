@@ -286,25 +286,29 @@ function FundsExplorerContent() {
       </div>
 
       {/* Category Selection Tabs */}
-      <div className="mt-6 overflow-x-auto pb-2.5 scrollbar-none">
-        <div className="flex gap-2.5 min-w-max">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => handleCategoryChange(cat)}
-              disabled={isPending}
-              className={cn(
-                "rounded-full px-4 sm:px-5 py-2.5 sm:py-2 text-xs font-semibold border transition-all duration-150 select-none cursor-pointer active:scale-[0.98]",
-                activeCategory === cat
-                  ? "border-primary/50 bg-primary/10 text-primary"
-                  : "border-border bg-card text-muted-foreground hover:border-muted-foreground hover:text-foreground",
-                isPending && activeCategory !== cat && "opacity-60"
-              )}
-            >
-              {getCategoryShortName(cat)}
-            </button>
-          ))}
+      <div className="relative mt-6">
+        <div className="overflow-x-auto pb-2.5 scrollbar-none">
+          <div className="flex gap-2.5 min-w-max pr-8 md:pr-0">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => handleCategoryChange(cat)}
+                disabled={isPending}
+                className={cn(
+                  "rounded-full px-4 sm:px-5 py-2.5 sm:py-2 text-xs font-semibold border transition-all duration-150 select-none cursor-pointer active:scale-[0.98]",
+                  activeCategory === cat
+                    ? "border-primary/50 bg-primary/10 text-primary"
+                    : "border-border bg-card text-muted-foreground hover:border-muted-foreground hover:text-foreground",
+                  isPending && activeCategory !== cat && "opacity-60"
+                )}
+              >
+                {getCategoryShortName(cat)}
+              </button>
+            ))}
+          </div>
         </div>
+        {/* Right-edge subtle fade overlay for mobile scroll signifier */}
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background to-transparent md:hidden" />
       </div>
 
 
