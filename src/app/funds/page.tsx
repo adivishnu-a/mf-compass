@@ -244,15 +244,15 @@ function FundsExplorerContent() {
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-muted-foreground leading-relaxed flex items-center flex-wrap">
             Funds in <span className="font-semibold text-foreground mx-1">{activeCategory}</span> ranked by relative peer-group score.
-            <span className="relative inline-block group ml-1.5 align-middle select-none">
-              <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-muted/60 text-muted-foreground hover:bg-primary/20 hover:text-primary transition-colors cursor-help">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-2.5 h-2.5">
+            <span className="relative hidden md:inline-block group ml-1.5 align-middle select-none">
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-muted/60 text-muted-foreground hover:bg-primary/20 hover:text-primary transition-colors cursor-help">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
                 </svg>
               </span>
               <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 rounded-lg border border-border bg-popover text-[11px] font-normal leading-normal text-popover-foreground shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 pointer-events-none">
                 <span className="font-bold text-foreground block mb-0.5">Outperformance Score</span>
-                Relative score based on returns: <span className="font-semibold text-foreground">3Y (40%)</span>, <span className="font-semibold text-foreground">1Y (35%)</span>, and <span className="font-semibold text-foreground">5Y (25%)</span>, with a <span className="font-semibold text-foreground">1.5x downside penalty</span> on negative returns, normalized from <span className="font-semibold text-foreground">50 to 100</span>.
+                Relative score based on weighted 3Y, 1Y, and 5Y returns, with a downside penalty on negative returns, normalized from <span className="font-semibold text-foreground">50 to 100</span>.
               </span>
             </span>
           </p>
