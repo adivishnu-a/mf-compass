@@ -27,9 +27,9 @@ export async function Footer() {
   return (
     <footer className="w-full border-t border-border bg-card text-card-foreground transition-colors duration-200">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {/* Brand & Mission */}
-          <div className="md:col-span-2">
+          <div className="col-span-2">
             <div className="flex items-center gap-2 mb-4">
               <img 
                 src="/logo-96.png" 
