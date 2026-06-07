@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { funds, categoryAverages } from "@drizzle/schema";
-import { eq } from "drizzle-orm";
+import { eq, and, gt, sql } from "drizzle-orm";
 import { formatPercent, formatINR, formatAUM, formatNAV, isReturnGenuine } from "@/lib/format";
 import { FundDetailActions } from "@/components/funds/FundDetailActions";
 import { ArrowLeft, Calendar, Activity, Star } from "lucide-react";
@@ -47,6 +47,21 @@ export default async function FundDetailPage({ params }: PageProps) {
     where: eq(categoryAverages.categoryName, fund.fundCategory || ""),
   });
 
+  // Calculate the rank of the fund in its category based on totalScore
+  let rank: number | null = null;
+  if (fund.totalScore) {
+    const rankResult = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(funds)
+      .where(
+        and(
+          eq(funds.fundCategory, fund.fundCategory || ""),
+          gt(funds.totalScore, fund.totalScore)
+        )
+      );
+    rank = Number(rankResult[0]?.count || 0) + 1;
+  }
+
   const managers = parseFundManagers(fund.fundManagers);
 
   const returnPeriods = [
@@ -76,10 +91,15 @@ export default async function FundDetailPage({ params }: PageProps) {
         <div className="flex items-start gap-4">
           <AmcLogo fundHouse={fund.fundHouse} fundHouseName={fund.fundHouseName} size="lg" className="mt-1.5 shrink-0 flex" />
           <div className="flex-1 min-w-0 space-y-2">
-            <div>
+            <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wide">
                 {fund.fundCategory} • {fund.fundType}
               </span>
+              {rank !== null && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary border border-primary/20 uppercase tracking-wide">
+                  #{rank}
+                </span>
+              )}
             </div>
             <h1 className="font-heading text-xl font-extrabold text-foreground sm:text-2xl leading-tight">
               {fund.schemeName}
