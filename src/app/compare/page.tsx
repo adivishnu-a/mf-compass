@@ -189,7 +189,7 @@ function CompareContent() {
 
     return (
       <tr className="border-b border-border hover:bg-muted/5 transition-all">
-        <td className="p-4 font-heading font-medium text-xs text-muted-foreground bg-muted/20 uppercase tracking-wide border-r border-border min-w-[150px]">
+        <td className="p-4 font-heading font-medium text-xs text-muted-foreground bg-muted/20 uppercase tracking-wide border-r border-border w-[130px]">
           {label}
         </td>
         {funds.map((fund) => {
@@ -314,11 +314,14 @@ function CompareContent() {
 
       {!loading && !error && funds.length > 0 && (
         <div className="mt-8 overflow-x-auto rounded-xl border border-border bg-card shadow-sm animate-in fade-in duration-200">
-          <table className="w-full border-collapse text-left text-sm table-fixed">
+          <table className={cn(
+            "w-full border-collapse text-left text-sm table-fixed",
+            funds.length === 1 ? "min-w-[400px]" : funds.length === 2 ? "min-w-[600px]" : "min-w-[780px]"
+          )}>
             <thead>
               <tr className="border-b border-border bg-muted/20">
                 {/* Heading spacer */}
-                <th className="p-4 font-heading font-semibold text-muted-foreground w-[180px] border-r border-border">
+                <th className="p-4 font-heading font-semibold text-muted-foreground w-[130px] border-r border-border">
                   Parameters
                 </th>
                 
