@@ -15,6 +15,7 @@ export function Navbar() {
   const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
   const [watchlistCount, setWatchlistCount] = useState(0);
   const [compareCount, setCompareCount] = useState(0);
+  const [compareCodes, setCompareCodes] = useState<string[]>([]);
 
   // Sync counts from localStorage
   const updateCounts = () => {
@@ -24,6 +25,7 @@ export function Navbar() {
       
       const compare = JSON.parse(localStorage.getItem("mfc:compare") || "[]");
       setCompareCount(compare.length);
+      setCompareCodes(compare);
     } catch (e) {
       console.error("Error reading storage counts", e);
     }
@@ -57,13 +59,16 @@ export function Navbar() {
       count: watchlistCount 
     },
     { 
-      href: "/compare", 
+      href: compareCodes.length > 0 ? `/compare?codes=${compareCodes.join(",")}` : "/compare", 
       label: "Compare", 
       icon: GitCompare, 
       count: compareCount,
       countMin: 2 // Only show badge if at least 1 or 2? Let's show always if > 0
     },
   ];
+
+  const isLinkActive = (href: string) => 
+    pathname === href || (href.startsWith("/compare") && pathname === "/compare");
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur-md transition-colors duration-200">
@@ -85,7 +90,7 @@ export function Navbar() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => {
-            const isActive = pathname === link.href;
+            const isActive = isLinkActive(link.href);
             return (
               <Link
                 key={link.href}
@@ -185,7 +190,7 @@ export function Navbar() {
         <div className="md:hidden absolute top-full left-0 right-0 w-full border-b border-border bg-background/95 backdrop-blur-lg shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200">
           <nav className="flex flex-col gap-2 p-4">
             {navLinks.map((link) => {
-              const isActive = pathname === link.href;
+              const isActive = isLinkActive(link.href);
               return (
                 <Link
                   key={link.href}
