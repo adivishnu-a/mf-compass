@@ -22,6 +22,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "MF Compass — Mutual Fund Outperformance Discovery",
   description: "Identify Indian mutual funds that consistently outperform their peers. Zero ads, zero tracking, purely data-driven discovery.",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
