@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, Suspense } from "react";
+import React, { useState, useEffect, useMemo, Suspense, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { RefreshCw, X, ChevronDown } from "lucide-react";
 import { FundsTable } from "@/components/funds/FundsTable";
@@ -45,6 +45,7 @@ interface Fund {
 function FundsExplorerContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
   // URL States
   const currentGroup = (searchParams.get("group") || "equity") as "equity" | "hybrid";
@@ -131,7 +132,9 @@ function FundsExplorerContent() {
         params.set(key, val.toString());
       }
     });
-    router.push(`/funds?${params.toString()}`);
+    startTransition(() => {
+      router.replace(`/funds?${params.toString()}`);
+    });
   };
 
   // Switch Group Tab
@@ -270,11 +273,13 @@ function FundsExplorerContent() {
             <button
               key={cat}
               onClick={() => handleCategoryChange(cat)}
+              disabled={isPending}
               className={cn(
                 "rounded-full px-4 py-2 text-xs font-semibold border transition-all duration-150 select-none",
                 activeCategory === cat
                   ? "border-primary/50 bg-primary/10 text-primary"
-                  : "border-border bg-card text-muted-foreground hover:border-muted-foreground hover:text-foreground"
+                  : "border-border bg-card text-muted-foreground hover:border-muted-foreground hover:text-foreground",
+                isPending && activeCategory !== cat && "opacity-60"
               )}
             >
               {getCategoryShortName(cat)}
