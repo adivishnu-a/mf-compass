@@ -171,7 +171,7 @@ export function CommandMenu() {
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/55 p-4 pt-[10vh] backdrop-blur-sm">
       {/* Click outside to close */}
-      <div className="fixed inset-0" onClick={() => setOpen(false)} />
+      <div className="fixed inset-0" onClick={() => setOpen(false)} aria-hidden="true" tabIndex={-1} />
 
       <div
         ref={modalRef}
@@ -187,11 +187,13 @@ export function CommandMenu() {
             placeholder="Search mutual funds (e.g. moti mid)..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full bg-transparent text-sm text-foreground placeholder-muted-foreground focus:outline-none"
+            className="w-full bg-transparent text-sm text-foreground placeholder-muted-foreground focus:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded-sm"
+            aria-label="Search mutual funds"
           />
           <button
             onClick={() => setOpen(false)}
-            className="text-muted-foreground hover:text-foreground transition-colors p-1"
+            className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            aria-label="Close search"
           >
             <X className="h-4 w-4" />
           </button>

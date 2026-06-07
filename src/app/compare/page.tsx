@@ -295,9 +295,8 @@ function CompareContent() {
       )}
 
       {loading && (
-        <div className="mt-8 flex flex-col items-center justify-center py-20 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary/20 border-t-primary" />
-          <p className="mt-4 text-xs text-muted-foreground">Loading comparison data...</p>
+        <div className="mt-8">
+          <SkeletonCompare />
         </div>
       )}
 
@@ -470,9 +469,29 @@ function CompareContent() {
   );
 }
 
+function SkeletonCompare() {
+  return (
+    <div className="w-full border border-border rounded-xl overflow-hidden bg-card animate-pulse shadow-sm">
+      <div className="h-24 border-b border-border bg-muted/20 w-full" />
+      <div className="divide-y divide-border/60">
+        {[...Array(10)].map((_, i) => (
+          <div key={i} className="flex items-center p-4 gap-4 w-full">
+            <div className="h-4 bg-muted rounded-md w-[120px] shrink-0" />
+            <div className="flex-1 flex justify-around gap-4">
+              <div className="h-4 bg-muted rounded-md w-1/3 max-w-[80px]" />
+              <div className="h-4 bg-muted rounded-md w-1/3 max-w-[80px]" />
+              <div className="h-4 bg-muted rounded-md w-1/3 max-w-[80px]" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function ComparePage() {
   return (
-    <Suspense fallback={<div className="mx-auto max-w-6xl px-4 py-8 text-center text-xs text-muted-foreground">Loading compare workspace...</div>}>
+    <Suspense fallback={<div className="mx-auto max-w-6xl px-4 py-8 text-center"><SkeletonCompare /></div>}>
       <CompareContent />
     </Suspense>
   );

@@ -82,6 +82,18 @@ export function FundsTable({ funds }: FundsTableProps) {
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>(null);
 
+  const getAriaSort = (field: SortField) => {
+    if (sortField !== field) return "none";
+    return sortOrder === "asc" ? "ascending" : sortOrder === "desc" ? "descending" : "none";
+  };
+
+  const handleHeaderKeyDown = (e: React.KeyboardEvent, field: SortField) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleSort(field);
+    }
+  };
+
   // Reset sorting on fund count changes (i.e. category change)
   React.useEffect(() => {
     setSortField(null);
@@ -172,56 +184,84 @@ export function FundsTable({ funds }: FundsTableProps) {
             <tr className="border-b border-border bg-muted/40 transition-colors">
               <th className="pl-6 pr-2 py-3 font-semibold text-muted-foreground w-16 text-center">Rank</th>
               <th 
-                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors"
+                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
                 onClick={() => handleSort("schemeName")}
+                onKeyDown={(e) => handleHeaderKeyDown(e, "schemeName")}
+                tabIndex={0}
+                role="columnheader"
+                aria-sort={getAriaSort("schemeName")}
               >
                 <div className="flex items-center">
                   Mutual Fund <SortIcon field="schemeName" sortField={sortField as SortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
-                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-24"
+                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-24 focus-visible:outline-none focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
                 onClick={() => handleSort("totalScore")}
+                onKeyDown={(e) => handleHeaderKeyDown(e, "totalScore")}
+                tabIndex={0}
+                role="columnheader"
+                aria-sort={getAriaSort("totalScore")}
               >
                 <div className="flex items-center justify-center">
                   Score <SortIcon field="totalScore" sortField={sortField as SortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
-                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16"
+                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16 focus-visible:outline-none focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
                 onClick={() => handleSort("returns1d")}
+                onKeyDown={(e) => handleHeaderKeyDown(e, "returns1d")}
+                tabIndex={0}
+                role="columnheader"
+                aria-sort={getAriaSort("returns1d")}
               >
                 <div className="flex items-center justify-center">
                   1D <SortIcon field="returns1d" sortField={sortField as SortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
-                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16"
+                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16 focus-visible:outline-none focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
                 onClick={() => handleSort("returns1w")}
+                onKeyDown={(e) => handleHeaderKeyDown(e, "returns1w")}
+                tabIndex={0}
+                role="columnheader"
+                aria-sort={getAriaSort("returns1w")}
               >
                 <div className="flex items-center justify-center">
                   1W <SortIcon field="returns1w" sortField={sortField as SortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
-                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16"
+                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16 focus-visible:outline-none focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
                 onClick={() => handleSort("returns1y")}
+                onKeyDown={(e) => handleHeaderKeyDown(e, "returns1y")}
+                tabIndex={0}
+                role="columnheader"
+                aria-sort={getAriaSort("returns1y")}
               >
                 <div className="flex items-center justify-center">
                   1Y <SortIcon field="returns1y" sortField={sortField as SortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
-                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16"
+                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16 focus-visible:outline-none focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
                 onClick={() => handleSort("returns3y")}
+                onKeyDown={(e) => handleHeaderKeyDown(e, "returns3y")}
+                tabIndex={0}
+                role="columnheader"
+                aria-sort={getAriaSort("returns3y")}
               >
                 <div className="flex items-center justify-center">
                   3Y <SortIcon field="returns3y" sortField={sortField as SortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 
-                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16"
+                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16 focus-visible:outline-none focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
                 onClick={() => handleSort("returns5y")}
+                onKeyDown={(e) => handleHeaderKeyDown(e, "returns5y")}
+                tabIndex={0}
+                role="columnheader"
+                aria-sort={getAriaSort("returns5y")}
               >
                 <div className="flex items-center justify-center">
                   5Y <SortIcon field="returns5y" sortField={sortField as SortField} sortOrder={sortOrder} />
@@ -284,7 +324,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                     <button
                       onClick={() => toggleCompare(fund.kuveraCode, fund.shortName || fund.schemeName)}
                       className={cn(
-                        "inline-flex h-4 w-4 items-center justify-center rounded-full border transition-all hover:border-primary",
+                        "inline-flex h-4 w-4 items-center justify-center rounded-full border transition-all hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1",
                         isCompareChecked 
                           ? "border-primary bg-primary text-primary-foreground" 
                           : "border-muted-foreground/40 bg-transparent text-transparent"
@@ -299,7 +339,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                   <td className="pl-2 pr-6 py-3 text-center">
                     <button
                       onClick={() => toggleWatchlist(fund.kuveraCode)}
-                      className="text-muted-foreground/40 hover:text-rose-500 transition-colors focus:outline-none"
+                      className="text-muted-foreground/40 hover:text-rose-500 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 rounded-full p-0.5"
                       aria-label={`Watch ${fund.schemeName}`}
                     >
                       <Heart 
@@ -382,9 +422,10 @@ export function FundsTable({ funds }: FundsTableProps) {
                   <button
                     onClick={() => toggleCompare(fund.kuveraCode, fund.shortName || fund.schemeName)}
                     className={cn(
-                      "flex items-center gap-1 text-[11px] font-medium transition-colors hover:text-primary",
+                      "flex items-center gap-1 text-[11px] font-medium transition-colors hover:text-primary py-3 px-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1",
                       isCompareChecked ? "text-primary" : "text-muted-foreground"
                     )}
+                    aria-label={`Compare ${fund.schemeName}`}
                   >
                     <GitCompare className="h-3.5 w-3.5" />
                     <span>Compare</span>
@@ -393,7 +434,8 @@ export function FundsTable({ funds }: FundsTableProps) {
                   {/* Watch Toggle */}
                   <button
                     onClick={() => toggleWatchlist(fund.kuveraCode)}
-                    className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-rose-500 transition-colors"
+                    className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-rose-500 transition-colors py-3 px-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1"
+                    aria-label={`Watch ${fund.schemeName}`}
                   >
                     <Heart 
                       className={cn(

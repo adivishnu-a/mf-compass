@@ -117,7 +117,7 @@ export function Navbar() {
           {/* Search Trigger */}
           <button
             onClick={triggerSearch}
-            className="flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-all hover:bg-accent hover:text-foreground"
+            className="flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-all hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             aria-label="Search funds"
           >
             <Search className="h-4 w-4" />
@@ -131,7 +131,7 @@ export function Navbar() {
           <div className="relative">
             <button
               onClick={() => setThemeDropdownOpen(!themeDropdownOpen)}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card/50 text-foreground transition-colors hover:bg-accent"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card/50 text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               aria-label="Toggle theme"
             >
               {theme === "light" && <Sun className="h-4 w-4" />}
@@ -154,7 +154,7 @@ export function Navbar() {
                         setThemeDropdownOpen(false);
                       }}
                       className={cn(
-                        "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium capitalize transition-colors hover:bg-accent hover:text-foreground",
+                        "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium capitalize transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                         theme === t ? "text-primary font-bold bg-accent/40" : "text-muted-foreground"
                       )}
                     >
@@ -172,7 +172,7 @@ export function Navbar() {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card/50 text-foreground md:hidden transition-colors hover:bg-accent"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card/50 text-foreground md:hidden transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             aria-label="Toggle mobile menu"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

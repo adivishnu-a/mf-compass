@@ -53,7 +53,7 @@ export function CompareStickyBar() {
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={clearCompare}
-            className="flex items-center gap-1 rounded-lg border border-border bg-transparent px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-all hover:bg-accent hover:text-foreground"
+            className="flex items-center gap-1 rounded-lg border border-border bg-transparent px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-all hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <X className="h-3.5 w-3.5" />
             <span>Clear</span>
@@ -63,7 +63,7 @@ export function CompareStickyBar() {
             onClick={handleCompareClick}
             disabled={compareList.length < 2}
             className={cn(
-              "flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-bold transition-all shadow-sm",
+              "flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-bold transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
               compareList.length >= 2
                 ? "bg-primary text-primary-foreground hover:bg-primary/95 cursor-pointer"
                 : "bg-muted text-muted-foreground/50 border border-border cursor-not-allowed"

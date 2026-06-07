@@ -57,11 +57,9 @@ export default function Home() {
 
           {/* Right Column: Interactive Floating Card Mockup */}
           <div className="lg:col-span-5 flex justify-center w-full relative group">
-            {/* Ambient Glow behind the card */}
-            <div className="absolute -inset-1.5 rounded-2xl bg-primary/20 opacity-40 blur-xl transition duration-1000 group-hover:opacity-60" />
             
             {/* The Card Surface */}
-            <div className="w-full max-w-md relative rounded-2xl border border-border/80 bg-card/70 backdrop-blur-xl p-6 shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:border-primary/40">
+            <div className="w-full max-w-md relative rounded-2xl border border-border/80 bg-card p-6 shadow-sm transition-all duration-500 hover:-translate-y-2 hover:border-primary/40">
               
               {/* Header inside card */}
               <div className="flex items-center justify-between gap-4 border-b border-border/40 pb-4">
@@ -131,38 +129,24 @@ export default function Home() {
                 </div>
               </div>
               
-              {/* Footer: Sparkline / Trend */}
+              {/* Footer: Monospaced Performance Matrix */}
               <div className="flex items-center justify-between pt-4">
                 <div className="text-left">
                   <span className="text-[10px] text-muted-foreground block">
-                    Alpha Trend (5 Years)
+                    Relative Alpha
                   </span>
-                  <span className="text-xs font-bold text-emerald-500">
-                    Consistent Outperformance
+                  <span className="text-xs font-bold text-foreground">
+                    Peer outperformance matrix
                   </span>
                 </div>
                 
-                {/* SVG Sparkline */}
-                <div className="w-24 h-8">
-                  <svg viewBox="0 0 100 30" className="w-full h-full">
-                    <defs>
-                      <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
-                        <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
-                      </linearGradient>
-                    </defs>
-                    <path
-                      d="M0,25 Q15,22 30,12 T60,15 T90,3 L100,2 L100,30 L0,30 Z"
-                      fill="url(#gradient)"
-                    />
-                    <path
-                      d="M0,25 Q15,22 30,12 T60,15 T90,3 L100,2"
-                      fill="none"
-                      stroke="#10b981"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                  </svg>
+                <div className="flex items-center gap-1.5">
+                  <span className="inline-flex items-center rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 font-data border border-emerald-500/20">
+                    1Y: +12.4%
+                  </span>
+                  <span className="inline-flex items-center rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 font-data border border-emerald-500/20">
+                    5Y: +8.9%
+                  </span>
                 </div>
               </div>
             </div>
