@@ -344,8 +344,10 @@ export function FundsTable({ funds }: FundsTableProps) {
                     >
                       <Heart 
                         className={cn(
-                          "h-4 w-4 transition-transform active:scale-125", 
-                          isWatchChecked && "fill-rose-500 text-rose-500 opacity-100"
+                          "h-4 w-4 transition-transform duration-200 active:scale-110", 
+                          isWatchChecked 
+                            ? "fill-rose-500 text-rose-500 opacity-100 animate-heart-pop" 
+                            : "opacity-80"
                         )} 
                       />
                     </button>
@@ -439,8 +441,10 @@ export function FundsTable({ funds }: FundsTableProps) {
                   >
                     <Heart 
                       className={cn(
-                        "h-3.5 w-3.5",
-                        isWatchChecked && "fill-rose-500 text-rose-500 opacity-100"
+                        "h-3.5 w-3.5 transition-transform duration-200 active:scale-110",
+                        isWatchChecked 
+                          ? "fill-rose-500 text-rose-500 opacity-100 animate-heart-pop" 
+                          : "opacity-80"
                       )} 
                     />
                     <span>Save</span>

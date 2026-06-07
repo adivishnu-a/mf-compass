@@ -238,11 +238,15 @@ export function CommandMenu() {
                       onClick={() => handleSelectFund(item.kuveraCode, item.schemeName)}
                       data-active={selectedIndex === idx}
                       className={cn(
-                        "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition-colors",
+                        "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition-colors animate-in fade-in slide-in-from-top-1 duration-200 select-none cursor-pointer",
                         selectedIndex === idx
                           ? "bg-accent text-foreground font-medium"
                           : "text-muted-foreground hover:bg-accent/40"
                       )}
+                      style={{
+                        animationDelay: `${Math.min(idx, 6) * 20}ms`,
+                        animationFillMode: "both"
+                      }}
                     >
                       <span className="truncate max-w-[400px]">{item.schemeName}</span>
                       <span className="text-[10px] font-data text-muted-foreground/60">{item.kuveraCode}</span>
@@ -270,11 +274,15 @@ export function CommandMenu() {
                   onClick={() => handleSelectFund(fund.kuveraCode, fund.schemeName)}
                   data-active={selectedIndex === idx}
                   className={cn(
-                    "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left transition-colors",
+                    "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left transition-colors animate-in fade-in slide-in-from-top-1 duration-200 select-none cursor-pointer",
                     selectedIndex === idx
                       ? "bg-accent text-foreground font-medium"
                       : "text-muted-foreground hover:bg-accent/40"
                   )}
+                  style={{
+                    animationDelay: `${Math.min(idx, 8) * 20}ms`,
+                    animationFillMode: "both"
+                  }}
                 >
                   <div className="flex flex-col truncate pr-4">
                     <span className="text-sm text-foreground truncate font-heading font-medium">

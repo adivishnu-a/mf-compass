@@ -329,7 +329,14 @@ function FundsExplorerContent() {
           <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
             Min Score
           </label>
-          <div className="flex items-center gap-1.5 h-[34px]">
+          <div className="relative inline-flex items-center rounded-lg border border-border bg-background p-0.5 h-8 w-[148px]">
+            {/* Sliding active indicator */}
+            <span
+              className={cn(
+                "absolute inset-y-0.5 left-0.5 w-12 rounded-md bg-primary transition-transform duration-200 ease-out shadow-sm transform-gpu",
+                minScore === 50 ? "translate-x-0" : minScore === 75 ? "translate-x-12" : "translate-x-24"
+              )}
+            />
             {[50, 75, 90].map((score) => {
               const isActive = minScore === score;
               return (
@@ -341,10 +348,10 @@ function FundsExplorerContent() {
                     updateUrl({ minScore: score });
                   }}
                   className={cn(
-                    "flex h-7 w-12 items-center justify-center rounded-lg border text-xs font-bold font-data transition-all duration-150 select-none",
+                    "relative flex h-7 w-12 items-center justify-center rounded-md text-xs font-bold font-data transition-colors duration-200 z-10 select-none cursor-pointer",
                     isActive
-                      ? "border-primary/50 bg-primary/10 text-primary shadow-sm"
-                      : "border-border bg-background text-muted-foreground hover:border-muted-foreground/60 hover:text-foreground"
+                      ? "text-primary-foreground font-extrabold"
+                      : "text-muted-foreground hover:text-foreground"
                   )}
                 >
                   {score}

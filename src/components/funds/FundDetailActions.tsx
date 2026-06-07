@@ -24,13 +24,20 @@ export function FundDetailActions({ kuveraCode, schemeName }: FundDetailActionsP
       <button
         onClick={() => toggleWatchlist(kuveraCode)}
         className={cn(
-          "flex items-center gap-1.5 rounded border px-4 py-2 text-xs font-semibold transition-all duration-150 cursor-pointer",
+          "flex items-center gap-1.5 rounded border px-4 py-2 text-xs font-semibold transition-all duration-150 cursor-pointer active:scale-98",
           isWatchChecked
             ? "border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
             : "border-border bg-card text-muted-foreground hover:border-muted-foreground hover:text-foreground"
         )}
       >
-        <Heart className={cn("h-4 w-4", isWatchChecked && "fill-rose-500")} />
+        <Heart 
+          className={cn(
+            "h-4 w-4 transition-transform duration-200 active:scale-110", 
+            isWatchChecked 
+              ? "fill-rose-500 text-rose-500 opacity-100 animate-heart-pop" 
+              : "opacity-80"
+          )} 
+        />
         <span>{isWatchChecked ? "Saved in Watchlist" : "Save to Watchlist"}</span>
       </button>
 
