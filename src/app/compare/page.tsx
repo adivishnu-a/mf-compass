@@ -296,7 +296,7 @@ function CompareContent() {
 
       {loading && (
         <div className="mt-8 flex flex-col items-center justify-center py-20 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary border-r-2 border-transparent" />
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary/20 border-t-primary" />
           <p className="mt-4 text-xs text-muted-foreground">Loading comparison data...</p>
         </div>
       )}

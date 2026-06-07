@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { TrendingUp, ShieldCheck, Award, Search, ShieldAlert } from "lucide-react";
+import { TrendingUp, ShieldCheck, Award, Search } from "lucide-react";
 
 export default function Home() {
   const triggerSearch = () => {
