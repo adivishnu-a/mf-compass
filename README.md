@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MF Compass
 
-## Getting Started
+An elegant, privacy-first discovery and outperformance analysis tool for Indian Mutual Funds. No tracking, no advertisements, no login walls — just raw, relative performance comparisons and peer-group analysis.
 
-First, run the development server:
+Live Application: [https://mf-compass.vercel.app/](https://mf-compass.vercel.app/)
+
+---
+
+## 🏗️ Codebase & Architecture
+
+The application is built on Next.js 16 (App Router), React 19, Neon Postgres, and Drizzle ORM, prioritizing type safety, small payload sizes, and extremely low latency.
+
+### 1. Directory Structure
+
+* **`src/app/`**: Next.js App Router entrypoints.
+  * `funds/`: Leaderboard view with filtering.
+  * `fund/[code]/`: ISR-cached detail pages (revalidated every 5 minutes) configured with static loading fallbacks (`loading.tsx`) for instant route switches.
+  * `compare/`: Multi-fund comparison dashboard.
+  * `watchlist/`: Client-side saved watchlist tracking.
+  * `api/`: API routes (including cached search indexing and parameter-validated fund querying).
+* **`src/components/`**: Meticulously separated React components:
+  * `ui/`: Core styling blocks (such as squirpled AMC Logo tags and toast notifications).
+  * `funds/`: Category sorting and list triggers.
+  * Global shell elements (`Navbar`, `Footer`, `CommandMenu`, `CompareStickyBar`).
+* **`src/hooks/`**: Custom React state managers (`useWatchlist`, `useCompare`) synchronized with LocalStorage.
+* **`src/lib/`**:
+  * `db/`: Neon Serverless Postgres client setup.
+  * `format/`: Numeric formatting helpers with formatting safeguards.
+  * `scoring/`: Category benchmarks and outperformance criteria.
+
+### 2. Key Technical Implementations
+
+* **In-Memory Search Index**: The search API caches minimal fund data columns in-memory with a 5-minute TTL to keep query latencies under 5ms, avoiding heavy SQL queries on every keystroke.
+* **Tokenized Relevance Search**: Relies on a deterministic query-tokenization algorithm that splits multi-word searches into prefixes and yields precise, weighted outperformance scores rather than fuzzy matching.
+* **Optimized State Transitions**: Employs dynamic React keys on tables to trigger hardware-accelerated CSS animations during filter switches.
+* **Accessibility & Reduced Motion**: Full keyboard focus sequencing, active `aria-sort` column status tags, and a global `@media (prefers-reduced-motion: reduce)` rule that instantly disables animations for users with motion-sensitive configurations.
+* **Type-Safe Database Interfacing**: Uses Drizzle ORM to compile queries down to SQL, mapping results directly to inferred schemas and preventing input injection.
+
+---
+
+## 🛠️ Technology Stack
+
+* **Framework**: Next.js 16 (App Router) & React 19
+* **Styling**: Tailwind CSS v4 & Lucide React Icons
+* **Database**: Neon Serverless Postgres
+* **Database ORM**: Drizzle ORM
+* **Deployment**: Vercel
+
+---
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+
+Ensure you have [Node.js](https://nodejs.org/) (v18 or higher) and [npm](https://www.npmjs.com/) installed.
+
+### 2. Environment Configuration
+
+Create a `.env.local` file in the root directory:
+
+```env
+DATABASE_URL=postgresql://[user]:[password]@[host]/[database]?sslmode=require
+```
+
+### 3. Install Dependencies
+
+```bash
+npm install
+```
+
+### 4. Running the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to view the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🗃️ Utility & Synchronization Scripts
 
-## Learn More
+The project includes pre-configured Node scripts for database synchronization, testing, and schema generation:
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* **`npm run dev`**: Starts the hot-reloading Next.js development server.
+* **`npm run build`**: Generates an optimized production build of the Next.js application.
+* **`npm run typecheck`**: Runs the TypeScript compiler to audit type safety.
+* **`npm run lint`**: Inspects static JavaScript/TypeScript code using ESLint.
+* **`npm run test`**: Runs unit and integration tests using Vitest.
+* **`npm run db:push`**: Pushes Drizzle schema definitions directly to the active Neon database.
+* **`npm run sync:daily`**: Synchronizes NAV values, assets under management (AUM), and fund parameters.
+* **`npm run sync:weekly`**: Executes heavier category-wide benchmarking, calculates averages, and normalizes outperformance rankings.
