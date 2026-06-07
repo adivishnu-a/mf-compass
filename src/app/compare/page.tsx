@@ -358,7 +358,7 @@ function CompareContent() {
             <tbody className="divide-y divide-border">
               {/* Score */}
               {renderCompareRow(
-                "MFC Score",
+                "Score",
                 (f) => f.totalScore,
                 (v) => (
                   <span className="inline-flex items-center justify-center rounded-md bg-primary/10 px-2.5 py-1 text-xs font-extrabold text-primary border border-primary/20">

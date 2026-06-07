@@ -109,9 +109,9 @@ export default async function FundDetailPage({ params }: PageProps) {
               </div>
             </div>
 
-            {/* MFC Score below NAV */}
+            {/* Score below NAV */}
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">MFC Score</span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Score</span>
               <span className="inline-flex items-center justify-center rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-extrabold text-primary font-data border border-primary/20">
                 {parseFloat(fund.totalScore || "0").toFixed(1)}
               </span>
@@ -132,9 +132,9 @@ export default async function FundDetailPage({ params }: PageProps) {
             </span>
           </div>
 
-          {/* MFC Score on right */}
+          {/* Score on right */}
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">MFC Score</span>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Score</span>
             <span className="inline-flex items-center justify-center rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-extrabold text-primary font-data border border-primary/20">
               {parseFloat(fund.totalScore || "0").toFixed(1)}
             </span>

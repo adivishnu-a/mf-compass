@@ -184,7 +184,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                 onClick={() => handleSort("totalScore")}
               >
                 <div className="flex items-center justify-center">
-                  MFC Score <SortIcon field="totalScore" sortField={sortField as SortField} sortOrder={sortOrder} />
+                  Score <SortIcon field="totalScore" sortField={sortField as SortField} sortOrder={sortOrder} />
                 </div>
               </th>
               <th 

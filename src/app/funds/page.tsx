@@ -220,8 +220,8 @@ function FundsExplorerContent() {
   ];
 
   const sortOptions = [
-    { value: "score_desc", label: "MFC Score (High to Low)" },
-    { value: "score_asc", label: "MFC Score (Low to High)" },
+    { value: "score_desc", label: "Score (High to Low)" },
+    { value: "score_asc", label: "Score (Low to High)" },
     { value: "returns1y_desc", label: "1Y Return (High to Low)" },
     { value: "aum_desc", label: "Fund AUM (High to Low)" },
   ];
@@ -235,7 +235,7 @@ function FundsExplorerContent() {
             Outperformance Leaderboard
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-muted-foreground leading-relaxed">
-            Funds in <span className="font-semibold text-foreground">{activeCategory}</span> ranked by relative peer-group MFC score.
+            Funds in <span className="font-semibold text-foreground">{activeCategory}</span> ranked by relative peer-group score.
           </p>
         </div>
 
@@ -293,7 +293,7 @@ function FundsExplorerContent() {
         {/* Score Buttons */}
         <div className="flex flex-col">
           <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
-            Min MFC Score
+            Min Score
           </label>
           <div className="flex items-center gap-1.5 h-[34px]">
             {[50, 75, 90].map((score) => {
@@ -374,7 +374,7 @@ function FundsExplorerContent() {
             }}
             className="flex w-full items-center justify-between rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground transition-colors hover:border-primary/50 focus:outline-none h-[34px]"
           >
-            <span className="truncate">{sortOptions.find(o => o.value === sort)?.label || "MFC Score (High to Low)"}</span>
+            <span className="truncate">{sortOptions.find(o => o.value === sort)?.label || "Score (High to Low)"}</span>
             <ChevronDown className="h-3.5 w-3.5 opacity-50 shrink-0 ml-2" />
           </button>
           
