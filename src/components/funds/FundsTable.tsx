@@ -381,7 +381,7 @@ export function FundsTable({ funds }: FundsTableProps) {
                       href={`/fund/${fund.kuveraCode}`}
                       className="font-heading font-semibold text-sm text-foreground hover:text-primary transition-colors block truncate"
                     >
-                      {fund.schemeName}
+                      {fund.shortName || fund.schemeName}
                     </Link>
                     <span className="text-[10px] text-muted-foreground block truncate">
                       {fund.fundCategory}
