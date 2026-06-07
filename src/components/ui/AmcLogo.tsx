@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useId } from "react";
 import { cn } from "@/lib/utils";
 
 interface AmcLogoProps {
@@ -33,8 +33,16 @@ function getAmcColorClass(name: string | null) {
   return colors[hash % colors.length];
 }
 
+// Highly precise G2-continuous squircle path normalized for objectBoundingBox (0 to 1).
+// This matches iOS corner smoothing (60% smoothing) and 22.37% corner radius.
+const SQUIRCLE_PATH =
+  "M 0.642080 0 c 0.125284 0 0.187926 0 0.235778 0.024382 a 0.223700 0.223700 0 0 1 0.097760 0.097760 c 0.024382 0.047852 0.024382 0.110494 0.024382 0.235778 L 1.000000 0.642080 c 0 0.125284 0 0.187926 -0.024382 0.235778 a 0.223700 0.223700 0 0 1 -0.097760 0.097760 c -0.047852 0.024382 -0.110494 0.024382 -0.235778 0.024382 L 0.357920 1.000000 c -0.125284 0 -0.187926 0 -0.235778 -0.024382 a 0.223700 0.223700 0 0 1 -0.097760 -0.097760 c -0.024382 -0.047852 -0.024382 -0.110494 -0.024382 -0.235778 L 0 0.357920 c 0 -0.125284 0 -0.187926 0.024382 -0.235778 a 0.223700 0.223700 0 0 1 0.097760 -0.097760 c 0.047852 -0.024382 0.110494 -0.024382 0.235778 -0.024382 Z";
+
 export function AmcLogo({ fundHouse, fundHouseName, className, size = "md" }: AmcLogoProps) {
   const [hasError, setHasError] = useState(!fundHouse);
+  const rawClipId = useId();
+  // Safe ID for SVG selectors (remove colons)
+  const clipId = `amc-clip-${rawClipId.replace(/:/g, "-")}`;
 
   const sizeClasses = {
     sm: "h-8 w-8 text-[10px]",
@@ -60,11 +68,24 @@ export function AmcLogo({ fundHouse, fundHouseName, className, size = "md" }: Am
   return (
     <div
       className={cn(
-        "flex shrink-0 items-center justify-center rounded-lg shadow-sm overflow-hidden",
+        "relative flex shrink-0 items-center justify-center shadow-sm overflow-hidden",
         sizeClasses[size],
         className
       )}
+      style={{
+        clipPath: `url(#${clipId})`,
+        WebkitClipPath: `url(#${clipId})`,
+      }}
     >
+      {/* Hidden SVG with the clip path definition */}
+      <svg width="0" height="0" className="absolute pointer-events-none">
+        <defs>
+          <clipPath id={clipId} clipPathUnits="objectBoundingBox">
+            <path d={SQUIRCLE_PATH} />
+          </clipPath>
+        </defs>
+      </svg>
+
       <img
         src={`/logos/amc/${fundHouse}.png`}
         alt={fundHouseName || "AMC Logo"}
