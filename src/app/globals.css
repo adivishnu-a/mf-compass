@@ -201,7 +201,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .animate-heart-pop {
-  animation: heart-pop 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation: heart-pop 0.32s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 @keyframes button-pop {
