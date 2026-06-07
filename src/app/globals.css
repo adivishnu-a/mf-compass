@@ -39,37 +39,37 @@
 }
 
 .dark {
-  --background: #090d16; /* Deep dark blue-black background */
+  --background: #0b0b0f; /* Premium deep near-black charcoal background */
   --foreground: #f8fafc;
   
-  --card: #111827;
+  --card: #121217; /* Crisp, slightly lighter card background */
   --card-foreground: #f8fafc;
   
-  --popover: #111827;
+  --popover: #121217;
   --popover-foreground: #f8fafc;
   
   --primary: #3da8ff; /* Vibrant bright blue for dark mode readability */
-  --primary-foreground: #090d16;
+  --primary-foreground: #0b0b0f;
   
-  --secondary: #1e293b;
+  --secondary: #18181c;
   --secondary-foreground: #f8fafc;
   
-  --muted: #1e293b;
+  --muted: #18181c;
   --muted-foreground: #94a3b8;
   
-  --accent: #1e293b;
+  --accent: #1c1c22;
   --accent-foreground: #f8fafc;
   
   --destructive: #f87171;
   --destructive-foreground: #ffffff;
   
-  --border: #1e293b;
-  --input: #1e293b;
+  --border: #1d1d24;
+  --input: #1d1d24;
   --ring: #3da8ff;
   
   --brand: #3da8ff;
   --brand-gilt: #3da8ff;
-  --brand-foreground: #090d16;
+  --brand-foreground: #0b0b0f;
 }
 
 @theme {
