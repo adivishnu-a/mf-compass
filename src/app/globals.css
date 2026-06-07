@@ -268,6 +268,36 @@ h1, h2, h3, h4, h5, h6 {
   animation: item-enter 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+@keyframes dropdown-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-dropdown-enter {
+  animation: dropdown-enter 0.12s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes mobile-menu-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-mobile-menu-enter {
+  animation: mobile-menu-enter 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
     animation-duration: 0.01ms !important;

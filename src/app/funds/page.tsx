@@ -380,7 +380,7 @@ function FundsExplorerContent() {
           {ratingDropdownOpen && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setRatingDropdownOpen(false)} />
-              <div className="absolute top-[calc(100%+4px)] left-0 w-full rounded-xl border border-border bg-card/95 p-1 shadow-xl z-50 animate-in fade-in slide-in-from-top-1 duration-100 backdrop-blur-md">
+              <div className="absolute top-[calc(100%+4px)] left-0 w-full rounded-xl border border-border bg-card/95 p-1 shadow-xl z-50 animate-dropdown-enter backdrop-blur-md">
                 {ratingOptions.map(opt => (
                   <button
                     key={opt.value}
@@ -422,7 +422,7 @@ function FundsExplorerContent() {
           {sortDropdownOpen && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setSortDropdownOpen(false)} />
-              <div className="absolute top-[calc(100%+4px)] left-0 w-full rounded-xl border border-border bg-card/95 p-1 shadow-xl z-50 animate-in fade-in slide-in-from-top-1 duration-100 backdrop-blur-md">
+              <div className="absolute top-[calc(100%+4px)] left-0 w-full rounded-xl border border-border bg-card/95 p-1 shadow-xl z-50 animate-dropdown-enter backdrop-blur-md">
                 {sortOptions.map(opt => (
                   <button
                     key={opt.value}

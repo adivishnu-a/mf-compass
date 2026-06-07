@@ -150,7 +150,7 @@ export function Navbar() {
                   className="fixed inset-0 z-40" 
                   onClick={() => setThemeDropdownOpen(false)}
                 />
-                <div className="absolute right-0 mt-2 w-32 origin-top-right rounded-xl border border-border bg-card/95 p-1 shadow-xl z-50 animate-in fade-in slide-in-from-top-1 duration-100">
+                <div className="absolute right-0 mt-2 w-32 origin-top-right rounded-xl border border-border bg-card/95 p-1 shadow-xl z-50 animate-dropdown-enter">
                   {(["light", "dark", "system"] as const).map((t) => (
                     <button
                       key={t}
@@ -187,7 +187,7 @@ export function Navbar() {
 
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 w-full border-b border-border bg-background/95 backdrop-blur-lg shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="md:hidden absolute top-full left-0 right-0 w-full border-b border-border bg-background/95 backdrop-blur-lg shadow-2xl z-50 animate-mobile-menu-enter">
           <nav className="flex flex-col gap-2 p-4">
             {navLinks.map((link) => {
               const isActive = isLinkActive(link.href);
