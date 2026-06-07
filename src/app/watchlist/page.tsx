@@ -140,7 +140,7 @@ export default function WatchlistPage() {
             My Saved Watchlist
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-muted-foreground leading-relaxed">
-            Monitor and compare your saved mutual funds. Sorted by performance score.
+            Monitor and compare your saved mutual funds.
           </p>
         </div>
       </div>
