@@ -9,6 +9,8 @@ import { CompareStickyBar } from "@/components/CompareStickyBar";
 import "./globals.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
+export const revalidate = 300; // Revalidate layout/footer data every 5 minutes
+
 const inter = Inter({
   variable: "--font-sans-default",
   subsets: ["latin"],

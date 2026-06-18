@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
     );
 
     return response;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching funds by codes:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },

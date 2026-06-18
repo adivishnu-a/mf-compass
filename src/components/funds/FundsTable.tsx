@@ -124,8 +124,11 @@ export function FundsTable({ funds }: FundsTableProps) {
     }
 
     return [...funds].sort((a, b) => {
-      let valA: any = a[sortField as keyof Fund];
-      let valB: any = b[sortField as keyof Fund];
+      const valA = a[sortField as keyof Fund];
+      const valB = b[sortField as keyof Fund];
+
+      let compA: string | number;
+      let compB: string | number;
 
       // Handle numeric conversion for returns, score, aum
       if (
@@ -133,16 +136,16 @@ export function FundsTable({ funds }: FundsTableProps) {
         sortField === "aum" ||
         sortField.startsWith("returns")
       ) {
-        valA = parseFloat(valA || "-999999");
-        valB = parseFloat(valB || "-999999");
+        compA = parseFloat((valA as string) || "-999999");
+        compB = parseFloat((valB as string) || "-999999");
       } else {
         // String sorting (schemeName)
-        valA = (valA || "").toString().toLowerCase();
-        valB = (valB || "").toString().toLowerCase();
+        compA = ((valA as string) || "").toString().toLowerCase();
+        compB = ((valB as string) || "").toString().toLowerCase();
       }
 
-      if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-      if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+      if (compA < compB) return sortOrder === "asc" ? -1 : 1;
+      if (compA > compB) return sortOrder === "asc" ? 1 : -1;
       return 0;
     });
   }, [funds, sortField, sortOrder]);
@@ -152,12 +155,12 @@ export function FundsTable({ funds }: FundsTableProps) {
     period: "1d" | "1w" | "1y" | "3y" | "5y",
     fund: Fund
   ) => {
-    if (val === null || val === undefined) return <span className="text-muted-foreground/40 font-data">--</span>;
+    if (val === null || val === undefined) return <span className="text-muted-foreground/45 font-sans">--</span>;
     const num = parseFloat(val);
-    if (isNaN(num)) return <span className="text-muted-foreground/40 font-data">--</span>;
+    if (isNaN(num)) return <span className="text-muted-foreground/45 font-sans">--</span>;
 
     const genuine = isReturnGenuine(val, period, fund);
-    if (!genuine) return <span className="text-muted-foreground/40 font-data">--</span>;
+    if (!genuine) return <span className="text-muted-foreground/45 font-sans">--</span>;
 
     return (
       <span

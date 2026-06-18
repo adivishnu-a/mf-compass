@@ -87,6 +87,8 @@ The project includes pre-configured Node scripts for database synchronization, t
 * **`npm run typecheck`**: Runs the TypeScript compiler to audit type safety.
 * **`npm run lint`**: Inspects static JavaScript/TypeScript code using ESLint.
 * **`npm run test`**: Runs unit and integration tests using Vitest.
-* **`npm run db:push`**: Pushes Drizzle schema definitions directly to the active Neon database.
+* **`npm run db:generate`**: Generates SQL migration files based on schema changes.
+* **`npm run db:migrate`**: Applies SQL migration files to the database (recommended for production environments).
+* **`npm run db:push`**: Pushes Drizzle schema definitions directly to the database (for rapid local prototyping).
 * **`npm run sync:daily`**: Synchronizes NAV values, assets under management (AUM), and fund parameters.
 * **`npm run sync:weekly`**: Executes heavier category-wide benchmarking, calculates averages, and normalizes outperformance rankings.

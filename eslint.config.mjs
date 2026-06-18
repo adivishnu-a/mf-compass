@@ -10,7 +10,6 @@ const eslintConfig = defineConfig([
       "react-hooks/set-state-in-effect": "off",
       "react-hooks/static-components": "off",
       "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
-      "@typescript-eslint/no-explicit-any": "off",
       "react/no-unescaped-entities": "off",
       "@next/next/no-img-element": "off"
     }

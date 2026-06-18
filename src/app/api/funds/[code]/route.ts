@@ -40,7 +40,7 @@ export async function GET(
     );
 
     return response;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching fund details:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },

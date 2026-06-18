@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { z } from "zod";
+
+const watchlistSchema = z.array(z.string());
 
 export function useWatchlist() {
   const [watchlist, setWatchlist] = useState<string[]>([]);
@@ -7,9 +10,19 @@ export function useWatchlist() {
     const stored = localStorage.getItem("mfc:watchlist");
     if (stored) {
       try {
-        setWatchlist(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        const validated = watchlistSchema.safeParse(parsed);
+        if (validated.success) {
+          setWatchlist(validated.data);
+        } else {
+          console.warn("Invalid watchlist schema in localStorage, resetting");
+          setWatchlist([]);
+          localStorage.removeItem("mfc:watchlist");
+        }
       } catch (e) {
         console.error("Failed to parse watchlist", e);
+        setWatchlist([]);
+        localStorage.removeItem("mfc:watchlist");
       }
     } else {
       setWatchlist([]);

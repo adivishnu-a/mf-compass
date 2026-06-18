@@ -83,7 +83,7 @@ function FundsExplorerContent() {
   // Validate and default Category if invalid
   const activeCategory = useMemo(() => {
     const categories = currentGroup === "equity" ? EQUITY_CATEGORIES : HYBRID_CATEGORIES;
-    if (categories.includes(currentCategory as any)) {
+    if ((categories as readonly string[]).includes(currentCategory)) {
       return currentCategory;
     }
     return categories[0];

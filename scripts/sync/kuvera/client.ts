@@ -56,13 +56,13 @@ export async function fetchFundList(): Promise<FundListItem[]> {
     throw new Error("Invalid response from fund list API: expected object");
   }
 
-  const flattened: any[] = [];
+  const flattened: unknown[] = [];
   for (const assetClass of Object.keys(raw)) {
-    const categoriesObj = (raw as Record<string, any>)[assetClass];
+    const categoriesObj = (raw as Record<string, unknown>)[assetClass] as Record<string, unknown>;
     if (!categoriesObj || typeof categoriesObj !== "object") continue;
 
     for (const categoryName of Object.keys(categoriesObj)) {
-      const fundHousesObj = categoriesObj[categoryName];
+      const fundHousesObj = categoriesObj[categoryName] as Record<string, unknown>;
       if (!fundHousesObj || typeof fundHousesObj !== "object") continue;
 
       for (const fundHouseName of Object.keys(fundHousesObj)) {

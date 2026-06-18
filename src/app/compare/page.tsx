@@ -35,7 +35,7 @@ interface Fund {
   startDate: string | null;
   expenseRatio: string | null;
   expenseRatioDate: string | null;
-  fundManagers: any;
+  fundManagers: unknown;
   investmentObjective: string | null;
   volatility: string | null;
   portfolioTurnover: string | null;
@@ -175,17 +175,17 @@ function CompareContent() {
   };
 
   // Render a comparison row
-  const renderCompareRow = (
+  const renderCompareRow = <T,>(
     label: string,
-    getValue: (fund: Fund) => string | number | null,
-    formatValue: (val: any, fund: Fund) => React.ReactNode,
+    getValue: (fund: Fund) => T,
+    formatValue: (val: T, fund: Fund) => React.ReactNode,
     lowerIsBetter = false,
     isNumeric = true,
     isMonospace = true
   ) => {
     const rowValues = funds.map((f) => {
       const v = getValue(f);
-      return isNumeric ? getFloat(v) : null;
+      return isNumeric ? getFloat(v as string | number | null) : null;
     });
 
     return (
@@ -196,7 +196,7 @@ function CompareContent() {
         {funds.map((fund) => {
           const raw = getValue(fund);
           const cellType = isNumeric 
-            ? compareRowValues(getFloat(raw), rowValues, lowerIsBetter)
+            ? compareRowValues(getFloat(raw as string | number | null), rowValues, lowerIsBetter)
             : "normal";
           
           return (
@@ -216,7 +216,7 @@ function CompareContent() {
     );
   };
 
-  const parseManagers = (managers: any) => {
+  const parseManagers = (managers: unknown) => {
     if (!managers) return "--";
     if (Array.isArray(managers)) return managers.join(", ");
     if (typeof managers === "string") {
@@ -370,9 +370,13 @@ function CompareContent() {
                 "Score",
                 (f) => f.totalScore,
                 (v) => (
-                  <span className="inline-flex items-center justify-center rounded-md bg-primary/10 px-2.5 py-1 text-xs font-extrabold text-primary border border-primary/20">
-                    {v ? parseFloat(v as string).toFixed(1) : "--"}
-                  </span>
+                  v ? (
+                    <span className="inline-flex items-center justify-center rounded-md bg-primary/10 px-2.5 py-1 text-xs font-extrabold text-primary border border-primary/20">
+                      {parseFloat(v as string).toFixed(1)}
+                    </span>
+                  ) : (
+                    <span className="font-sans text-muted-foreground/45">--</span>
+                  )
                 )
               )}
 
@@ -380,7 +384,7 @@ function CompareContent() {
               {renderCompareRow(
                 "Current NAV",
                 (f) => f.currentNav,
-                (v) => formatNAV(v),
+                (v) => v ? formatNAV(v) : <span className="font-sans text-muted-foreground/45">--</span>,
                 false,
                 true
               )}
@@ -389,46 +393,46 @@ function CompareContent() {
               {renderCompareRow(
                 "1D Return",
                 (f) => f.returns1d,
-                (v, f) => isReturnGenuine(v, "1d", f) ? formatPercent(v, true, true) : "--"
+                (v, f) => isReturnGenuine(v, "1d", f) ? formatPercent(v, true, true) : <span className="font-sans text-muted-foreground/45">--</span>
               )}
               {renderCompareRow(
                 "1W Return",
                 (f) => f.returns1w,
-                (v, f) => isReturnGenuine(v, "1w", f) ? formatPercent(v, true, true) : "--"
+                (v, f) => isReturnGenuine(v, "1w", f) ? formatPercent(v, true, true) : <span className="font-sans text-muted-foreground/45">--</span>
               )}
               {renderCompareRow(
                 "1Y Return",
                 (f) => f.returns1y,
-                (v, f) => isReturnGenuine(v, "1y", f) ? formatPercent(v, true, true) : "--"
+                (v, f) => isReturnGenuine(v, "1y", f) ? formatPercent(v, true, true) : <span className="font-sans text-muted-foreground/45">--</span>
               )}
               {renderCompareRow(
                 "3Y Return",
                 (f) => f.returns3y,
-                (v, f) => isReturnGenuine(v, "3y", f) ? formatPercent(v, true, true) : "--"
+                (v, f) => isReturnGenuine(v, "3y", f) ? formatPercent(v, true, true) : <span className="font-sans text-muted-foreground/45">--</span>
               )}
               {renderCompareRow(
                 "5Y Return",
                 (f) => f.returns5y,
-                (v, f) => isReturnGenuine(v, "5y", f) ? formatPercent(v, true, true) : "--"
+                (v, f) => isReturnGenuine(v, "5y", f) ? formatPercent(v, true, true) : <span className="font-sans text-muted-foreground/45">--</span>
               )}
               {renderCompareRow(
                 "Inception Return",
                 (f) => f.returnsInception,
-                (v) => formatPercent(v)
+                (v) => v ? formatPercent(v) : <span className="font-sans text-muted-foreground/45">--</span>
               )}
 
               {/* AUM */}
               {renderCompareRow(
                 "Fund AUM",
                 (f) => f.aum,
-                (v) => formatAUM(v)
+                (v) => v ? formatAUM(v) : <span className="font-sans text-muted-foreground/45">--</span>
               )}
 
               {/* Expense Ratio (Lower is better) */}
               {renderCompareRow(
                 "Expense Ratio",
                 (f) => f.expenseRatio,
-                (v) => (v ? `${v}%` : "--"),
+                (v) => (v ? `${v}%` : <span className="font-sans text-muted-foreground/45">--</span>),
                 true // lowerIsBetter
               )}
 
@@ -436,14 +440,14 @@ function CompareContent() {
               {renderCompareRow(
                 "CRISIL Rating",
                 (f) => f.fundRating,
-                (v) => (v ? `★ ${v}` : "No Rating")
+                (v) => (v ? `★ ${v}` : <span className="font-sans text-muted-foreground/45">No Rating</span>)
               )}
 
               {/* Std Dev Volatility (Lower is better) */}
               {renderCompareRow(
                 "Volatility (StdDev)",
                 (f) => f.volatility,
-                (v) => (v ? parseFloat(v as string).toFixed(2) : "--"),
+                (v) => (v ? parseFloat(v as string).toFixed(2) : <span className="font-sans text-muted-foreground/45">--</span>),
                 true // lowerIsBetter
               )}
 
@@ -451,7 +455,7 @@ function CompareContent() {
               {renderCompareRow(
                 "Portfolio Turnover",
                 (f) => f.portfolioTurnover,
-                (v) => (v ? `${(parseFloat(v as string) * 100).toFixed(0)}%` : "--"),
+                (v) => (v ? `${(parseFloat(v as string) * 100).toFixed(0)}%` : <span className="font-sans text-muted-foreground/45">--</span>),
                 true // lowerIsBetter
               )}
 
@@ -459,7 +463,7 @@ function CompareContent() {
               {renderCompareRow(
                 "Lock-in Period",
                 (f) => f.lockInPeriod,
-                (v) => (v ? `${v} days` : "No Lock-in"),
+                (v) => (v ? `${v} days` : <span className="font-sans text-muted-foreground/45">No Lock-in</span>),
                 true
               )}
 

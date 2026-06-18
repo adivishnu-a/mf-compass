@@ -200,7 +200,7 @@ async function main(): Promise<void> {
             .limit(1)
         );
 
-        const selectResults = await db.batch(selectQueries as [any, ...any[]]);
+        const selectResults = (await db.batch(selectQueries as unknown as [never, ...never[]])) as unknown as { id: number }[][];
 
         const writeQueries = batch.map((fund, idx) => {
           const existing = selectResults[idx];
@@ -217,7 +217,7 @@ async function main(): Promise<void> {
         });
 
         if (writeQueries.length > 0) {
-          await db.batch(writeQueries as [any, ...any[]]);
+          await db.batch(writeQueries as unknown as [never, ...never[]]);
         }
 
         for (const fund of batch) {
@@ -233,7 +233,7 @@ async function main(): Promise<void> {
     }
 
     // Step 8: Hard-delete absent funds
-    if (allUpsertedCodes.length > 0) {
+    if (allUpsertedCodes.length > 0 && summary.errors === 0) {
       const deleted = await db
         .delete(funds)
         .where(notInArray(funds.kuveraCode, allUpsertedCodes))
@@ -301,7 +301,7 @@ async function main(): Promise<void> {
               .where(eq(funds.id, fund.id))
           );
           if (queries.length > 0) {
-            await db.batch(queries as [any, ...any[]]);
+            await db.batch(queries as unknown as [never, ...never[]]);
           }
         } catch (err) {
           summary.errors += batch.length;

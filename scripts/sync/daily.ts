@@ -106,7 +106,7 @@ async function main(): Promise<void> {
     const codes = existingFunds.map((f) => f.kuveraCode);
     logger.info("Refreshing existing funds", { count: codes.length });
 
-    const pendingUpdates: { code: string; data: any }[] = [];
+    const pendingUpdates: { code: string; data: Record<string, unknown> }[] = [];
 
     for (let i = 0; i < codes.length; i += BATCH_SIZE) {
       const batch = codes.slice(i, i + BATCH_SIZE);
@@ -175,7 +175,7 @@ async function main(): Promise<void> {
             .where(eq(funds.kuveraCode, item.code))
         );
         if (queries.length > 0) {
-          await db.batch(queries as [any, ...any[]]);
+          await db.batch(queries as unknown as [never, ...never[]]);
           summary.fundsUpdated += batch.length;
         }
       } catch (err) {
@@ -295,7 +295,7 @@ async function main(): Promise<void> {
               .where(eq(funds.id, fund.id))
           );
           if (queries.length > 0) {
-            await db.batch(queries as [any, ...any[]]);
+            await db.batch(queries as unknown as [never, ...never[]]);
           }
         } catch (err) {
           summary.errors += batch.length;

@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     // Query filters
     let queryFilter = undefined;
     if (category && category !== "all") {
-      const isValid = FUND_CATEGORIES.includes(category as any);
+      const isValid = (FUND_CATEGORIES as readonly string[]).includes(category);
       if (!isValid) {
         return NextResponse.json(
           { success: false, error: `Invalid category: ${category}` },
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
     );
 
     return response;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching funds:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },

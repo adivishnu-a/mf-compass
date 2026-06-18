@@ -69,7 +69,7 @@ export function cleanReturns(returns: {
       continue;
     }
 
-    (result as any)[current.key] = val.toFixed(4);
+    (result as Record<string, string | null>)[current.key] = val.toFixed(4);
   }
 
   let inceptionVal = returns.inception;

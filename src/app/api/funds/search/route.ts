@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
+interface SearchFund {
+  id: number;
+  kuveraCode: string;
+  schemeName: string;
+  shortName: string | null;
+  fundHouseName: string | null;
+  fundCategory: string | null;
+  totalScore: string | null;
+}
+
 // Cache the search universe in-memory to keep response times under 5ms
-let cachedSearchFunds: any[] | null = null;
+let cachedSearchFunds: SearchFund[] | null = null;
 let lastCacheTime = 0;
 const CACHE_TTL = 60 * 1000 * 5; // 5 minutes
 
-async function getSearchFunds() {
+async function getSearchFunds(): Promise<SearchFund[]> {
   const now = Date.now();
   if (cachedSearchFunds && now - lastCacheTime < CACHE_TTL) {
     return cachedSearchFunds;
@@ -167,7 +177,7 @@ export async function GET(request: NextRequest) {
     );
 
     return response;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error searching funds:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },

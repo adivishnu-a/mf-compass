@@ -17,7 +17,17 @@ interface PageProps {
   params: Promise<{ code: string }>;
 }
 
-function parseFundManagers(managers: any): string[] {
+interface PeerFund {
+  code: string;
+  name: string;
+  short_name?: string | null;
+  "1y"?: number | null;
+  "3y"?: number | null;
+  expense_ratio?: number | null;
+  aum?: number | null;
+}
+
+function parseFundManagers(managers: unknown): string[] {
   if (!managers) return [];
   if (Array.isArray(managers)) return managers.map(String);
   if (typeof managers === "string") {
@@ -223,7 +233,12 @@ export default async function FundDetailPage({ params }: PageProps) {
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                   {period.label}
                 </span>
-                <div className="mt-1 font-data font-extrabold text-lg text-foreground">
+                <div className={cn(
+                  "mt-1 text-lg",
+                  isGenuine 
+                    ? "font-data font-extrabold text-foreground" 
+                    : "font-sans text-muted-foreground/45"
+                )}>
                   {displayValue}
                 </div>
               </div>
@@ -434,7 +449,7 @@ export default async function FundDetailPage({ params }: PageProps) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {fund.comparison.map((peer: any) => (
+                {Array.isArray(fund.comparison) && (fund.comparison as unknown as PeerFund[]).map((peer) => (
                   <tr key={peer.code} className="hover:bg-muted/20 transition-colors">
                     <td className="pl-6 pr-4 py-3">
                       <Link
@@ -447,7 +462,11 @@ export default async function FundDetailPage({ params }: PageProps) {
                     <td className="px-4 py-3 text-center text-xs sm:text-sm hidden sm:table-cell">
                       <span className={cn(
                         "font-data font-semibold",
-                        peer["1y"] > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                        (peer["1y"] ?? 0) > 0 
+                          ? "text-emerald-600 dark:text-emerald-400" 
+                          : (peer["1y"] ?? 0) < 0 
+                            ? "text-rose-600 dark:text-rose-400" 
+                            : "text-muted-foreground"
                       )}>
                         {peer["1y"] ? formatPercent(peer["1y"]) : "--"}
                       </span>
@@ -455,7 +474,11 @@ export default async function FundDetailPage({ params }: PageProps) {
                     <td className="px-4 py-3 text-center text-xs sm:text-sm">
                       <span className={cn(
                         "font-data font-semibold",
-                        peer["3y"] > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                        (peer["3y"] ?? 0) > 0 
+                          ? "text-emerald-600 dark:text-emerald-400" 
+                          : (peer["3y"] ?? 0) < 0 
+                            ? "text-rose-600 dark:text-rose-400" 
+                            : "text-muted-foreground"
                       )}>
                         {peer["3y"] ? formatPercent(peer["3y"]) : "--"}
                       </span>

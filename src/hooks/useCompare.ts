@@ -1,4 +1,8 @@
 import { useState, useEffect } from "react";
+import { z } from "zod";
+
+const compareListSchema = z.array(z.string());
+const compareNamesSchema = z.record(z.string(), z.string());
 
 export function useCompare() {
   const [compareList, setCompareList] = useState<string[]>([]);
@@ -8,18 +12,43 @@ export function useCompare() {
     const stored = localStorage.getItem("mfc:compare");
     if (stored) {
       try {
-        setCompareList(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        const validated = compareListSchema.safeParse(parsed);
+        if (validated.success) {
+          setCompareList(validated.data);
+        } else {
+          console.warn("Invalid compare list schema in localStorage, resetting");
+          setCompareList([]);
+          localStorage.removeItem("mfc:compare");
+        }
       } catch (e) {
         console.error("Failed to parse compare list", e);
+        setCompareList([]);
+        localStorage.removeItem("mfc:compare");
       }
+    } else {
+      setCompareList([]);
     }
+
     const storedNames = localStorage.getItem("mfc:compare_names");
     if (storedNames) {
       try {
-        setCompareNames(JSON.parse(storedNames));
+        const parsed = JSON.parse(storedNames);
+        const validated = compareNamesSchema.safeParse(parsed);
+        if (validated.success) {
+          setCompareNames(validated.data);
+        } else {
+          console.warn("Invalid compare names schema in localStorage, resetting");
+          setCompareNames({});
+          localStorage.removeItem("mfc:compare_names");
+        }
       } catch (e) {
         console.error("Failed to parse compare names", e);
+        setCompareNames({});
+        localStorage.removeItem("mfc:compare_names");
       }
+    } else {
+      setCompareNames({});
     }
   };
 
