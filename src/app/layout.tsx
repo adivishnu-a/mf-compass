@@ -4,7 +4,7 @@ import { ThemeScript } from "@/components/ThemeScript";
 import { ToastProvider } from "@/components/Toast";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { CommandMenu } from "@/components/CommandMenu";
+import { CommandMenuLoader } from "@/components/CommandMenuLoader";
 import { CompareStickyBar } from "@/components/CompareStickyBar";
 import "./globals.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     locale: "en_IN",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
   },
 };
 
@@ -71,7 +71,7 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
-        <CommandMenu />
+        <CommandMenuLoader />
         <CompareStickyBar />
         <ToastProvider />
         <SpeedInsights />

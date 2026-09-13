@@ -1,21 +1,31 @@
 import { MetadataRoute } from "next";
 import { db } from "@/lib/db";
+import { funds } from "@drizzle/schema";
+import { sql } from "drizzle-orm";
 import { FUND_CATEGORIES } from "@/lib/kuvera/categories";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mf-compass.vercel.app";
 
-  // Base routes
+  // The site changes when the data does; fall back to build time if the query fails.
+  let dataUpdated = new Date();
+  try {
+    const [row] = await db.select({ max: sql<Date | null>`MAX(${funds.lastUpdated})` }).from(funds);
+    if (row?.max) dataUpdated = new Date(row.max);
+  } catch (error) {
+    console.error("Error reading data timestamp for sitemap:", error);
+  }
+
   const routes = [
     {
       url: baseUrl,
-      lastModified: new Date(),
+      lastModified: dataUpdated,
       changeFrequency: "daily" as const,
       priority: 1.0,
     },
     {
       url: `${baseUrl}/funds`,
-      lastModified: new Date(),
+      lastModified: dataUpdated,
       changeFrequency: "daily" as const,
       priority: 0.8,
     },
@@ -36,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     return {
       url: `${baseUrl}/funds?group=${group}&category=${encodeURIComponent(cat)}`,
-      lastModified: new Date(),
+      lastModified: dataUpdated,
       changeFrequency: "daily" as const,
       priority: 0.7,
     };

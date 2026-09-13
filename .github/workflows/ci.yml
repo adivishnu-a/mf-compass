@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - main
-      - fresh-build
   pull_request:
     branches:
       - main
-      - fresh-build
 
 jobs:
   validate:

@@ -1,4 +1,4 @@
-import React, { cache } from "react";
+import React from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -9,6 +9,7 @@ import { formatPercent, formatINR, formatAUM, formatNAV, isReturnGenuine } from 
 import { FundDetailActions } from "@/components/funds/FundDetailActions";
 import { ArrowLeft, Calendar, Activity, Star } from "lucide-react";
 import { AmcLogo } from "@/components/ui/AmcLogo";
+import { getFund } from "@/lib/funds/queries";
 import { cn } from "@/lib/utils";
 
 // ISR caching: revalidate every 5 minutes
@@ -40,10 +41,6 @@ function parseFundManagers(managers: unknown): string[] {
   }
   return [];
 }
-
-const getFund = cache(async (code: string) =>
-  db.query.funds.findFirst({ where: eq(funds.kuveraCode, code) })
-);
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { code } = await params;

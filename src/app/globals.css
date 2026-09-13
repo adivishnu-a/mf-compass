@@ -10,7 +10,7 @@
   --popover: #ffffff;
   --popover-foreground: #0f172a;
   
-  --primary: #0183ff; /* Lighter vibrant cobalt/cerulean blue */
+  --primary: #006ad6; /* Cobalt: 5.2:1 with white text (AA) */
   --primary-foreground: #ffffff;
   
   --secondary: #f1f5f9;
@@ -27,10 +27,10 @@
   
   --border: #e2e8f0;
   --input: #e2e8f0;
-  --ring: #0183ff;
+  --ring: #006ad6;
   
-  --brand: #0183ff;
-  --brand-gilt: #0183ff;
+  --brand: #006ad6;
+  --brand-gilt: #006ad6;
   --brand-foreground: #ffffff;
   
   --radius: 0.5rem;      /* Softened component radius (8px) */

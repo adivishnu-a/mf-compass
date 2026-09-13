@@ -19,9 +19,9 @@ interface RecentSearch {
   schemeName: string;
 }
 
-export function CommandMenu() {
+export function CommandMenu({ defaultOpen = false }: { defaultOpen?: boolean }) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);

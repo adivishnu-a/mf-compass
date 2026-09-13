@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { funds } from "@drizzle/schema";
-import { eq, desc } from "drizzle-orm";
+import { getLeaderboard } from "@/lib/funds/queries";
 import { FUND_CATEGORIES } from "@/lib/kuvera/categories";
 
 export async function GET(request: NextRequest) {
@@ -9,60 +7,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
 
-    // Query filters
-    let queryFilter = undefined;
-    if (category && category !== "all") {
-      const isValid = (FUND_CATEGORIES as readonly string[]).includes(category);
-      if (!isValid) {
-        return NextResponse.json(
-          { success: false, error: `Invalid category: ${category}` },
-          { status: 400 }
-        );
-      }
-      queryFilter = eq(funds.fundCategory, category);
+    if (category && category !== "all" && !(FUND_CATEGORIES as readonly string[]).includes(category)) {
+      return NextResponse.json(
+        { success: false, error: `Invalid category: ${category}` },
+        { status: 400 }
+      );
     }
 
-    // Projection fields (excluding heavy fields to keep payload small)
-    const data = await db.query.funds.findMany({
-      columns: {
-        id: true,
-        kuveraCode: true,
-        schemeName: true,
-        shortName: true,
-        smallScreenName: true,
-        isin: true,
-        fundHouse: true,
-        fundHouseName: true,
-        fundCategory: true,
-        fundType: true,
-        lumpAvailable: true,
-        lumpMin: true,
-        sipAvailable: true,
-        sipMin: true,
-        lockInPeriod: true,
-        currentNavDate: true,
-        t1NavDate: true,
-        returns1d: true,
-        returns1w: true,
-        returns1y: true,
-        returns3y: true,
-        returns5y: true,
-        returnsInception: true,
-        returnsDate: true,
-        startDate: true,
-        expenseRatio: true,
-        expenseRatioDate: true,
-        aum: true,
-        fundRating: true,
-        fundRatingDate: true,
-        totalScore: true,
-        scoreUpdated: true,
-        lastUpdated: true,
-        createdAt: true,
-      },
-      where: queryFilter,
-      orderBy: [desc(funds.totalScore)],
-    });
+    const data = await getLeaderboard(category && category !== "all" ? category : null);
 
     const response = NextResponse.json({
       success: true,
