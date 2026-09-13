@@ -1,4 +1,5 @@
 import React from "react";
+import { unstable_cache } from "next/cache";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { funds } from "@drizzle/schema";
@@ -6,7 +7,9 @@ import { sql } from "drizzle-orm";
 import { formatIST } from "@/lib/format";
 import { CompareFooterLink } from "./CompareFooterLink";
 
-async function getLastUpdatedTimestamp(): Promise<string> {
+// Cached so dynamic pages do not query the database on every request.
+const getLastUpdatedTimestamp = unstable_cache(
+  async (): Promise<string> => {
   try {
     const result = await db
       .select({
@@ -20,7 +23,10 @@ async function getLastUpdatedTimestamp(): Promise<string> {
     console.error("Error fetching last updated timestamp for footer:", error);
     return formatIST(new Date()); // fallback to current date
   }
-}
+  },
+  ["footer-last-updated"],
+  { revalidate: 300, tags: ["funds"] }
+);
 
 export async function Footer() {
   const lastUpdated = await getLastUpdatedTimestamp();
