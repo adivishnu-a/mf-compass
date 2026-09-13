@@ -4,7 +4,8 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "MF Compass",
     short_name: "MFC",
-    description: "Identify Indian mutual funds that consistently outperform their peers.",
+    description:
+      "Identify Indian mutual funds that consistently outperform their peers.",
     start_url: "/",
     display: "standalone",
     background_color: "#f8fafc",

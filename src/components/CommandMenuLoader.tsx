@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 const CommandMenu = dynamic(
   () => import("@/components/CommandMenu").then((mod) => mod.CommandMenu),
-  { ssr: false }
+  { ssr: false },
 );
 
 /**

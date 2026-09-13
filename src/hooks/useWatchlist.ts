@@ -32,7 +32,8 @@ export function useWatchlist() {
   useEffect(() => {
     loadWatchlist();
     window.addEventListener("mfc-watchlist-change", loadWatchlist);
-    return () => window.removeEventListener("mfc-watchlist-change", loadWatchlist);
+    return () =>
+      window.removeEventListener("mfc-watchlist-change", loadWatchlist);
   }, []);
 
   const toggleWatchlist = (code: string) => {

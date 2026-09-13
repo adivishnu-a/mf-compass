@@ -3,14 +3,23 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Sun, Moon, Laptop, Heart, GitCompare, Menu, X } from "lucide-react";
+import {
+  Search,
+  Sun,
+  Moon,
+  Laptop,
+  Heart,
+  GitCompare,
+  Menu,
+  X,
+} from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
-  
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
   const [watchlistCount, setWatchlistCount] = useState(0);
@@ -20,9 +29,11 @@ export function Navbar() {
   // Sync counts from localStorage
   const updateCounts = () => {
     try {
-      const watchlist = JSON.parse(localStorage.getItem("mfc:watchlist") || "[]");
+      const watchlist = JSON.parse(
+        localStorage.getItem("mfc:watchlist") || "[]",
+      );
       setWatchlistCount(watchlist.length);
-      
+
       const compare = JSON.parse(localStorage.getItem("mfc:compare") || "[]");
       setCompareCount(compare.length);
       setCompareCodes(compare);
@@ -33,12 +44,12 @@ export function Navbar() {
 
   useEffect(() => {
     updateCounts();
-    
+
     // Listen to local storage and custom events
     window.addEventListener("storage", updateCounts);
     window.addEventListener("mfc-watchlist-change", updateCounts);
     window.addEventListener("mfc-compare-change", updateCounts);
-    
+
     return () => {
       window.removeEventListener("storage", updateCounts);
       window.removeEventListener("mfc-watchlist-change", updateCounts);
@@ -52,43 +63,48 @@ export function Navbar() {
 
   const navLinks = [
     { href: "/funds", label: "Explore Funds" },
-    { 
-      href: "/watchlist", 
-      label: "Watchlist", 
-      icon: Heart, 
-      count: watchlistCount 
+    {
+      href: "/watchlist",
+      label: "Watchlist",
+      icon: Heart,
+      count: watchlistCount,
     },
-    { 
-      href: compareCodes.length > 0 ? `/compare?codes=${compareCodes.join(",")}` : "/compare", 
-      label: "Compare", 
-      icon: GitCompare, 
+    {
+      href:
+        compareCodes.length > 0
+          ? `/compare?codes=${compareCodes.join(",")}`
+          : "/compare",
+      label: "Compare",
+      icon: GitCompare,
       count: compareCount,
-      countMin: 2 // Only show badge if at least 1 or 2? Let's show always if > 0
+      countMin: 2, // Only show badge if at least 1 or 2? Let's show always if > 0
     },
   ];
 
-  const isLinkActive = (href: string) => 
-    pathname === href || (href.startsWith("/compare") && pathname === "/compare");
+  const isLinkActive = (href: string) =>
+    pathname === href ||
+    (href.startsWith("/compare") && pathname === "/compare");
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur-md transition-colors duration-200">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <img 
-            src="/logo-96.png" 
-            alt="MF Compass Logo" 
-            width={24} 
-            height={24} 
+        <Link href="/" className="group flex items-center gap-2.5">
+          <img
+            src="/logo-96.png"
+            alt="MF Compass Logo"
+            width={24}
+            height={24}
             className="h-6 w-6 object-contain"
           />
-          <span className="font-heading font-extrabold text-xl tracking-tight text-foreground transition-colors">
-            <span className="text-primary group-hover:text-primary/80">MF</span> Compass
+          <span className="font-heading text-xl font-extrabold tracking-tight text-foreground transition-colors">
+            <span className="text-primary group-hover:text-primary/80">MF</span>{" "}
+            Compass
           </span>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden items-center gap-6 md:flex">
           {navLinks.map((link) => {
             const isActive = isLinkActive(link.href);
             return (
@@ -97,15 +113,15 @@ export function Navbar() {
                 href={link.href}
                 className={cn(
                   "relative flex items-center gap-1.5 py-2 text-sm font-medium transition-colors hover:text-foreground/90",
-                  isActive 
-                    ? "text-foreground font-semibold" 
-                    : "text-muted-foreground"
+                  isActive
+                    ? "font-semibold text-foreground"
+                    : "text-muted-foreground",
                 )}
               >
                 {link.icon && <link.icon className="h-4 w-4" />}
                 {link.label}
                 {link.count !== undefined && link.count > 0 && (
-                  <span className="inline-flex items-center justify-center rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground font-data">
+                  <span className="font-data inline-flex items-center justify-center rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
                     {link.count}
                   </span>
                 )}
@@ -122,12 +138,15 @@ export function Navbar() {
           {/* Search Trigger */}
           <button
             onClick={triggerSearch}
-            className="flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-all hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-all hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
             aria-label="Search funds"
           >
             <Search className="h-4 w-4" />
             <span className="hidden sm:inline">Search...</span>
-            <kbd aria-hidden="true" className="hidden lg:inline-flex h-5 select-none items-center gap-0.5 rounded border border-border bg-muted px-1.5 text-[10px] font-medium opacity-100 font-data">
+            <kbd
+              aria-hidden="true"
+              className="font-data hidden h-5 items-center gap-0.5 rounded border border-border bg-muted px-1.5 text-[10px] font-medium opacity-100 select-none lg:inline-flex"
+            >
               <span className="text-xs">⌘</span>K
             </kbd>
           </button>
@@ -136,7 +155,7 @@ export function Navbar() {
           <div className="relative">
             <button
               onClick={() => setThemeDropdownOpen(!themeDropdownOpen)}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card/50 text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card/50 text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
               aria-label="Toggle theme"
             >
               {theme === "light" && <Sun className="h-4 w-4" />}
@@ -146,11 +165,11 @@ export function Navbar() {
 
             {themeDropdownOpen && (
               <>
-                <div 
-                  className="fixed inset-0 z-40" 
+                <div
+                  className="fixed inset-0 z-40"
                   onClick={() => setThemeDropdownOpen(false)}
                 />
-                <div className="absolute right-0 mt-2 w-32 origin-top-right rounded-xl border border-border bg-card/95 p-1 shadow-xl z-50 animate-dropdown-enter">
+                <div className="animate-dropdown-enter absolute right-0 z-50 mt-2 w-32 origin-top-right rounded-xl border border-border bg-card/95 p-1 shadow-xl">
                   {(["light", "dark", "system"] as const).map((t) => (
                     <button
                       key={t}
@@ -159,8 +178,10 @@ export function Navbar() {
                         setThemeDropdownOpen(false);
                       }}
                       className={cn(
-                        "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium capitalize transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                        theme === t ? "text-primary font-bold bg-accent/40" : "text-muted-foreground"
+                        "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium capitalize transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none",
+                        theme === t
+                          ? "bg-accent/40 font-bold text-primary"
+                          : "text-muted-foreground",
                       )}
                     >
                       {t === "light" && <Sun className="h-3.5 w-3.5" />}
@@ -177,17 +198,21 @@ export function Navbar() {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card/50 text-foreground md:hidden transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card/50 text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none md:hidden"
             aria-label="Toggle mobile menu"
           >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {mobileMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </button>
         </div>
       </div>
 
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 w-full border-b border-border bg-background/95 backdrop-blur-lg shadow-2xl z-50 animate-mobile-menu-enter">
+        <div className="animate-mobile-menu-enter absolute top-full right-0 left-0 z-50 w-full border-b border-border bg-background/95 shadow-2xl backdrop-blur-lg md:hidden">
           <nav className="flex flex-col gap-2 p-4">
             {navLinks.map((link) => {
               const isActive = isLinkActive(link.href);
@@ -198,7 +223,9 @@ export function Navbar() {
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent hover:text-foreground",
-                    isActive ? "bg-accent/60 text-foreground font-semibold" : "text-muted-foreground"
+                    isActive
+                      ? "bg-accent/60 font-semibold text-foreground"
+                      : "text-muted-foreground",
                   )}
                 >
                   <span className="flex items-center gap-2">
@@ -206,7 +233,7 @@ export function Navbar() {
                     {link.label}
                   </span>
                   {link.count !== undefined && link.count > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-primary px-2 py-0.5 text-xs font-bold text-primary-foreground font-data">
+                    <span className="font-data inline-flex items-center justify-center rounded-full bg-primary px-2 py-0.5 text-xs font-bold text-primary-foreground">
                       {link.count}
                     </span>
                   )}

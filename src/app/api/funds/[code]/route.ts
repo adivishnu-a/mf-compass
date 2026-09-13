@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ code: string }> }
+  { params }: { params: Promise<{ code: string }> },
 ) {
   try {
     const { code } = await params;
@@ -13,7 +13,7 @@ export async function GET(
     if (!code) {
       return NextResponse.json(
         { success: false, error: "Kuvera code is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -24,7 +24,7 @@ export async function GET(
     if (!data) {
       return NextResponse.json(
         { success: false, error: "Fund not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -36,7 +36,7 @@ export async function GET(
     // Cache-Control: public, s-maxage=300, stale-while-revalidate=600
     response.headers.set(
       "Cache-Control",
-      "public, s-maxage=300, stale-while-revalidate=600"
+      "public, s-maxage=300, stale-while-revalidate=600",
     );
 
     return response;
@@ -44,7 +44,7 @@ export async function GET(
     console.error("Error fetching fund details:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

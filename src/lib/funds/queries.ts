@@ -59,15 +59,21 @@ async function queryLeaderboard(category: string | null) {
   }));
 }
 
-export type LeaderboardFund = Awaited<ReturnType<typeof queryLeaderboard>>[number];
+export type LeaderboardFund = Awaited<
+  ReturnType<typeof queryLeaderboard>
+>[number];
 
 /** Category leaderboard, cached for five minutes per category (null = all funds). */
-export const getLeaderboard = unstable_cache(queryLeaderboard, ["leaderboard"], {
-  revalidate: 300,
-  tags: ["funds"],
-});
+export const getLeaderboard = unstable_cache(
+  queryLeaderboard,
+  ["leaderboard"],
+  {
+    revalidate: 300,
+    tags: ["funds"],
+  },
+);
 
 /** One fund by Kuvera code, deduplicated across metadata, page and share card within a request. */
 export const getFund = cache(async (code: string) =>
-  db.query.funds.findFirst({ where: eq(funds.kuveraCode, code) })
+  db.query.funds.findFirst({ where: eq(funds.kuveraCode, code) }),
 );

@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     if (!codesParam) {
       return NextResponse.json(
         { success: false, error: "Missing 'codes' query parameter" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -23,14 +23,14 @@ export async function GET(request: NextRequest) {
     if (codes.length === 0) {
       return NextResponse.json(
         { success: false, error: "Empty 'codes' query parameter" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (codes.length > 10) {
       return NextResponse.json(
         { success: false, error: "Cannot request more than 10 codes" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     // Map to preserve order and keep only valid found ones
     const data = codes
       .map((code) => dbFunds.find((f) => f.kuveraCode === code))
-      .filter((f): f is typeof dbFunds[number] => !!f);
+      .filter((f): f is (typeof dbFunds)[number] => !!f);
 
     const response = NextResponse.json({
       success: true,
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     // Cache-Control: public, s-maxage=300, stale-while-revalidate=600
     response.headers.set(
       "Cache-Control",
-      "public, s-maxage=300, stale-while-revalidate=600"
+      "public, s-maxage=300, stale-while-revalidate=600",
     );
 
     return response;
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching funds by codes:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

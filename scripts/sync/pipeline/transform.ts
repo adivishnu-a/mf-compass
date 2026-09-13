@@ -22,18 +22,27 @@ function parseFundManagers(raw: string | null | undefined): string[] {
  * Compute 1-day return from current and previous NAV.
  * returns_1d = (current_nav - t1_nav) / t1_nav * 100
  */
-function computeReturns1d(currentNav: number | null, t1Nav: number | null): string | null {
+function computeReturns1d(
+  currentNav: number | null,
+  t1Nav: number | null,
+): string | null {
   if (currentNav === null || t1Nav === null || t1Nav === 0) return null;
   return (((currentNav - t1Nav) / t1Nav) * 100).toFixed(4);
 }
 
-export function cleanReturns(returns: {
-  week_1?: number | null;
-  year_1?: number | null;
-  year_3?: number | null;
-  year_5?: number | null;
-  inception?: number | null;
-} | null | undefined, stripTrailingZeros: boolean = false) {
+export function cleanReturns(
+  returns:
+    | {
+        week_1?: number | null;
+        year_1?: number | null;
+        year_3?: number | null;
+        year_5?: number | null;
+        inception?: number | null;
+      }
+    | null
+    | undefined,
+  stripTrailingZeros: boolean = false,
+) {
   const result = {
     returns1w: null as string | null,
     returns1y: null as string | null,
@@ -87,9 +96,10 @@ export function cleanReturns(returns: {
 export function transformFundDetail(detail: FundDetail): NewFund {
   const currentNav = detail.nav?.nav ?? null;
   const t1Nav = detail.last_nav?.nav ?? null;
-  const aumCrore = detail.aum !== null && detail.aum !== undefined
-    ? (detail.aum / 10).toFixed(2)
-    : null;
+  const aumCrore =
+    detail.aum !== null && detail.aum !== undefined
+      ? (detail.aum / 10).toFixed(2)
+      : null;
 
   const cleaned = cleanReturns(detail.returns);
 
@@ -134,7 +144,10 @@ export function transformFundDetail(detail: FundDetail): NewFund {
     comparison: detail.comparison
       ? detail.comparison.map((peer) => ({
           ...peer,
-          aum: peer.aum !== null && peer.aum !== undefined ? peer.aum / 10 : peer.aum,
+          aum:
+            peer.aum !== null && peer.aum !== undefined
+              ? peer.aum / 10
+              : peer.aum,
         }))
       : null,
     totalScore: null,

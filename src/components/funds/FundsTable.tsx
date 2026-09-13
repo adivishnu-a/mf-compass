@@ -2,7 +2,13 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
-import { ArrowUpDown, ArrowUp, ArrowDown, Heart, GitCompare } from "lucide-react";
+import {
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Heart,
+  GitCompare,
+} from "lucide-react";
 import { AmcLogo } from "@/components/ui/AmcLogo";
 import { useWatchlist } from "@/hooks/useWatchlist";
 import { useCompare } from "@/hooks/useCompare";
@@ -69,9 +75,14 @@ interface SortIconProps {
 }
 
 function SortIcon({ field, sortField, sortOrder }: SortIconProps) {
-  if (sortField !== field) return <ArrowUpDown className="ml-1 h-3.5 w-3.5 opacity-40 hover:opacity-100 transition-opacity" />;
-  if (sortOrder === "desc") return <ArrowDown className="ml-1 h-3.5 w-3.5 text-primary font-bold" />;
-  if (sortOrder === "asc") return <ArrowUp className="ml-1 h-3.5 w-3.5 text-primary font-bold" />;
+  if (sortField !== field)
+    return (
+      <ArrowUpDown className="ml-1 h-3.5 w-3.5 opacity-40 transition-opacity hover:opacity-100" />
+    );
+  if (sortOrder === "desc")
+    return <ArrowDown className="ml-1 h-3.5 w-3.5 font-bold text-primary" />;
+  if (sortOrder === "asc")
+    return <ArrowUp className="ml-1 h-3.5 w-3.5 font-bold text-primary" />;
   return <ArrowUpDown className="ml-1 h-3.5 w-3.5 opacity-40" />;
 }
 
@@ -84,7 +95,11 @@ export function FundsTable({ funds }: FundsTableProps) {
 
   const getAriaSort = (field: SortField) => {
     if (sortField !== field) return "none";
-    return sortOrder === "asc" ? "ascending" : sortOrder === "desc" ? "descending" : "none";
+    return sortOrder === "asc"
+      ? "ascending"
+      : sortOrder === "desc"
+        ? "descending"
+        : "none";
   };
 
   const handleHeaderKeyDown = (e: React.KeyboardEvent, field: SortField) => {
@@ -153,24 +168,27 @@ export function FundsTable({ funds }: FundsTableProps) {
   const renderReturnCell = (
     val: string | null,
     period: "1d" | "1w" | "1y" | "3y" | "5y",
-    fund: Fund
+    fund: Fund,
   ) => {
-    if (val === null || val === undefined) return <span className="text-muted-foreground/45 font-sans">--</span>;
+    if (val === null || val === undefined)
+      return <span className="font-sans text-muted-foreground/45">--</span>;
     const num = parseFloat(val);
-    if (isNaN(num)) return <span className="text-muted-foreground/45 font-sans">--</span>;
+    if (isNaN(num))
+      return <span className="font-sans text-muted-foreground/45">--</span>;
 
     const genuine = isReturnGenuine(val, period, fund);
-    if (!genuine) return <span className="text-muted-foreground/45 font-sans">--</span>;
+    if (!genuine)
+      return <span className="font-sans text-muted-foreground/45">--</span>;
 
     return (
       <span
         className={cn(
-          "font-data font-semibold text-xs px-2 py-0.5 rounded",
-          num > 0 
-            ? "text-emerald-800 dark:text-emerald-400 bg-emerald-500/10" 
-            : num < 0 
-              ? "text-rose-800 dark:text-rose-400 bg-rose-500/10" 
-              : "text-muted-foreground"
+          "font-data rounded px-2 py-0.5 text-xs font-semibold",
+          num > 0
+            ? "bg-emerald-500/10 text-emerald-800 dark:text-emerald-400"
+            : num < 0
+              ? "bg-rose-500/10 text-rose-800 dark:text-rose-400"
+              : "text-muted-foreground",
         )}
       >
         {formatPercent(num, true, true)}
@@ -181,13 +199,15 @@ export function FundsTable({ funds }: FundsTableProps) {
   return (
     <div className="w-full">
       {/* Desktop Table View */}
-      <div className="hidden md:block overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
+      <div className="hidden overflow-x-auto rounded-xl border border-border bg-card shadow-sm md:block">
         <table className="w-full border-collapse text-left text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/40 transition-colors">
-              <th className="pl-6 pr-2 py-3 font-semibold text-muted-foreground w-16 text-center">Rank</th>
-              <th 
-                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+              <th className="w-16 py-3 pr-2 pl-6 text-center font-semibold text-muted-foreground">
+                Rank
+              </th>
+              <th
+                className="cursor-pointer px-2 py-3 font-semibold text-muted-foreground transition-colors select-none hover:bg-muted/60 focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset"
                 onClick={() => handleSort("schemeName")}
                 onKeyDown={(e) => handleHeaderKeyDown(e, "schemeName")}
                 tabIndex={0}
@@ -195,11 +215,16 @@ export function FundsTable({ funds }: FundsTableProps) {
                 aria-sort={getAriaSort("schemeName")}
               >
                 <div className="flex items-center">
-                  Mutual Fund <SortIcon field="schemeName" sortField={sortField as SortField} sortOrder={sortOrder} />
+                  Mutual Fund{" "}
+                  <SortIcon
+                    field="schemeName"
+                    sortField={sortField as SortField}
+                    sortOrder={sortOrder}
+                  />
                 </div>
               </th>
-              <th 
-                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-24 focus-visible:outline-none focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+              <th
+                className="w-24 cursor-pointer px-2 py-3 text-center font-semibold text-muted-foreground transition-colors select-none hover:bg-muted/60 focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset"
                 onClick={() => handleSort("totalScore")}
                 onKeyDown={(e) => handleHeaderKeyDown(e, "totalScore")}
                 tabIndex={0}
@@ -207,11 +232,16 @@ export function FundsTable({ funds }: FundsTableProps) {
                 aria-sort={getAriaSort("totalScore")}
               >
                 <div className="flex items-center justify-center">
-                  Score <SortIcon field="totalScore" sortField={sortField as SortField} sortOrder={sortOrder} />
+                  Score{" "}
+                  <SortIcon
+                    field="totalScore"
+                    sortField={sortField as SortField}
+                    sortOrder={sortOrder}
+                  />
                 </div>
               </th>
-              <th 
-                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16 focus-visible:outline-none focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+              <th
+                className="w-16 cursor-pointer px-2 py-3 text-center font-semibold text-muted-foreground transition-colors select-none hover:bg-muted/60 focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset"
                 onClick={() => handleSort("returns1d")}
                 onKeyDown={(e) => handleHeaderKeyDown(e, "returns1d")}
                 tabIndex={0}
@@ -219,11 +249,16 @@ export function FundsTable({ funds }: FundsTableProps) {
                 aria-sort={getAriaSort("returns1d")}
               >
                 <div className="flex items-center justify-center">
-                  1D <SortIcon field="returns1d" sortField={sortField as SortField} sortOrder={sortOrder} />
+                  1D{" "}
+                  <SortIcon
+                    field="returns1d"
+                    sortField={sortField as SortField}
+                    sortOrder={sortOrder}
+                  />
                 </div>
               </th>
-              <th 
-                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16 focus-visible:outline-none focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+              <th
+                className="w-16 cursor-pointer px-2 py-3 text-center font-semibold text-muted-foreground transition-colors select-none hover:bg-muted/60 focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset"
                 onClick={() => handleSort("returns1w")}
                 onKeyDown={(e) => handleHeaderKeyDown(e, "returns1w")}
                 tabIndex={0}
@@ -231,11 +266,16 @@ export function FundsTable({ funds }: FundsTableProps) {
                 aria-sort={getAriaSort("returns1w")}
               >
                 <div className="flex items-center justify-center">
-                  1W <SortIcon field="returns1w" sortField={sortField as SortField} sortOrder={sortOrder} />
+                  1W{" "}
+                  <SortIcon
+                    field="returns1w"
+                    sortField={sortField as SortField}
+                    sortOrder={sortOrder}
+                  />
                 </div>
               </th>
-              <th 
-                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16 focus-visible:outline-none focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+              <th
+                className="w-16 cursor-pointer px-2 py-3 text-center font-semibold text-muted-foreground transition-colors select-none hover:bg-muted/60 focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset"
                 onClick={() => handleSort("returns1y")}
                 onKeyDown={(e) => handleHeaderKeyDown(e, "returns1y")}
                 tabIndex={0}
@@ -243,11 +283,16 @@ export function FundsTable({ funds }: FundsTableProps) {
                 aria-sort={getAriaSort("returns1y")}
               >
                 <div className="flex items-center justify-center">
-                  1Y <SortIcon field="returns1y" sortField={sortField as SortField} sortOrder={sortOrder} />
+                  1Y{" "}
+                  <SortIcon
+                    field="returns1y"
+                    sortField={sortField as SortField}
+                    sortOrder={sortOrder}
+                  />
                 </div>
               </th>
-              <th 
-                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16 focus-visible:outline-none focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+              <th
+                className="w-16 cursor-pointer px-2 py-3 text-center font-semibold text-muted-foreground transition-colors select-none hover:bg-muted/60 focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset"
                 onClick={() => handleSort("returns3y")}
                 onKeyDown={(e) => handleHeaderKeyDown(e, "returns3y")}
                 tabIndex={0}
@@ -255,11 +300,16 @@ export function FundsTable({ funds }: FundsTableProps) {
                 aria-sort={getAriaSort("returns3y")}
               >
                 <div className="flex items-center justify-center">
-                  3Y <SortIcon field="returns3y" sortField={sortField as SortField} sortOrder={sortOrder} />
+                  3Y{" "}
+                  <SortIcon
+                    field="returns3y"
+                    sortField={sortField as SortField}
+                    sortOrder={sortOrder}
+                  />
                 </div>
               </th>
-              <th 
-                className="px-2 py-3 font-semibold text-muted-foreground cursor-pointer select-none hover:bg-muted/60 transition-colors text-center w-16 focus-visible:outline-none focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+              <th
+                className="w-16 cursor-pointer px-2 py-3 text-center font-semibold text-muted-foreground transition-colors select-none hover:bg-muted/60 focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset"
                 onClick={() => handleSort("returns5y")}
                 onKeyDown={(e) => handleHeaderKeyDown(e, "returns5y")}
                 tabIndex={0}
@@ -267,11 +317,20 @@ export function FundsTable({ funds }: FundsTableProps) {
                 aria-sort={getAriaSort("returns5y")}
               >
                 <div className="flex items-center justify-center">
-                  5Y <SortIcon field="returns5y" sortField={sortField as SortField} sortOrder={sortOrder} />
+                  5Y{" "}
+                  <SortIcon
+                    field="returns5y"
+                    sortField={sortField as SortField}
+                    sortOrder={sortOrder}
+                  />
                 </div>
               </th>
-              <th className="px-2 py-3 font-semibold text-muted-foreground w-12 text-center">Compare</th>
-              <th className="pl-2 pr-6 py-3 font-semibold text-muted-foreground w-16 text-center">Watch</th>
+              <th className="w-12 px-2 py-3 text-center font-semibold text-muted-foreground">
+                Compare
+              </th>
+              <th className="w-16 py-3 pr-6 pl-2 text-center font-semibold text-muted-foreground">
+                Watch
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -281,56 +340,75 @@ export function FundsTable({ funds }: FundsTableProps) {
               const isWatchChecked = isWatched(fund.kuveraCode);
 
               return (
-                <tr 
-                  key={fund.id} 
-                  className="hover:bg-muted/20 transition-all group duration-150"
+                <tr
+                  key={fund.id}
+                  className="group transition-all duration-150 hover:bg-muted/20"
                 >
                   {/* Rank */}
-                  <td className="pl-6 pr-2 py-3 text-center font-data font-bold text-muted-foreground/80">
+                  <td className="font-data py-3 pr-2 pl-6 text-center font-bold text-muted-foreground/80">
                     {rank}
                   </td>
-                  
+
                   {/* Fund Name & House */}
                   <td className="px-2 py-3">
                     <div className="flex items-center gap-3">
-                      <AmcLogo fundHouse={fund.fundHouse} fundHouseName={fund.fundHouseName} size="md" />
-                      <div className="flex flex-col truncate max-w-[280px] lg:max-w-[400px]">
-                        <Link 
+                      <AmcLogo
+                        fundHouse={fund.fundHouse}
+                        fundHouseName={fund.fundHouseName}
+                        size="md"
+                      />
+                      <div className="flex max-w-[280px] flex-col truncate lg:max-w-[400px]">
+                        <Link
                           href={`/fund/${fund.kuveraCode}`}
-                          className="font-heading font-medium text-foreground hover:text-primary transition-colors truncate"
+                          className="truncate font-heading font-medium text-foreground transition-colors hover:text-primary"
                         >
                           {fund.schemeName}
                         </Link>
-                        <span className="text-[10px] text-muted-foreground truncate mt-0.5">
+                        <span className="mt-0.5 truncate text-[10px] text-muted-foreground">
                           {fund.fundHouseName} • {fund.fundType}
                         </span>
                       </div>
                     </div>
                   </td>
- 
+
                   {/* Score */}
                   <td className="px-2 py-3 text-center">
-                    <span className="inline-flex items-center justify-center rounded-md bg-primary/10 px-2 py-1 text-xs font-bold text-primary font-data border border-primary/20">
+                    <span className="font-data inline-flex items-center justify-center rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs font-bold text-primary">
                       {parseFloat(fund.totalScore || "0").toFixed(1)}
                     </span>
                   </td>
 
                   {/* Returns */}
-                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns1d, "1d", fund)}</td>
-                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns1w, "1w", fund)}</td>
-                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns1y, "1y", fund)}</td>
-                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns3y, "3y", fund)}</td>
-                  <td className="px-2 py-3 text-center">{renderReturnCell(fund.returns5y, "5y", fund)}</td>
+                  <td className="px-2 py-3 text-center">
+                    {renderReturnCell(fund.returns1d, "1d", fund)}
+                  </td>
+                  <td className="px-2 py-3 text-center">
+                    {renderReturnCell(fund.returns1w, "1w", fund)}
+                  </td>
+                  <td className="px-2 py-3 text-center">
+                    {renderReturnCell(fund.returns1y, "1y", fund)}
+                  </td>
+                  <td className="px-2 py-3 text-center">
+                    {renderReturnCell(fund.returns3y, "3y", fund)}
+                  </td>
+                  <td className="px-2 py-3 text-center">
+                    {renderReturnCell(fund.returns5y, "5y", fund)}
+                  </td>
 
                   {/* Compare Checkbox */}
                   <td className="px-2 py-3 text-center">
                     <button
-                      onClick={() => toggleCompare(fund.kuveraCode, fund.shortName || fund.schemeName)}
+                      onClick={() =>
+                        toggleCompare(
+                          fund.kuveraCode,
+                          fund.shortName || fund.schemeName,
+                        )
+                      }
                       className={cn(
-                        "inline-flex h-4 w-4 items-center justify-center rounded-full border transition-all hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1",
-                        isCompareChecked 
-                          ? "border-primary bg-primary text-primary-foreground" 
-                          : "border-muted-foreground/40 bg-transparent text-transparent"
+                        "inline-flex h-4 w-4 items-center justify-center rounded-full border transition-all hover:border-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none",
+                        isCompareChecked
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-muted-foreground/40 bg-transparent text-transparent",
                       )}
                       aria-label={`Compare ${fund.schemeName}`}
                     >
@@ -339,20 +417,20 @@ export function FundsTable({ funds }: FundsTableProps) {
                   </td>
 
                   {/* Watchlist Heart */}
-                  <td className="pl-2 pr-6 py-3 text-center">
+                  <td className="py-3 pr-6 pl-2 text-center">
                     <button
                       onClick={() => toggleWatchlist(fund.kuveraCode)}
-                      className="text-muted-foreground/40 hover:text-rose-500 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 rounded-full p-0.5"
+                      className="rounded-full p-0.5 text-muted-foreground/40 transition-colors hover:text-rose-500 focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 focus-visible:outline-none"
                       aria-label={`Save ${fund.schemeName} to watchlist`}
                       aria-pressed={isWatchChecked}
                     >
-                      <Heart 
+                      <Heart
                         className={cn(
-                          "h-4 w-4 transition-transform duration-200 active:scale-110", 
-                          isWatchChecked 
-                            ? "fill-rose-500 text-rose-500 opacity-100 animate-heart-pop" 
-                            : "opacity-80"
-                        )} 
+                          "h-4 w-4 transition-transform duration-200 active:scale-110",
+                          isWatchChecked
+                            ? "animate-heart-pop fill-rose-500 text-rose-500 opacity-100"
+                            : "opacity-80",
+                        )}
                       />
                     </button>
                   </td>
@@ -364,72 +442,95 @@ export function FundsTable({ funds }: FundsTableProps) {
       </div>
 
       {/* Mobile Card Layout */}
-      <div className="md:hidden space-y-2.5">
+      <div className="space-y-2.5 md:hidden">
         {sortedFunds.map((fund, index) => {
           const rank = index + 1;
           const isCompareChecked = isComparing(fund.kuveraCode);
           const isWatchChecked = isWatched(fund.kuveraCode);
 
           return (
-            <div 
+            <div
               key={fund.id}
-              className="rounded-xl border border-border bg-card p-3 transition-all shadow-sm"
+              className="rounded-xl border border-border bg-card p-3 shadow-sm transition-all"
             >
               {/* Header */}
               <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="font-data font-bold text-muted-foreground text-sm">
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <span className="font-data text-sm font-bold text-muted-foreground">
                     #{rank}
                   </span>
-                  <AmcLogo fundHouse={fund.fundHouse} fundHouseName={fund.fundHouseName} size="sm" />
+                  <AmcLogo
+                    fundHouse={fund.fundHouse}
+                    fundHouseName={fund.fundHouseName}
+                    size="sm"
+                  />
                   <div className="min-w-0">
-                    <Link 
+                    <Link
                       href={`/fund/${fund.kuveraCode}`}
-                      className="font-heading font-semibold text-base text-foreground hover:text-primary transition-colors block truncate"
+                      className="block truncate font-heading text-base font-semibold text-foreground transition-colors hover:text-primary"
                     >
                       {fund.shortName || fund.schemeName}
                     </Link>
-                    <span className="text-[10px] text-muted-foreground block truncate">
+                    <span className="block truncate text-[10px] text-muted-foreground">
                       {fund.fundCategory}
                     </span>
                   </div>
                 </div>
 
                 {/* Score */}
-                <span className="inline-flex items-center justify-center rounded-md bg-primary/10 px-2.5 py-1 text-sm font-extrabold text-primary font-data border border-primary/20 shrink-0">
+                <span className="font-data inline-flex shrink-0 items-center justify-center rounded-md border border-primary/20 bg-primary/10 px-2.5 py-1 text-sm font-extrabold text-primary">
                   {parseFloat(fund.totalScore || "0").toFixed(1)}
                 </span>
               </div>
 
               {/* Top 3 returns grid */}
-              <div className="grid grid-cols-3 gap-2 mt-2.5 text-center bg-muted/20 rounded-lg py-1.5 px-2">
+              <div className="mt-2.5 grid grid-cols-3 gap-2 rounded-lg bg-muted/20 px-2 py-1.5 text-center">
                 <div>
-                  <span className="text-[9px] font-semibold text-muted-foreground block uppercase">1D</span>
-                  <div className="mt-0.5">{renderReturnCell(fund.returns1d, "1d", fund)}</div>
+                  <span className="block text-[9px] font-semibold text-muted-foreground uppercase">
+                    1D
+                  </span>
+                  <div className="mt-0.5">
+                    {renderReturnCell(fund.returns1d, "1d", fund)}
+                  </div>
                 </div>
                 <div>
-                  <span className="text-[9px] font-semibold text-muted-foreground block uppercase">1Y</span>
-                  <div className="mt-0.5">{renderReturnCell(fund.returns1y, "1y", fund)}</div>
+                  <span className="block text-[9px] font-semibold text-muted-foreground uppercase">
+                    1Y
+                  </span>
+                  <div className="mt-0.5">
+                    {renderReturnCell(fund.returns1y, "1y", fund)}
+                  </div>
                 </div>
                 <div>
-                  <span className="text-[9px] font-semibold text-muted-foreground block uppercase">3Y</span>
-                  <div className="mt-0.5">{renderReturnCell(fund.returns3y, "3y", fund)}</div>
+                  <span className="block text-[9px] font-semibold text-muted-foreground uppercase">
+                    3Y
+                  </span>
+                  <div className="mt-0.5">
+                    {renderReturnCell(fund.returns3y, "3y", fund)}
+                  </div>
                 </div>
               </div>
 
               {/* Action bar */}
-              <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-border/60">
-                <div className="text-[10px] text-muted-foreground font-data">
+              <div className="mt-2.5 flex items-center justify-between border-t border-border/60 pt-2">
+                <div className="font-data text-[10px] text-muted-foreground">
                   AUM: {formatAUM(fund.aum)}
                 </div>
 
                 <div className="flex items-center gap-4">
                   {/* Compare Toggle */}
                   <button
-                    onClick={() => toggleCompare(fund.kuveraCode, fund.shortName || fund.schemeName)}
+                    onClick={() =>
+                      toggleCompare(
+                        fund.kuveraCode,
+                        fund.shortName || fund.schemeName,
+                      )
+                    }
                     className={cn(
-                      "flex items-center gap-1 text-[11px] font-medium transition-colors hover:text-primary py-3 px-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1",
-                      isCompareChecked ? "text-primary" : "text-muted-foreground"
+                      "flex items-center gap-1 rounded-lg px-2 py-3 text-[11px] font-medium transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none",
+                      isCompareChecked
+                        ? "text-primary"
+                        : "text-muted-foreground",
                     )}
                     aria-label={`Compare ${fund.schemeName}`}
                   >
@@ -440,17 +541,17 @@ export function FundsTable({ funds }: FundsTableProps) {
                   {/* Watch Toggle */}
                   <button
                     onClick={() => toggleWatchlist(fund.kuveraCode)}
-                    className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-rose-500 transition-colors py-3 px-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1"
+                    className="flex items-center gap-1 rounded-lg px-2 py-3 text-[11px] font-medium text-muted-foreground transition-colors hover:text-rose-500 focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 focus-visible:outline-none"
                     aria-label={`Save ${fund.schemeName} to watchlist`}
                     aria-pressed={isWatchChecked}
                   >
-                    <Heart 
+                    <Heart
                       className={cn(
                         "h-3.5 w-3.5 transition-transform duration-200 active:scale-110",
-                        isWatchChecked 
-                          ? "fill-rose-500 text-rose-500 opacity-100 animate-heart-pop" 
-                          : "opacity-80"
-                      )} 
+                        isWatchChecked
+                          ? "animate-heart-pop fill-rose-500 text-rose-500 opacity-100"
+                          : "opacity-80",
+                      )}
                     />
                     <span>Save</span>
                   </button>

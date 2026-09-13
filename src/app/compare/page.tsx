@@ -4,7 +4,12 @@ import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { GitCompare, Trash2, ArrowLeft, ShieldAlert } from "lucide-react";
-import { formatPercent, formatNAV, formatAUM, isReturnGenuine } from "@/lib/format";
+import {
+  formatPercent,
+  formatNAV,
+  formatAUM,
+  isReturnGenuine,
+} from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 interface Fund {
@@ -49,7 +54,7 @@ interface Fund {
 function CompareContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   const [funds, setFunds] = useState<Fund[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,9 +81,11 @@ function CompareContent() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/api/funds/by-codes?codes=${requestedCodes.join(",")}`);
+        const res = await fetch(
+          `/api/funds/by-codes?codes=${requestedCodes.join(",")}`,
+        );
         const data = await res.json();
-        
+
         if (active) {
           if (data.success) {
             setFunds(data.data || []);
@@ -106,7 +113,7 @@ function CompareContent() {
   // Handle removing a fund from compare list
   const handleRemoveFund = (codeToRemove: string) => {
     const updatedCodes = requestedCodes.filter((c) => c !== codeToRemove);
-    
+
     // Also sync localStorage compare selection
     try {
       localStorage.setItem("mfc:compare", JSON.stringify(updatedCodes));
@@ -125,7 +132,9 @@ function CompareContent() {
   // Detect which funds are "stale" or "no longer tracked"
   const staleCodes = useMemo(() => {
     if (loading) return [];
-    return requestedCodes.filter((code) => !funds.some((f) => f.kuveraCode === code));
+    return requestedCodes.filter(
+      (code) => !funds.some((f) => f.kuveraCode === code),
+    );
   }, [requestedCodes, funds, loading]);
 
   // Utility to determine best/worst styling for cell comparisons
@@ -133,7 +142,7 @@ function CompareContent() {
   const compareRowValues = (
     currentVal: number | null,
     allVals: (number | null)[],
-    lowerIsBetter = false
+    lowerIsBetter = false,
   ) => {
     if (currentVal === null || allVals.filter((v) => v !== null).length < 2) {
       return "normal";
@@ -181,7 +190,7 @@ function CompareContent() {
     formatValue: (val: T, fund: Fund) => React.ReactNode,
     lowerIsBetter = false,
     isNumeric = true,
-    isMonospace = true
+    isMonospace = true,
   ) => {
     const rowValues = funds.map((f) => {
       const v = getValue(f);
@@ -189,23 +198,27 @@ function CompareContent() {
     });
 
     return (
-      <tr className="border-b border-border hover:bg-muted/5 transition-all">
-        <td className="p-4 font-heading font-medium text-xs text-muted-foreground bg-muted/20 uppercase tracking-wide border-r border-border w-[130px]">
+      <tr className="border-b border-border transition-all hover:bg-muted/5">
+        <td className="w-[130px] border-r border-border bg-muted/20 p-4 font-heading text-xs font-medium tracking-wide text-muted-foreground uppercase">
           {label}
         </td>
         {funds.map((fund) => {
           const raw = getValue(fund);
-          const cellType = isNumeric 
-            ? compareRowValues(getFloat(raw as string | number | null), rowValues, lowerIsBetter)
+          const cellType = isNumeric
+            ? compareRowValues(
+                getFloat(raw as string | number | null),
+                rowValues,
+                lowerIsBetter,
+              )
             : "normal";
-          
+
           return (
             <td
               key={fund.kuveraCode}
               className={cn(
-                "p-4 text-center text-xs border-r border-border transition-colors",
+                "border-r border-border p-4 text-center text-xs transition-colors",
                 isMonospace ? "font-data" : "font-sans",
-                getHighlightClass(cellType)
+                getHighlightClass(cellType),
               )}
             >
               {formatValue(raw, fund)}
@@ -220,7 +233,10 @@ function CompareContent() {
     if (!managers) return "--";
     if (Array.isArray(managers)) return managers.join(", ");
     if (typeof managers === "string") {
-      return managers.split(";").map((m) => m.trim()).join(", ");
+      return managers
+        .split(";")
+        .map((m) => m.trim())
+        .join(", ");
     }
     return "--";
   };
@@ -228,12 +244,15 @@ function CompareContent() {
   if (requestedCodes.length === 0) {
     return (
       <div className="mx-auto max-w-xl px-4 py-20 text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground mb-4">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
           <GitCompare className="h-6 w-6" />
         </div>
-        <h2 className="font-heading text-lg font-bold text-foreground">No funds to compare</h2>
-        <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-          Select at least two mutual funds from the explore leaderboard to begin comparing performance metrics.
+        <h2 className="font-heading text-lg font-bold text-foreground">
+          No funds to compare
+        </h2>
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+          Select at least two mutual funds from the explore leaderboard to begin
+          comparing performance metrics.
         </p>
         <Link
           href="/funds"
@@ -250,18 +269,19 @@ function CompareContent() {
       {/* Back button */}
       <Link
         href="/funds"
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors mb-6"
+        className="mb-6 inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" /> Back to Rankings
       </Link>
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b border-border pb-6">
+      <div className="flex flex-col gap-6 border-b border-border pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-heading text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
             Side-by-Side Fund Analysis
           </h1>
-          <p className="mt-1 text-xs sm:text-sm text-muted-foreground leading-relaxed">
-            Comparing core outperformance returns, score indicators, and expense metrics.
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+            Comparing core outperformance returns, score indicators, and expense
+            metrics.
           </p>
         </div>
       </div>
@@ -275,19 +295,24 @@ function CompareContent() {
               className="flex items-start justify-between gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-4"
             >
               <div className="flex gap-2">
-                <ShieldAlert className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
                 <div>
-                  <span className="font-heading font-bold text-xs text-foreground uppercase tracking-wider block">
+                  <span className="block font-heading text-xs font-bold tracking-wider text-foreground uppercase">
                     Fund no longer tracked
                   </span>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    The fund with code <span className="font-data font-semibold text-foreground">{code}</span> is no longer actively monitored (AUM under threshold or merged).
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    The fund with code{" "}
+                    <span className="font-data font-semibold text-foreground">
+                      {code}
+                    </span>{" "}
+                    is no longer actively monitored (AUM under threshold or
+                    merged).
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => handleRemoveFund(code)}
-                className="text-xs font-bold text-destructive hover:underline shrink-0"
+                className="shrink-0 text-xs font-bold text-destructive hover:underline"
               >
                 Remove from List
               </button>
@@ -303,60 +328,68 @@ function CompareContent() {
       )}
 
       {!loading && error && (
-        <div className="mt-8 rounded-xl border border-destructive/20 bg-destructive/5 p-8 text-center animate-in fade-in duration-200">
-          <p className="text-sm text-destructive font-medium">{error}</p>
+        <div className="animate-in fade-in mt-8 rounded-xl border border-destructive/20 bg-destructive/5 p-8 text-center duration-200">
+          <p className="text-sm font-medium text-destructive">{error}</p>
         </div>
       )}
 
       {!loading && !error && funds.length === 0 && (
-        <div className="mt-8 rounded-xl border border-border bg-card p-12 text-center animate-in fade-in duration-200 shadow-sm">
-          <p className="text-sm text-muted-foreground">None of the requested funds are available for comparison.</p>
+        <div className="animate-in fade-in mt-8 rounded-xl border border-border bg-card p-12 text-center shadow-sm duration-200">
+          <p className="text-sm text-muted-foreground">
+            None of the requested funds are available for comparison.
+          </p>
         </div>
       )}
 
       {!loading && !error && funds.length > 0 && (
-        <div className="mt-8 overflow-x-auto rounded-xl border border-border bg-card shadow-sm animate-in fade-in duration-200">
-          <table className={cn(
-            "w-full border-collapse text-left text-sm table-fixed",
-            funds.length === 1 ? "min-w-[400px]" : funds.length === 2 ? "min-w-[600px]" : "min-w-[780px]"
-          )}>
+        <div className="animate-in fade-in mt-8 overflow-x-auto rounded-xl border border-border bg-card shadow-sm duration-200">
+          <table
+            className={cn(
+              "w-full table-fixed border-collapse text-left text-sm",
+              funds.length === 1
+                ? "min-w-[400px]"
+                : funds.length === 2
+                  ? "min-w-[600px]"
+                  : "min-w-[780px]",
+            )}
+          >
             <thead>
               <tr className="border-b border-border bg-muted/20">
                 {/* Heading spacer */}
-                <th className="p-4 font-heading font-semibold text-muted-foreground w-[130px] border-r border-border">
+                <th className="w-[130px] border-r border-border p-4 font-heading font-semibold text-muted-foreground">
                   Parameters
                 </th>
-                
+
                 {/* Fund Headings */}
                 {funds.map((fund) => (
                   <th
                     key={fund.kuveraCode}
-                    className="p-4 font-heading font-semibold text-foreground border-r border-border text-center group min-w-[200px]"
+                    className="group min-w-[200px] border-r border-border p-4 text-center font-heading font-semibold text-foreground"
                   >
-                    <div className="flex flex-col h-full justify-between items-center text-center">
+                    <div className="flex h-full flex-col items-center justify-between text-center">
                       {/* Remove button */}
                       <button
                         onClick={() => handleRemoveFund(fund.kuveraCode)}
-                        className="text-muted-foreground/40 hover:text-destructive transition-colors self-end p-0.5"
+                        className="self-end p-0.5 text-muted-foreground/40 transition-colors hover:text-destructive"
                         aria-label={`Remove ${fund.schemeName}`}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
-                      
-                      <div className="text-xs font-bold text-muted-foreground truncate w-full uppercase mt-2">
+
+                      <div className="mt-2 w-full truncate text-xs font-bold text-muted-foreground uppercase">
                         {fund.fundCategory}
                       </div>
-                      
-                      <h3 className="text-sm font-extrabold text-foreground truncate w-full mt-1.5 leading-snug">
-                        <Link 
+
+                      <h3 className="mt-1.5 w-full truncate text-sm leading-snug font-extrabold text-foreground">
+                        <Link
                           href={`/fund/${fund.kuveraCode}`}
-                          className="hover:text-primary transition-colors block truncate"
+                          className="block truncate transition-colors hover:text-primary"
                         >
                           {fund.schemeName}
                         </Link>
                       </h3>
-                      
-                      <span className="text-[10px] text-muted-foreground font-data mt-1">
+
+                      <span className="font-data mt-1 text-[10px] text-muted-foreground">
                         {fund.kuveraCode}
                       </span>
                     </div>
@@ -369,102 +402,194 @@ function CompareContent() {
               {renderCompareRow(
                 "Score",
                 (f) => f.totalScore,
-                (v) => (
+                (v) =>
                   v ? (
-                    <span className="inline-flex items-center justify-center rounded-md bg-primary/10 px-2.5 py-1 text-xs font-extrabold text-primary border border-primary/20">
+                    <span className="inline-flex items-center justify-center rounded-md border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-extrabold text-primary">
                       {parseFloat(v as string).toFixed(1)}
                     </span>
                   ) : (
-                    <span className="font-sans text-muted-foreground/45">--</span>
-                  )
-                )
+                    <span className="font-sans text-muted-foreground/45">
+                      --
+                    </span>
+                  ),
               )}
 
               {/* NAV */}
               {renderCompareRow(
                 "Current NAV",
                 (f) => f.currentNav,
-                (v) => v ? formatNAV(v) : <span className="font-sans text-muted-foreground/45">--</span>,
+                (v) =>
+                  v ? (
+                    formatNAV(v)
+                  ) : (
+                    <span className="font-sans text-muted-foreground/45">
+                      --
+                    </span>
+                  ),
                 false,
-                true
+                true,
               )}
 
               {/* Returns */}
               {renderCompareRow(
                 "1D Return",
                 (f) => f.returns1d,
-                (v, f) => isReturnGenuine(v, "1d", f) ? formatPercent(v, true, true) : <span className="font-sans text-muted-foreground/45">--</span>
+                (v, f) =>
+                  isReturnGenuine(v, "1d", f) ? (
+                    formatPercent(v, true, true)
+                  ) : (
+                    <span className="font-sans text-muted-foreground/45">
+                      --
+                    </span>
+                  ),
               )}
               {renderCompareRow(
                 "1W Return",
                 (f) => f.returns1w,
-                (v, f) => isReturnGenuine(v, "1w", f) ? formatPercent(v, true, true) : <span className="font-sans text-muted-foreground/45">--</span>
+                (v, f) =>
+                  isReturnGenuine(v, "1w", f) ? (
+                    formatPercent(v, true, true)
+                  ) : (
+                    <span className="font-sans text-muted-foreground/45">
+                      --
+                    </span>
+                  ),
               )}
               {renderCompareRow(
                 "1Y Return",
                 (f) => f.returns1y,
-                (v, f) => isReturnGenuine(v, "1y", f) ? formatPercent(v, true, true) : <span className="font-sans text-muted-foreground/45">--</span>
+                (v, f) =>
+                  isReturnGenuine(v, "1y", f) ? (
+                    formatPercent(v, true, true)
+                  ) : (
+                    <span className="font-sans text-muted-foreground/45">
+                      --
+                    </span>
+                  ),
               )}
               {renderCompareRow(
                 "3Y Return",
                 (f) => f.returns3y,
-                (v, f) => isReturnGenuine(v, "3y", f) ? formatPercent(v, true, true) : <span className="font-sans text-muted-foreground/45">--</span>
+                (v, f) =>
+                  isReturnGenuine(v, "3y", f) ? (
+                    formatPercent(v, true, true)
+                  ) : (
+                    <span className="font-sans text-muted-foreground/45">
+                      --
+                    </span>
+                  ),
               )}
               {renderCompareRow(
                 "5Y Return",
                 (f) => f.returns5y,
-                (v, f) => isReturnGenuine(v, "5y", f) ? formatPercent(v, true, true) : <span className="font-sans text-muted-foreground/45">--</span>
+                (v, f) =>
+                  isReturnGenuine(v, "5y", f) ? (
+                    formatPercent(v, true, true)
+                  ) : (
+                    <span className="font-sans text-muted-foreground/45">
+                      --
+                    </span>
+                  ),
               )}
               {renderCompareRow(
                 "Inception Return",
                 (f) => f.returnsInception,
-                (v) => v ? formatPercent(v) : <span className="font-sans text-muted-foreground/45">--</span>
+                (v) =>
+                  v ? (
+                    formatPercent(v)
+                  ) : (
+                    <span className="font-sans text-muted-foreground/45">
+                      --
+                    </span>
+                  ),
               )}
 
               {/* AUM */}
               {renderCompareRow(
                 "Fund AUM",
                 (f) => f.aum,
-                (v) => v ? formatAUM(v) : <span className="font-sans text-muted-foreground/45">--</span>
+                (v) =>
+                  v ? (
+                    formatAUM(v)
+                  ) : (
+                    <span className="font-sans text-muted-foreground/45">
+                      --
+                    </span>
+                  ),
               )}
 
               {/* Expense Ratio (Lower is better) */}
               {renderCompareRow(
                 "Expense Ratio",
                 (f) => f.expenseRatio,
-                (v) => (v ? `${v}%` : <span className="font-sans text-muted-foreground/45">--</span>),
-                true // lowerIsBetter
+                (v) =>
+                  v ? (
+                    `${v}%`
+                  ) : (
+                    <span className="font-sans text-muted-foreground/45">
+                      --
+                    </span>
+                  ),
+                true, // lowerIsBetter
               )}
 
               {/* Rating */}
               {renderCompareRow(
                 "CRISIL Rating",
                 (f) => f.fundRating,
-                (v) => (v ? `★ ${v}` : <span className="font-sans text-muted-foreground/45">No Rating</span>)
+                (v) =>
+                  v ? (
+                    `★ ${v}`
+                  ) : (
+                    <span className="font-sans text-muted-foreground/45">
+                      No Rating
+                    </span>
+                  ),
               )}
 
               {/* Std Dev Volatility (Lower is better) */}
               {renderCompareRow(
                 "Volatility (StdDev)",
                 (f) => f.volatility,
-                (v) => (v ? parseFloat(v as string).toFixed(2) : <span className="font-sans text-muted-foreground/45">--</span>),
-                true // lowerIsBetter
+                (v) =>
+                  v ? (
+                    parseFloat(v as string).toFixed(2)
+                  ) : (
+                    <span className="font-sans text-muted-foreground/45">
+                      --
+                    </span>
+                  ),
+                true, // lowerIsBetter
               )}
 
               {/* Portfolio Turnover */}
               {renderCompareRow(
                 "Portfolio Turnover",
                 (f) => f.portfolioTurnover,
-                (v) => (v ? `${(parseFloat(v as string) * 100).toFixed(0)}%` : <span className="font-sans text-muted-foreground/45">--</span>),
-                true // lowerIsBetter
+                (v) =>
+                  v ? (
+                    `${(parseFloat(v as string) * 100).toFixed(0)}%`
+                  ) : (
+                    <span className="font-sans text-muted-foreground/45">
+                      --
+                    </span>
+                  ),
+                true, // lowerIsBetter
               )}
 
               {/* Lock-In Period */}
               {renderCompareRow(
                 "Lock-in Period",
                 (f) => f.lockInPeriod,
-                (v) => (v ? `${v} days` : <span className="font-sans text-muted-foreground/45">No Lock-in</span>),
-                true
+                (v) =>
+                  v ? (
+                    `${v} days`
+                  ) : (
+                    <span className="font-sans text-muted-foreground/45">
+                      No Lock-in
+                    </span>
+                  ),
+                true,
               )}
 
               {/* Fund Managers */}
@@ -474,7 +599,7 @@ function CompareContent() {
                 (v) => parseManagers(v),
                 false,
                 false, // not numeric
-                false // not monospace
+                false, // not monospace
               )}
             </tbody>
           </table>
@@ -486,16 +611,16 @@ function CompareContent() {
 
 function SkeletonCompare() {
   return (
-    <div className="w-full border border-border rounded-xl overflow-hidden bg-card animate-pulse shadow-sm">
-      <div className="h-24 border-b border-border bg-muted/20 w-full" />
+    <div className="w-full animate-pulse overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+      <div className="h-24 w-full border-b border-border bg-muted/20" />
       <div className="divide-y divide-border/60">
         {[...Array(10)].map((_, i) => (
-          <div key={i} className="flex items-center p-4 gap-4 w-full">
-            <div className="h-4 bg-muted rounded-md w-[120px] shrink-0" />
-            <div className="flex-1 flex justify-around gap-4">
-              <div className="h-4 bg-muted rounded-md w-1/3 max-w-[80px]" />
-              <div className="h-4 bg-muted rounded-md w-1/3 max-w-[80px]" />
-              <div className="h-4 bg-muted rounded-md w-1/3 max-w-[80px]" />
+          <div key={i} className="flex w-full items-center gap-4 p-4">
+            <div className="h-4 w-[120px] shrink-0 rounded-md bg-muted" />
+            <div className="flex flex-1 justify-around gap-4">
+              <div className="h-4 w-1/3 max-w-[80px] rounded-md bg-muted" />
+              <div className="h-4 w-1/3 max-w-[80px] rounded-md bg-muted" />
+              <div className="h-4 w-1/3 max-w-[80px] rounded-md bg-muted" />
             </div>
           </div>
         ))}
@@ -506,7 +631,13 @@ function SkeletonCompare() {
 
 export default function ComparePage() {
   return (
-    <Suspense fallback={<div className="mx-auto max-w-6xl px-4 py-8 text-center"><SkeletonCompare /></div>}>
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-6xl px-4 py-8 text-center">
+          <SkeletonCompare />
+        </div>
+      }
+    >
       <CompareContent />
     </Suspense>
   );

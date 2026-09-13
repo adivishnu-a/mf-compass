@@ -22,7 +22,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mf-compass.vercel.app";
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://mf-compass.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -30,7 +31,8 @@ export const metadata: Metadata = {
     default: "MF Compass — Mutual Fund Outperformance Discovery",
     template: "%s | MF Compass",
   },
-  description: "Identify Indian mutual funds that consistently outperform their peers. Zero ads, zero tracking, purely data-driven discovery.",
+  description:
+    "Identify Indian mutual funds that consistently outperform their peers. Zero ads, zero tracking, purely data-driven discovery.",
   icons: {
     icon: "/favicon.ico",
   },
@@ -65,11 +67,9 @@ export default function RootLayout({
       <head>
         <ThemeScript />
       </head>
-      <body className="min-h-full flex flex-col bg-background text-foreground selection:bg-brand-gilt/20 selection:text-foreground">
+      <body className="flex min-h-full flex-col bg-background text-foreground selection:bg-brand-gilt/20 selection:text-foreground">
         <Navbar />
-        <main className="flex-1">
-          {children}
-        </main>
+        <main className="flex-1">{children}</main>
         <Footer />
         <CommandMenuLoader />
         <CompareStickyBar />

@@ -15,21 +15,27 @@ export function CompareFooterLink() {
         console.error("Error loading compare codes in footer:", e);
       }
     };
-    
+
     updateCodes();
     window.addEventListener("storage", updateCodes);
     window.addEventListener("mfc-compare-change", updateCodes);
-    
+
     return () => {
       window.removeEventListener("storage", updateCodes);
       window.removeEventListener("mfc-compare-change", updateCodes);
     };
   }, []);
 
-  const href = compareCodes.length > 0 ? `/compare?codes=${compareCodes.join(",")}` : "/compare";
+  const href =
+    compareCodes.length > 0
+      ? `/compare?codes=${compareCodes.join(",")}`
+      : "/compare";
 
   return (
-    <Link href={href} className="text-muted-foreground hover:text-foreground transition-colors">
+    <Link
+      href={href}
+      className="text-muted-foreground transition-colors hover:text-foreground"
+    >
       Compare Funds
     </Link>
   );

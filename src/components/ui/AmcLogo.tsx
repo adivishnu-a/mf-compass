@@ -21,8 +21,11 @@ function getAmcInitials(name: string | null) {
 }
 
 function getAmcColorClass(name: string | null) {
-  if (!name) return "bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300";
-  const hash = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  if (!name)
+    return "bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300";
+  const hash = name
+    .split("")
+    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const colors = [
     "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/50 dark:border-amber-900/40",
     "bg-teal-100 text-teal-800 dark:bg-teal-950/40 dark:text-teal-300 border border-teal-200/50 dark:border-teal-900/40",
@@ -38,7 +41,12 @@ function getAmcColorClass(name: string | null) {
 const SQUIRCLE_PATH =
   "M 0.642080 0 c 0.125284 0 0.187926 0 0.235778 0.024382 a 0.223700 0.223700 0 0 1 0.097760 0.097760 c 0.024382 0.047852 0.024382 0.110494 0.024382 0.235778 L 1.000000 0.642080 c 0 0.125284 0 0.187926 -0.024382 0.235778 a 0.223700 0.223700 0 0 1 -0.097760 0.097760 c -0.047852 0.024382 -0.110494 0.024382 -0.235778 0.024382 L 0.357920 1.000000 c -0.125284 0 -0.187926 0 -0.235778 -0.024382 a 0.223700 0.223700 0 0 1 -0.097760 -0.097760 c -0.024382 -0.047852 -0.024382 -0.110494 -0.024382 -0.235778 L 0 0.357920 c 0 -0.125284 0 -0.187926 0.024382 -0.235778 a 0.223700 0.223700 0 0 1 0.097760 -0.097760 c 0.047852 -0.024382 0.110494 -0.024382 0.235778 -0.024382 Z";
 
-export function AmcLogo({ fundHouse, fundHouseName, className, size = "md" }: AmcLogoProps) {
+export function AmcLogo({
+  fundHouse,
+  fundHouseName,
+  className,
+  size = "md",
+}: AmcLogoProps) {
   const [hasError, setHasError] = useState(!fundHouse);
   const rawClipId = useId();
   // Safe ID for SVG selectors (remove colons)
@@ -57,7 +65,7 @@ export function AmcLogo({ fundHouse, fundHouseName, className, size = "md" }: Am
           "flex shrink-0 items-center justify-center rounded-lg font-heading font-bold shadow-sm",
           getAmcColorClass(fundHouseName),
           sizeClasses[size],
-          className
+          className,
         )}
       >
         {getAmcInitials(fundHouseName)}
@@ -68,9 +76,9 @@ export function AmcLogo({ fundHouse, fundHouseName, className, size = "md" }: Am
   return (
     <div
       className={cn(
-        "relative flex shrink-0 items-center justify-center shadow-sm overflow-hidden",
+        "relative flex shrink-0 items-center justify-center overflow-hidden shadow-sm",
         sizeClasses[size],
-        className
+        className,
       )}
       style={{
         clipPath: `url(#${clipId})`,
@@ -78,7 +86,7 @@ export function AmcLogo({ fundHouse, fundHouseName, className, size = "md" }: Am
       }}
     >
       {/* Hidden SVG with the clip path definition */}
-      <svg width="0" height="0" className="absolute pointer-events-none">
+      <svg width="0" height="0" className="pointer-events-none absolute">
         <defs>
           <clipPath id={clipId} clipPathUnits="objectBoundingBox">
             <path d={SQUIRCLE_PATH} />
@@ -93,7 +101,7 @@ export function AmcLogo({ fundHouse, fundHouseName, className, size = "md" }: Am
         height={128}
         loading="lazy"
         decoding="async"
-        className="w-full h-full object-cover"
+        className="h-full w-full object-cover"
         onError={() => setHasError(true)}
       />
     </div>

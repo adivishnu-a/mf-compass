@@ -17,7 +17,9 @@ export function useCompare() {
         if (validated.success) {
           setCompareList(validated.data);
         } else {
-          console.warn("Invalid compare list schema in localStorage, resetting");
+          console.warn(
+            "Invalid compare list schema in localStorage, resetting",
+          );
           setCompareList([]);
           localStorage.removeItem("mfc:compare");
         }
@@ -38,7 +40,9 @@ export function useCompare() {
         if (validated.success) {
           setCompareNames(validated.data);
         } else {
-          console.warn("Invalid compare names schema in localStorage, resetting");
+          console.warn(
+            "Invalid compare names schema in localStorage, resetting",
+          );
           setCompareNames({});
           localStorage.removeItem("mfc:compare_names");
         }
@@ -54,7 +58,7 @@ export function useCompare() {
 
   useEffect(() => {
     loadCompare();
-    
+
     window.addEventListener("mfc-compare-change", loadCompare);
     return () => window.removeEventListener("mfc-compare-change", loadCompare);
   }, []);
@@ -73,21 +77,21 @@ export function useCompare() {
 
         nextList.push(code);
         if (name) nextNames[code] = name;
-        
+
         window.dispatchEvent(
           new CustomEvent("mfc-toast", {
             detail: {
               message: "Maximum 3 funds. Replaced the oldest selected fund.",
               type: "warning",
             },
-          })
+          }),
         );
       } else {
         nextList.push(code);
         if (name) nextNames[code] = name;
       }
     }
-    
+
     setCompareList(nextList);
     setCompareNames(nextNames);
     localStorage.setItem("mfc:compare", JSON.stringify(nextList));

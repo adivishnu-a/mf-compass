@@ -76,8 +76,8 @@ describe("Scoring Unit Tests", () => {
 
     test("multiple return periods available are weighted dynamically", () => {
       const fund = {
-        returns1w: 2,   // outperf = (2 - 1) / 1 = 1
-        returns1y: 15,  // outperf = (15 - 10) / 10 = 0.5
+        returns1w: 2, // outperf = (2 - 1) / 1 = 1
+        returns1y: 15, // outperf = (15 - 10) / 10 = 0.5
         returns3y: null,
         returns5y: null,
       };

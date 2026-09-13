@@ -36,7 +36,7 @@ interface CategoryReturns {
  */
 export function computeOutperformance(
   fundReturn: number,
-  categoryReturn: number
+  categoryReturn: number,
 ): number {
   const denom = Math.max(Math.abs(categoryReturn), 1);
   let outperf = (fundReturn - categoryReturn) / denom;
@@ -53,11 +53,17 @@ export function computeOutperformance(
  */
 export function computeRawScore(
   fund: FundReturns,
-  category: CategoryReturns
+  category: CategoryReturns,
 ): number {
-  const periods: ReturnPeriod[] = ["returns1y", "returns3y", "returns5y", "returns1w"];
+  const periods: ReturnPeriod[] = [
+    "returns1y",
+    "returns3y",
+    "returns5y",
+    "returns1w",
+  ];
 
-  const available: { period: ReturnPeriod; fundVal: number; catVal: number }[] = [];
+  const available: { period: ReturnPeriod; fundVal: number; catVal: number }[] =
+    [];
 
   for (const period of periods) {
     const fundVal = fund[period];
@@ -73,7 +79,7 @@ export function computeRawScore(
 
   const totalAvailableWeight = available.reduce(
     (sum, { period }) => sum + WEIGHTS[period],
-    0
+    0,
   );
 
   let rawScore = 0;
@@ -118,9 +124,8 @@ export function normalizeScores(rawScores: number[]): number[] {
  * Arithmetic mean of each period, ignoring nulls.
  */
 export function computeSyntheticBenchmark(
-  funds: FundReturns[]
+  funds: FundReturns[],
 ): CategoryReturns {
-
   function meanForPeriod(period: keyof FundReturns): number | null {
     const values = funds
       .map((f) => f[period])

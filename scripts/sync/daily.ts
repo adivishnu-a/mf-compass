@@ -23,10 +23,20 @@ import { eq, sql } from "drizzle-orm";
 import * as schema from "@drizzle/schema";
 import { funds, categoryAverages } from "@drizzle/schema";
 import type { NewCategoryAverage } from "@drizzle/schema";
-import { fetchFundDetail, fetchCategoryAverages } from "@scripts/sync/kuvera/client";
+import {
+  fetchFundDetail,
+  fetchCategoryAverages,
+} from "@scripts/sync/kuvera/client";
 import { cleanReturns } from "@scripts/sync/pipeline/transform";
-import { computeRawScore, normalizeScores, computeSyntheticBenchmark } from "@/lib/scoring";
-import { FUND_CATEGORIES, SYNTHETIC_BENCHMARK_CATEGORY } from "@/lib/kuvera/categories";
+import {
+  computeRawScore,
+  normalizeScores,
+  computeSyntheticBenchmark,
+} from "@/lib/scoring";
+import {
+  FUND_CATEGORIES,
+  SYNTHETIC_BENCHMARK_CATEGORY,
+} from "@/lib/kuvera/categories";
 import { logger } from "@scripts/sync/shared/logger";
 
 const BATCH_SIZE = 10;
@@ -35,8 +45,6 @@ const BATCH_DELAY_MS = 100;
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
-
-
 
 async function main(): Promise<void> {
   const startTime = Date.now();
@@ -64,7 +72,9 @@ async function main(): Promise<void> {
     const kuveraCategoryAverages = await fetchCategoryAverages();
 
     for (const cat of kuveraCategoryAverages) {
-      const matchingCategory = FUND_CATEGORIES.find((c) => c === cat.category_name);
+      const matchingCategory = FUND_CATEGORIES.find(
+        (c) => c === cat.category_name,
+      );
       if (!matchingCategory) continue;
 
       const row: NewCategoryAverage = {
@@ -106,13 +116,14 @@ async function main(): Promise<void> {
     const codes = existingFunds.map((f) => f.kuveraCode);
     logger.info("Refreshing existing funds", { count: codes.length });
 
-    const pendingUpdates: { code: string; data: Record<string, unknown> }[] = [];
+    const pendingUpdates: { code: string; data: Record<string, unknown> }[] =
+      [];
 
     for (let i = 0; i < codes.length; i += BATCH_SIZE) {
       const batch = codes.slice(i, i + BATCH_SIZE);
 
       const results = await Promise.allSettled(
-        batch.map((code) => fetchFundDetail(code))
+        batch.map((code) => fetchFundDetail(code)),
       );
 
       for (const result of results) {
@@ -143,9 +154,10 @@ async function main(): Promise<void> {
             returns5y: cleaned.returns5y,
             returnsInception: cleaned.returnsInception,
             returnsDate: detail.returns?.date ?? null,
-            aum: detail.aum !== null && detail.aum !== undefined
-              ? (detail.aum / 10).toFixed(2)
-              : null,
+            aum:
+              detail.aum !== null && detail.aum !== undefined
+                ? (detail.aum / 10).toFixed(2)
+                : null,
             expenseRatio: detail.expense_ratio?.toFixed(2) ?? null,
             expenseRatioDate: detail.expense_ratio_date ?? null,
             fundRating: detail.fund_rating ?? null,
@@ -153,7 +165,7 @@ async function main(): Promise<void> {
             crisilRating: detail.crisil_rating ?? null,
             volatility: detail.volatility?.toFixed(4) ?? null,
             portfolioTurnover: detail.portfolio_turnover?.toFixed(4) ?? null,
-          }
+          },
         });
       }
 
@@ -163,7 +175,9 @@ async function main(): Promise<void> {
     }
 
     // Now write the accumulated updates in transactions of 25
-    logger.info("Flushing daily updates to DB in transactional batches of 25", { total: pendingUpdates.length });
+    logger.info("Flushing daily updates to DB in transactional batches of 25", {
+      total: pendingUpdates.length,
+    });
     const BATCH_WRITE_SIZE = 25;
     for (let i = 0; i < pendingUpdates.length; i += BATCH_WRITE_SIZE) {
       const batch = pendingUpdates.slice(i, i + BATCH_WRITE_SIZE);
@@ -172,7 +186,7 @@ async function main(): Promise<void> {
           db
             .update(funds)
             .set({ ...item.data, lastUpdated: sql`NOW()` })
-            .where(eq(funds.kuveraCode, item.code))
+            .where(eq(funds.kuveraCode, item.code)),
         );
         if (queries.length > 0) {
           await db.batch(queries as unknown as [never, ...never[]]);
@@ -201,10 +215,14 @@ async function main(): Promise<void> {
         let r5y = f.returns5y ? parseFloat(f.returns5y) : null;
 
         let hasNonZero = false;
-        if (r5y === 0 && !hasNonZero) r5y = null; else if (r5y !== null && r5y !== 0) hasNonZero = true;
-        if (r3y === 0 && !hasNonZero) r3y = null; else if (r3y !== null && r3y !== 0) hasNonZero = true;
-        if (r1y === 0 && !hasNonZero) r1y = null; else if (r1y !== null && r1y !== 0) hasNonZero = true;
-        if (r1w === 0 && !hasNonZero) r1w = null; else if (r1w !== null && r1w !== 0) hasNonZero = true;
+        if (r5y === 0 && !hasNonZero) r5y = null;
+        else if (r5y !== null && r5y !== 0) hasNonZero = true;
+        if (r3y === 0 && !hasNonZero) r3y = null;
+        else if (r3y !== null && r3y !== 0) hasNonZero = true;
+        if (r1y === 0 && !hasNonZero) r1y = null;
+        else if (r1y !== null && r1y !== 0) hasNonZero = true;
+        if (r1w === 0 && !hasNonZero) r1w = null;
+        else if (r1w !== null && r1w !== 0) hasNonZero = true;
 
         return {
           returns1w: r1w,
@@ -247,7 +265,9 @@ async function main(): Promise<void> {
 
     // Step 4: Recompute and normalize scores per category
     const categoryAvgRows = await db.select().from(categoryAverages);
-    const categoryAvgMap = new Map(categoryAvgRows.map((r) => [r.categoryName, r]));
+    const categoryAvgMap = new Map(
+      categoryAvgRows.map((r) => [r.categoryName, r]),
+    );
 
     for (const category of FUND_CATEGORIES) {
       const catAvg = categoryAvgMap.get(category);
@@ -275,8 +295,8 @@ async function main(): Promise<void> {
             returns3y: f.returns3y ? parseFloat(f.returns3y) : null,
             returns5y: f.returns5y ? parseFloat(f.returns5y) : null,
           },
-          catReturns
-        )
+          catReturns,
+        ),
       );
 
       const normalized = normalizeScores(rawScores);
@@ -292,7 +312,7 @@ async function main(): Promise<void> {
                 totalScore: batchNormalized[idx].toFixed(2),
                 scoreUpdated: sql`NOW()`,
               })
-              .where(eq(funds.id, fund.id))
+              .where(eq(funds.id, fund.id)),
           );
           if (queries.length > 0) {
             await db.batch(queries as unknown as [never, ...never[]]);
@@ -316,7 +336,14 @@ async function main(): Promise<void> {
       ...summary,
       error: err instanceof Error ? err.message : String(err),
     });
-    fs.writeFileSync("summary.json", JSON.stringify({ ...summary, error: err instanceof Error ? err.message : String(err) }, null, 2));
+    fs.writeFileSync(
+      "summary.json",
+      JSON.stringify(
+        { ...summary, error: err instanceof Error ? err.message : String(err) },
+        null,
+        2,
+      ),
+    );
     process.exit(1);
   }
 }

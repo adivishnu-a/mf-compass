@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
           headers: {
             "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
           },
-        }
+        },
       );
     }
 
@@ -150,7 +150,8 @@ export async function GET(request: NextRequest) {
 
       // Tie-breaker: prefer funds with higher totalScore
       const totalScoreNum = parseFloat(fund.totalScore || "0");
-      const finalScore = matchedTokensCount * 10000 + scoreBonus + totalScoreNum;
+      const finalScore =
+        matchedTokensCount * 10000 + scoreBonus + totalScoreNum;
 
       return {
         fund,
@@ -173,7 +174,7 @@ export async function GET(request: NextRequest) {
 
     response.headers.set(
       "Cache-Control",
-      "public, s-maxage=300, stale-while-revalidate=600"
+      "public, s-maxage=300, stale-while-revalidate=600",
     );
 
     return response;
@@ -181,7 +182,7 @@ export async function GET(request: NextRequest) {
     console.error("Error searching funds:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

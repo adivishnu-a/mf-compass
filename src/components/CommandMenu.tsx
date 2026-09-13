@@ -19,7 +19,11 @@ interface RecentSearch {
   schemeName: string;
 }
 
-export function CommandMenu({ defaultOpen = false }: { defaultOpen?: boolean }) {
+export function CommandMenu({
+  defaultOpen = false,
+}: {
+  defaultOpen?: boolean;
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(defaultOpen);
   const [query, setQuery] = useState("");
@@ -27,7 +31,7 @@ export function CommandMenu({ defaultOpen = false }: { defaultOpen?: boolean }) 
   const [loading, setLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
-  
+
   const modalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -42,17 +46,23 @@ export function CommandMenu({ defaultOpen = false }: { defaultOpen?: boolean }) 
     }
   };
 
-  const saveRecentSearch = (fund: { kuveraCode: string; schemeName: string }) => {
+  const saveRecentSearch = (fund: {
+    kuveraCode: string;
+    schemeName: string;
+  }) => {
     try {
       const stored = localStorage.getItem("mfc:recent-searches");
       let list: RecentSearch[] = stored ? JSON.parse(stored) : [];
-      
+
       // Filter out existing occurrence of same code
       list = list.filter((item) => item.kuveraCode !== fund.kuveraCode);
-      
+
       // Add to front of list
-      list.unshift({ kuveraCode: fund.kuveraCode, schemeName: fund.schemeName });
-      
+      list.unshift({
+        kuveraCode: fund.kuveraCode,
+        schemeName: fund.schemeName,
+      });
+
       // Limit to 5
       const truncated = list.slice(0, 5);
       localStorage.setItem("mfc:recent-searches", JSON.stringify(truncated));
@@ -72,7 +82,7 @@ export function CommandMenu({ defaultOpen = false }: { defaultOpen?: boolean }) 
         setOpen(false);
       }
     };
-    
+
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [open]);
@@ -82,7 +92,7 @@ export function CommandMenu({ defaultOpen = false }: { defaultOpen?: boolean }) 
     const handleOpen = () => {
       setOpen(true);
     };
-    
+
     window.addEventListener("mfc-open-search", handleOpen);
     return () => window.removeEventListener("mfc-open-search", handleOpen);
   }, []);
@@ -115,7 +125,9 @@ export function CommandMenu({ defaultOpen = false }: { defaultOpen?: boolean }) 
     setLoading(true);
     const delayDebounceFn = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/funds/search?q=${encodeURIComponent(query)}`);
+        const res = await fetch(
+          `/api/funds/search?q=${encodeURIComponent(query)}`,
+        );
         const json = await res.json();
         if (json.success) {
           setResults(json.data || []);
@@ -143,8 +155,9 @@ export function CommandMenu({ defaultOpen = false }: { defaultOpen?: boolean }) 
 
   // Keyboard navigation inside modal
   const handleModalKeyDown = (e: React.KeyboardEvent) => {
-    const itemsCount = query.trim().length < 2 ? recentSearches.length : results.length;
-    
+    const itemsCount =
+      query.trim().length < 2 ? recentSearches.length : results.length;
+
     if (e.key === "Escape") {
       setOpen(false);
     } else if (e.key === "ArrowDown") {
@@ -152,7 +165,9 @@ export function CommandMenu({ defaultOpen = false }: { defaultOpen?: boolean }) 
       setSelectedIndex((prev) => (prev + 1) % Math.max(itemsCount, 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setSelectedIndex((prev) => (prev - 1 + itemsCount) % Math.max(itemsCount, 1));
+      setSelectedIndex(
+        (prev) => (prev - 1 + itemsCount) % Math.max(itemsCount, 1),
+      );
     } else if (e.key === "Enter") {
       e.preventDefault();
       if (query.trim().length < 2) {
@@ -184,16 +199,21 @@ export function CommandMenu({ defaultOpen = false }: { defaultOpen?: boolean }) 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/55 p-4 pt-[10vh] backdrop-blur-sm">
       {/* Click outside to close */}
-      <div className="fixed inset-0" onClick={() => setOpen(false)} aria-hidden="true" tabIndex={-1} />
+      <div
+        className="fixed inset-0"
+        onClick={() => setOpen(false)}
+        aria-hidden="true"
+        tabIndex={-1}
+      />
 
       <div
         ref={modalRef}
         onKeyDown={handleModalKeyDown}
-        className="relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-card shadow-2xl animate-modal-enter"
+        className="animate-modal-enter relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-card shadow-2xl"
       >
         {/* Search Input Box */}
         <div className="flex items-center border-b border-border px-4 py-3">
-          <Search className="h-5 w-5 text-muted-foreground mr-3 shrink-0" />
+          <Search className="mr-3 h-5 w-5 shrink-0 text-muted-foreground" />
           <input
             ref={inputRef}
             type="text"
@@ -206,7 +226,7 @@ export function CommandMenu({ defaultOpen = false }: { defaultOpen?: boolean }) 
           />
           <button
             onClick={() => setOpen(false)}
-            className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
             aria-label="Close search"
           >
             <X className="h-4 w-4" />
@@ -223,33 +243,39 @@ export function CommandMenu({ defaultOpen = false }: { defaultOpen?: boolean }) 
 
           {!loading && showRecent && (
             <div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
                 <History className="h-3.5 w-3.5" /> Recent Searches
               </div>
               {recentSearches.length === 0 ? (
-                <div className="px-3 py-4 text-xs text-muted-foreground text-center">
+                <div className="px-3 py-4 text-center text-xs text-muted-foreground">
                   No recent searches. Try searching for "Axis" or "Motilal".
                 </div>
               ) : (
-                <div className="space-y-0.5 mt-1">
+                <div className="mt-1 space-y-0.5">
                   {recentSearches.map((item, idx) => (
                     <button
                       key={item.kuveraCode}
-                      onClick={() => handleSelectFund(item.kuveraCode, item.schemeName)}
+                      onClick={() =>
+                        handleSelectFund(item.kuveraCode, item.schemeName)
+                      }
                       data-active={selectedIndex === idx}
                       className={cn(
-                        "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition-colors animate-item-enter select-none cursor-pointer",
+                        "animate-item-enter flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition-colors select-none",
                         selectedIndex === idx
-                          ? "bg-accent text-foreground font-medium"
-                          : "text-muted-foreground hover:bg-accent/40"
+                          ? "bg-accent font-medium text-foreground"
+                          : "text-muted-foreground hover:bg-accent/40",
                       )}
                       style={{
                         animationDelay: `${Math.min(idx, 6) * 20}ms`,
-                        animationFillMode: "both"
+                        animationFillMode: "both",
                       }}
                     >
-                      <span className="truncate max-w-[400px]">{item.schemeName}</span>
-                      <span className="text-[10px] font-data text-muted-foreground/60">{item.kuveraCode}</span>
+                      <span className="max-w-[400px] truncate">
+                        {item.schemeName}
+                      </span>
+                      <span className="font-data text-[10px] text-muted-foreground/60">
+                        {item.kuveraCode}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -258,42 +284,44 @@ export function CommandMenu({ defaultOpen = false }: { defaultOpen?: boolean }) 
           )}
 
           {!loading && !showRecent && results.length === 0 && (
-            <div className="px-3 py-6 text-sm text-muted-foreground text-center">
+            <div className="px-3 py-6 text-center text-sm text-muted-foreground">
               No results found for "{query}"
             </div>
           )}
 
           {!loading && !showRecent && results.length > 0 && (
             <div className="space-y-0.5">
-              <div className="px-3 py-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+              <div className="px-3 py-1 text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
                 Search Results ({results.length})
               </div>
               {results.map((fund, idx) => (
                 <button
                   key={fund.kuveraCode}
-                  onClick={() => handleSelectFund(fund.kuveraCode, fund.schemeName)}
+                  onClick={() =>
+                    handleSelectFund(fund.kuveraCode, fund.schemeName)
+                  }
                   data-active={selectedIndex === idx}
                   className={cn(
-                    "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left transition-colors animate-item-enter select-none cursor-pointer",
+                    "animate-item-enter flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-left transition-colors select-none",
                     selectedIndex === idx
-                      ? "bg-accent text-foreground font-medium"
-                      : "text-muted-foreground hover:bg-accent/40"
+                      ? "bg-accent font-medium text-foreground"
+                      : "text-muted-foreground hover:bg-accent/40",
                   )}
                   style={{
                     animationDelay: `${Math.min(idx, 8) * 20}ms`,
-                    animationFillMode: "both"
+                    animationFillMode: "both",
                   }}
                 >
                   <div className="flex flex-col truncate pr-4">
-                    <span className="text-sm text-foreground truncate font-heading font-medium">
+                    <span className="truncate font-heading text-sm font-medium text-foreground">
                       {fund.schemeName}
                     </span>
-                    <span className="text-[10px] text-muted-foreground truncate mt-0.5">
+                    <span className="mt-0.5 truncate text-[10px] text-muted-foreground">
                       {fund.fundCategory} • {fund.fundHouseName}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="inline-flex items-center justify-center rounded-md bg-primary/10 px-2 py-1 text-xs font-bold text-primary font-data border border-primary/20">
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <span className="font-data inline-flex items-center justify-center rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs font-bold text-primary">
                       Score {parseFloat(fund.totalScore as string).toFixed(1)}
                     </span>
                   </div>
@@ -307,13 +335,22 @@ export function CommandMenu({ defaultOpen = false }: { defaultOpen?: boolean }) 
         <div className="flex items-center justify-between border-t border-border/80 bg-muted/30 px-4 py-2.5 text-[10px] text-muted-foreground select-none">
           <div className="flex items-center gap-3">
             <span>
-              <kbd className="rounded border border-border bg-card px-1 font-data">↑↓</kbd> Navigate
+              <kbd className="font-data rounded border border-border bg-card px-1">
+                ↑↓
+              </kbd>{" "}
+              Navigate
             </span>
             <span>
-              <kbd className="rounded border border-border bg-card px-1 font-data">Enter</kbd> Select
+              <kbd className="font-data rounded border border-border bg-card px-1">
+                Enter
+              </kbd>{" "}
+              Select
             </span>
             <span>
-              <kbd className="rounded border border-border bg-card px-1 font-data">Esc</kbd> Close
+              <kbd className="font-data rounded border border-border bg-card px-1">
+                Esc
+              </kbd>{" "}
+              Close
             </span>
           </div>
           <span className="hidden sm:inline">MF Compass</span>

@@ -24,7 +24,9 @@ async function main(): Promise<void> {
   // Verify confirmation
   const confirmation = process.env.CONFIRM_FLUSH;
   if (confirmation !== "FLUSH") {
-    logger.error("Aborting flush: CONFIRM_FLUSH environment variable must be set to 'FLUSH' to run this operation");
+    logger.error(
+      "Aborting flush: CONFIRM_FLUSH environment variable must be set to 'FLUSH' to run this operation",
+    );
     process.exit(1);
   }
 

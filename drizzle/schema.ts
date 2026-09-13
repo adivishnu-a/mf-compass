@@ -1,4 +1,16 @@
-import { pgTable, serial, text, decimal, integer, boolean, date, timestamp, jsonb, index, uniqueIndex } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  serial,
+  text,
+  decimal,
+  integer,
+  boolean,
+  date,
+  timestamp,
+  jsonb,
+  index,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 
 export const funds = pgTable(
   "funds",
@@ -35,7 +47,10 @@ export const funds = pgTable(
     fundManagers: jsonb("fund_managers"),
     investmentObjective: text("investment_objective"),
     volatility: decimal("volatility", { precision: 8, scale: 4 }),
-    portfolioTurnover: decimal("portfolio_turnover", { precision: 8, scale: 4 }),
+    portfolioTurnover: decimal("portfolio_turnover", {
+      precision: 8,
+      scale: 4,
+    }),
     aum: decimal("aum", { precision: 15, scale: 2 }),
     fundRating: integer("fund_rating"),
     fundRatingDate: date("fund_rating_date"),
@@ -54,7 +69,7 @@ export const funds = pgTable(
     index("idx_funds_fund_house").on(table.fundHouse),
     index("idx_funds_fund_type").on(table.fundType),
     index("idx_funds_total_score").on(table.totalScore.desc()),
-  ]
+  ],
 );
 
 export const categoryAverages = pgTable(
@@ -76,7 +91,7 @@ export const categoryAverages = pgTable(
   (table) => [
     uniqueIndex("idx_category_averages_name").on(table.categoryName),
     index("idx_category_averages_date").on(table.reportDate),
-  ]
+  ],
 );
 
 export type Fund = typeof funds.$inferSelect;

@@ -122,9 +122,7 @@
         "category_averages_category_name_unique": {
           "name": "category_averages_category_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "category_name"
-          ]
+          "columns": ["category_name"]
         }
       },
       "policies": {},
@@ -494,9 +492,7 @@
         "funds_kuvera_code_unique": {
           "name": "funds_kuvera_code_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "kuvera_code"
-          ]
+          "columns": ["kuvera_code"]
         }
       },
       "policies": {},

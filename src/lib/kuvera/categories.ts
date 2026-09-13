@@ -32,4 +32,5 @@ export const HYBRID_CATEGORIES: FundCategory[] = [
 ];
 
 /** Category that requires a synthetic benchmark (no natural Kuvera benchmark). */
-export const SYNTHETIC_BENCHMARK_CATEGORY: FundCategory = "Multi Asset Allocation";
+export const SYNTHETIC_BENCHMARK_CATEGORY: FundCategory =
+  "Multi Asset Allocation";

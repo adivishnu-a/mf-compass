@@ -16,20 +16,27 @@ interface FundsExplorerProps {
   error: string | null;
 }
 
-export function FundsExplorer({ group: currentGroup, category: activeCategory, funds, error }: FundsExplorerProps) {
+export function FundsExplorer({
+  group: currentGroup,
+  category: activeCategory,
+  funds,
+  error,
+}: FundsExplorerProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
   // Local state initialized from URL search params
-  const [minScore, setMinScore] = useState(() => 
-    searchParams.get("minScore") ? parseInt(searchParams.get("minScore")!) : 50
+  const [minScore, setMinScore] = useState(() =>
+    searchParams.get("minScore") ? parseInt(searchParams.get("minScore")!) : 50,
   );
-  const [minRating, setMinRating] = useState(() => 
-    searchParams.get("minRating") ? parseInt(searchParams.get("minRating")!) : 0
+  const [minRating, setMinRating] = useState(() =>
+    searchParams.get("minRating")
+      ? parseInt(searchParams.get("minRating")!)
+      : 0,
   );
-  const [sort, setSort] = useState(() => 
-    searchParams.get("sort") || "score_desc"
+  const [sort, setSort] = useState(
+    () => searchParams.get("sort") || "score_desc",
   );
 
   const [ratingDropdownOpen, setRatingDropdownOpen] = useState(false);
@@ -37,8 +44,12 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
 
   // Sync URL search params back to local states
   useEffect(() => {
-    const urlMinScore = searchParams.get("minScore") ? parseInt(searchParams.get("minScore")!) : 50;
-    const urlMinRating = searchParams.get("minRating") ? parseInt(searchParams.get("minRating")!) : 0;
+    const urlMinScore = searchParams.get("minScore")
+      ? parseInt(searchParams.get("minScore")!)
+      : 50;
+    const urlMinRating = searchParams.get("minRating")
+      ? parseInt(searchParams.get("minRating")!)
+      : 0;
     const urlSort = searchParams.get("sort") || "score_desc";
 
     setMinScore(urlMinScore);
@@ -50,7 +61,14 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
   const updateUrl = (updates: Record<string, string | number | null>) => {
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(updates).forEach(([key, val]) => {
-      if (val === null || val === undefined || val === "" || val === 0 || (key === "minScore" && val === 50) || (key === "sort" && val === "score_desc")) {
+      if (
+        val === null ||
+        val === undefined ||
+        val === "" ||
+        val === 0 ||
+        (key === "minScore" && val === 50) ||
+        (key === "sort" && val === "score_desc")
+      ) {
         params.delete(key);
       } else {
         params.set(key, val.toString());
@@ -63,7 +81,8 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
 
   // Switch Group Tab
   const handleGroupChange = (group: "equity" | "hybrid") => {
-    const newCategory = group === "equity" ? EQUITY_CATEGORIES[0] : HYBRID_CATEGORIES[0];
+    const newCategory =
+      group === "equity" ? EQUITY_CATEGORIES[0] : HYBRID_CATEGORIES[0];
     updateUrl({
       group,
       category: newCategory,
@@ -94,7 +113,9 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
 
     // Filter by Min Score
     if (minScore > 50) {
-      result = result.filter((f) => parseFloat(f.totalScore || "0") >= minScore);
+      result = result.filter(
+        (f) => parseFloat(f.totalScore || "0") >= minScore,
+      );
     }
 
     // Filter by Min Rating
@@ -105,19 +126,32 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
     // Sort Order
     result.sort((a, b) => {
       if (sort === "score_desc") {
-        return parseFloat(b.totalScore || "0") - parseFloat(a.totalScore || "0");
+        return (
+          parseFloat(b.totalScore || "0") - parseFloat(a.totalScore || "0")
+        );
       }
       if (sort === "score_asc") {
-        return parseFloat(a.totalScore || "0") - parseFloat(b.totalScore || "0");
+        return (
+          parseFloat(a.totalScore || "0") - parseFloat(b.totalScore || "0")
+        );
       }
       if (sort === "returns1y_desc") {
-        return parseFloat(b.returns1y || "-999999") - parseFloat(a.returns1y || "-999999");
+        return (
+          parseFloat(b.returns1y || "-999999") -
+          parseFloat(a.returns1y || "-999999")
+        );
       }
       if (sort === "returns3y_desc") {
-        return parseFloat(b.returns3y || "-999999") - parseFloat(a.returns3y || "-999999");
+        return (
+          parseFloat(b.returns3y || "-999999") -
+          parseFloat(a.returns3y || "-999999")
+        );
       }
       if (sort === "returns5y_desc") {
-        return parseFloat(b.returns5y || "-999999") - parseFloat(a.returns5y || "-999999");
+        return (
+          parseFloat(b.returns5y || "-999999") -
+          parseFloat(a.returns5y || "-999999")
+        );
       }
       if (sort === "aum_desc") {
         return parseFloat(b.aum || "0") - parseFloat(a.aum || "0");
@@ -131,14 +165,18 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
   // Display name helpers for category buttons
   const getCategoryShortName = (name: string) => {
     return name
-      .replace(/Dynamic Asset Allocation or Balanced Advantage/i, "Balanced Adv")
+      .replace(
+        /Dynamic Asset Allocation or Balanced Advantage/i,
+        "Balanced Adv",
+      )
       .replace(/Aggressive Hybrid Fund/i, "Aggressive Hybrid")
       .replace(/Fund/gi, "")
       .replace(/fund/gi, "")
       .trim();
   };
 
-  const categories = currentGroup === "equity" ? EQUITY_CATEGORIES : HYBRID_CATEGORIES;
+  const categories =
+    currentGroup === "equity" ? EQUITY_CATEGORIES : HYBRID_CATEGORIES;
 
   const ratingOptions = [
     { value: 0, label: "Any Rating" },
@@ -161,45 +199,63 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Title & Group Switcher */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b border-border pb-6">
+      <div className="flex flex-col gap-6 border-b border-border pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-heading text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
             Outperformance Leaderboard
           </h1>
-          <p className="mt-1 text-xs sm:text-sm text-muted-foreground leading-relaxed flex items-center flex-wrap">
-            Funds in <span className="font-semibold text-foreground mx-1">{activeCategory}</span> ranked by relative peer-group score.
-            <span className="relative hidden md:inline-block group ml-1.5 align-middle select-none">
-              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-muted/60 text-muted-foreground hover:bg-primary/20 hover:text-primary transition-colors cursor-help">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
+          <p className="mt-1 flex flex-wrap items-center text-xs leading-relaxed text-muted-foreground sm:text-sm">
+            Funds in{" "}
+            <span className="mx-1 font-semibold text-foreground">
+              {activeCategory}
+            </span>{" "}
+            ranked by relative peer-group score.
+            <span className="group relative ml-1.5 hidden align-middle select-none md:inline-block">
+              <span className="flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-muted/60 text-muted-foreground transition-colors hover:bg-primary/20 hover:text-primary">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="h-3 w-3"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </span>
-              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 rounded-lg border border-border bg-popover text-[11px] font-normal leading-normal text-popover-foreground shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 pointer-events-none">
-                <span className="font-bold text-foreground block mb-0.5">Outperformance Score</span>
-                Relative score based on weighted 3Y, 1Y, and 5Y returns, with a downside penalty on negative returns, normalized from <span className="font-semibold text-foreground">50 to 100</span>.
+              <span className="pointer-events-none invisible absolute bottom-full left-1/2 z-50 mb-2 w-72 -translate-x-1/2 rounded-lg border border-border bg-popover p-3 text-[11px] leading-normal font-normal text-popover-foreground opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100">
+                <span className="mb-0.5 block font-bold text-foreground">
+                  Outperformance Score
+                </span>
+                Relative score based on weighted 3Y, 1Y, and 5Y returns, with a
+                downside penalty on negative returns, normalized from{" "}
+                <span className="font-semibold text-foreground">50 to 100</span>
+                .
               </span>
             </span>
           </p>
         </div>
 
         {/* Group Tab Switcher (Equity / Hybrid) */}
-        <div className="relative inline-flex rounded-xl border border-border bg-card p-1 self-start sm:self-center">
+        <div className="relative inline-flex self-start rounded-xl border border-border bg-card p-1 sm:self-center">
           {/* Sliding active pill indicator */}
           <span
             className={cn(
-              "absolute inset-y-1 rounded-lg bg-primary transition-all duration-200 ease-out shadow-sm",
+              "absolute inset-y-1 rounded-lg bg-primary shadow-sm transition-all duration-200 ease-out",
               currentGroup === "equity"
-                ? "left-1 right-1/2"
-                : "left-1/2 right-1"
+                ? "right-1/2 left-1"
+                : "right-1 left-1/2",
             )}
           />
           <button
             onClick={() => handleGroupChange("equity")}
             className={cn(
-              "relative rounded-lg px-4 py-1.5 text-xs font-bold transition-colors duration-200 z-10 select-none cursor-pointer",
+              "relative z-10 cursor-pointer rounded-lg px-4 py-1.5 text-xs font-bold transition-colors duration-200 select-none",
               currentGroup === "equity"
                 ? "text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
             Equity
@@ -207,10 +263,10 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
           <button
             onClick={() => handleGroupChange("hybrid")}
             className={cn(
-              "relative rounded-lg px-4 py-1.5 text-xs font-bold transition-colors duration-200 z-10 select-none cursor-pointer",
+              "relative z-10 cursor-pointer rounded-lg px-4 py-1.5 text-xs font-bold transition-colors duration-200 select-none",
               currentGroup === "hybrid"
                 ? "text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
             Hybrid
@@ -220,19 +276,19 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
 
       {/* Category Selection Tabs */}
       <div className="relative mt-6">
-        <div className="overflow-x-auto pb-2.5 scrollbar-none">
-          <div className="flex gap-2.5 min-w-max pr-8 md:pr-0">
+        <div className="scrollbar-none overflow-x-auto pb-2.5">
+          <div className="flex min-w-max gap-2.5 pr-8 md:pr-0">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => handleCategoryChange(cat)}
                 disabled={isPending}
                 className={cn(
-                  "rounded-full px-4 sm:px-5 py-2.5 sm:py-2 text-xs font-semibold border transition-all duration-150 select-none cursor-pointer active:scale-[0.98]",
+                  "cursor-pointer rounded-full border px-4 py-2.5 text-xs font-semibold transition-all duration-150 select-none active:scale-[0.98] sm:px-5 sm:py-2",
                   activeCategory === cat
                     ? "border-primary/50 bg-primary/10 text-primary"
                     : "border-border bg-card text-muted-foreground hover:border-muted-foreground hover:text-foreground",
-                  isPending && activeCategory !== cat && "opacity-60"
+                  isPending && activeCategory !== cat && "opacity-60",
                 )}
               >
                 {getCategoryShortName(cat)}
@@ -244,21 +300,23 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
         <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background to-transparent md:hidden" />
       </div>
 
-
-
       {/* Filter Options Bar */}
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-[auto_1fr_1fr_auto] gap-4 rounded-xl border border-border bg-card p-4 shadow-sm">
+      <div className="mt-6 grid grid-cols-1 gap-4 rounded-xl border border-border bg-card p-4 shadow-sm md:grid-cols-[auto_1fr_1fr_auto]">
         {/* Score Buttons */}
         <div className="flex flex-col">
-          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
+          <label className="mb-1.5 text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
             Min Score
           </label>
-          <div className="relative inline-flex items-center rounded-lg border border-border bg-background p-0.5 h-8 w-[148px]">
+          <div className="relative inline-flex h-8 w-[148px] items-center rounded-lg border border-border bg-background p-0.5">
             {/* Sliding active indicator */}
             <span
               className={cn(
-                "absolute inset-y-0.5 left-0.5 w-12 rounded-md bg-primary transition-transform duration-200 ease-out shadow-sm transform-gpu",
-                minScore === 50 ? "translate-x-0" : minScore === 75 ? "translate-x-12" : "translate-x-24"
+                "absolute inset-y-0.5 left-0.5 w-12 transform-gpu rounded-md bg-primary shadow-sm transition-transform duration-200 ease-out",
+                minScore === 50
+                  ? "translate-x-0"
+                  : minScore === 75
+                    ? "translate-x-12"
+                    : "translate-x-24",
               )}
             />
             {[50, 75, 90].map((score) => {
@@ -272,10 +330,10 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
                     updateUrl({ minScore: score });
                   }}
                   className={cn(
-                    "relative flex h-7 w-12 items-center justify-center rounded-md text-xs font-bold font-data transition-colors duration-200 z-10 select-none cursor-pointer",
+                    "font-data relative z-10 flex h-7 w-12 cursor-pointer items-center justify-center rounded-md text-xs font-bold transition-colors duration-200 select-none",
                     isActive
-                      ? "text-primary-foreground font-extrabold"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "font-extrabold text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {score}
@@ -286,8 +344,8 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
         </div>
 
         {/* Rating Filter */}
-        <div className="flex flex-col relative z-20">
-          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
+        <div className="relative z-20 flex flex-col">
+          <label className="mb-1.5 text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
             Min Fund Rating
           </label>
           <button
@@ -295,17 +353,23 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
               setRatingDropdownOpen(!ratingDropdownOpen);
               setSortDropdownOpen(false);
             }}
-            className="flex w-full items-center justify-between rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground transition-colors hover:border-primary/50 focus:outline-none h-[34px]"
+            className="flex h-[34px] w-full items-center justify-between rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground transition-colors hover:border-primary/50 focus:outline-none"
           >
-            <span className="truncate">{ratingOptions.find(o => o.value === minRating)?.label || "Any Rating"}</span>
-            <ChevronDown className="h-3.5 w-3.5 opacity-50 shrink-0 ml-2" />
+            <span className="truncate">
+              {ratingOptions.find((o) => o.value === minRating)?.label ||
+                "Any Rating"}
+            </span>
+            <ChevronDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
           </button>
-          
+
           {ratingDropdownOpen && (
             <>
-              <div className="fixed inset-0 z-40" onClick={() => setRatingDropdownOpen(false)} />
-              <div className="absolute top-[calc(100%+4px)] left-0 w-full rounded-xl border border-border bg-card/95 p-1 shadow-xl z-50 animate-dropdown-enter backdrop-blur-md">
-                {ratingOptions.map(opt => (
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setRatingDropdownOpen(false)}
+              />
+              <div className="animate-dropdown-enter absolute top-[calc(100%+4px)] left-0 z-50 w-full rounded-xl border border-border bg-card/95 p-1 shadow-xl backdrop-blur-md">
+                {ratingOptions.map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
@@ -315,8 +379,10 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
                       setRatingDropdownOpen(false);
                     }}
                     className={cn(
-                      "flex w-full items-center px-2 py-1.5 text-xs transition-colors hover:bg-accent hover:text-foreground rounded-lg",
-                      minRating === opt.value ? "bg-accent/40 text-primary font-bold" : "text-muted-foreground"
+                      "flex w-full items-center rounded-lg px-2 py-1.5 text-xs transition-colors hover:bg-accent hover:text-foreground",
+                      minRating === opt.value
+                        ? "bg-accent/40 font-bold text-primary"
+                        : "text-muted-foreground",
                     )}
                   >
                     {opt.label}
@@ -328,8 +394,8 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
         </div>
 
         {/* Sorting option */}
-        <div className="flex flex-col relative z-10">
-          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
+        <div className="relative z-10 flex flex-col">
+          <label className="mb-1.5 text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
             Sort Universe By
           </label>
           <button
@@ -337,17 +403,23 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
               setSortDropdownOpen(!sortDropdownOpen);
               setRatingDropdownOpen(false);
             }}
-            className="flex w-full items-center justify-between rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground transition-colors hover:border-primary/50 focus:outline-none h-[34px]"
+            className="flex h-[34px] w-full items-center justify-between rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground transition-colors hover:border-primary/50 focus:outline-none"
           >
-            <span className="truncate">{sortOptions.find(o => o.value === sort)?.label || "Score (High to Low)"}</span>
-            <ChevronDown className="h-3.5 w-3.5 opacity-50 shrink-0 ml-2" />
+            <span className="truncate">
+              {sortOptions.find((o) => o.value === sort)?.label ||
+                "Score (High to Low)"}
+            </span>
+            <ChevronDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
           </button>
-          
+
           {sortDropdownOpen && (
             <>
-              <div className="fixed inset-0 z-40" onClick={() => setSortDropdownOpen(false)} />
-              <div className="absolute top-[calc(100%+4px)] left-0 w-full rounded-xl border border-border bg-card/95 p-1 shadow-xl z-50 animate-dropdown-enter backdrop-blur-md">
-                {sortOptions.map(opt => (
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setSortDropdownOpen(false)}
+              />
+              <div className="animate-dropdown-enter absolute top-[calc(100%+4px)] left-0 z-50 w-full rounded-xl border border-border bg-card/95 p-1 shadow-xl backdrop-blur-md">
+                {sortOptions.map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
@@ -357,8 +429,10 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
                       setSortDropdownOpen(false);
                     }}
                     className={cn(
-                      "flex w-full items-center px-2 py-1.5 text-xs transition-colors hover:bg-accent hover:text-foreground rounded-lg text-left",
-                      sort === opt.value ? "bg-accent/40 text-primary font-bold" : "text-muted-foreground"
+                      "flex w-full items-center rounded-lg px-2 py-1.5 text-left text-xs transition-colors hover:bg-accent hover:text-foreground",
+                      sort === opt.value
+                        ? "bg-accent/40 font-bold text-primary"
+                        : "text-muted-foreground",
                     )}
                   >
                     {opt.label}
@@ -373,12 +447,14 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
         <div className="flex items-end">
           <button
             onClick={handleClearFilters}
-            disabled={minScore === 50 && minRating === 0 && sort === "score_desc"}
+            disabled={
+              minScore === 50 && minRating === 0 && sort === "score_desc"
+            }
             className={cn(
-              "flex w-full items-center justify-center gap-1.5 rounded-lg border px-4 py-1.5 text-xs font-semibold transition-all duration-150 h-[34px]",
-              (minScore > 50 || minRating > 0 || sort !== "score_desc")
-                ? "border-border hover:bg-accent text-foreground hover:text-foreground cursor-pointer"
-                : "border-border/40 text-muted-foreground/30 bg-muted/20 cursor-not-allowed"
+              "flex h-[34px] w-full items-center justify-center gap-1.5 rounded-lg border px-4 py-1.5 text-xs font-semibold transition-all duration-150",
+              minScore > 50 || minRating > 0 || sort !== "score_desc"
+                ? "cursor-pointer border-border text-foreground hover:bg-accent hover:text-foreground"
+                : "cursor-not-allowed border-border/40 bg-muted/20 text-muted-foreground/30",
             )}
           >
             <X className="h-3.5 w-3.5" />
@@ -388,10 +464,15 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
       </div>
 
       {/* Main Results Container */}
-      <div className={cn("mt-8 transition-opacity duration-200", isPending && "opacity-60")}>
+      <div
+        className={cn(
+          "mt-8 transition-opacity duration-200",
+          isPending && "opacity-60",
+        )}
+      >
         {error && (
-          <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-8 text-center animate-fade-in">
-            <p className="text-sm text-destructive font-medium">{error}</p>
+          <div className="animate-fade-in rounded-xl border border-destructive/20 bg-destructive/5 p-8 text-center">
+            <p className="text-sm font-medium text-destructive">{error}</p>
             <button
               onClick={() => router.refresh()}
               className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-destructive/30 px-4 py-2 text-xs font-semibold text-destructive hover:bg-destructive/10"
@@ -402,10 +483,13 @@ export function FundsExplorer({ group: currentGroup, category: activeCategory, f
         )}
 
         {!error && filteredFunds.length === 0 && (
-          <div className="rounded-xl border border-border bg-card p-12 text-center animate-fade-in shadow-sm">
-            <h3 className="font-heading font-bold text-sm text-foreground">No funds match your filters</h3>
-            <p className="mt-1 text-xs text-muted-foreground max-w-sm mx-auto">
-              Your filter thresholds might be too restrictive. Try resetting filters to view the full leaderboard.
+          <div className="animate-fade-in rounded-xl border border-border bg-card p-12 text-center shadow-sm">
+            <h3 className="font-heading text-sm font-bold text-foreground">
+              No funds match your filters
+            </h3>
+            <p className="mx-auto mt-1 max-w-sm text-xs text-muted-foreground">
+              Your filter thresholds might be too restrictive. Try resetting
+              filters to view the full leaderboard.
             </p>
             <button
               onClick={handleClearFilters}

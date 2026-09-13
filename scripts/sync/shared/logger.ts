@@ -12,7 +12,11 @@ interface LogEntry {
   [key: string]: unknown;
 }
 
-function log(level: LogLevel, message: string, data?: Record<string, unknown>): void {
+function log(
+  level: LogLevel,
+  message: string,
+  data?: Record<string, unknown>,
+): void {
   const entry: LogEntry = {
     timestamp: new Date().toISOString(),
     level,
@@ -23,8 +27,12 @@ function log(level: LogLevel, message: string, data?: Record<string, unknown>): 
 }
 
 export const logger = {
-  info: (message: string, data?: Record<string, unknown>) => log("info", message, data),
-  warn: (message: string, data?: Record<string, unknown>) => log("warn", message, data),
-  error: (message: string, data?: Record<string, unknown>) => log("error", message, data),
-  debug: (message: string, data?: Record<string, unknown>) => log("debug", message, data),
+  info: (message: string, data?: Record<string, unknown>) =>
+    log("info", message, data),
+  warn: (message: string, data?: Record<string, unknown>) =>
+    log("warn", message, data),
+  error: (message: string, data?: Record<string, unknown>) =>
+    log("error", message, data),
+  debug: (message: string, data?: Record<string, unknown>) =>
+    log("debug", message, data),
 };

@@ -44,22 +44,31 @@ export const fundDetailSchema = z.object({
   sip_available: z.string().optional().nullable(),
   sip_min: z.coerce.number().optional().nullable(),
   lock_in_period: z.coerce.number().optional().nullable(),
-  nav: z.object({
-    nav: z.coerce.number().optional().nullable(),
-    date: z.string().optional().nullable(),
-  }).optional().nullable(),
-  last_nav: z.object({
-    nav: z.coerce.number().optional().nullable(),
-    date: z.string().optional().nullable(),
-  }).optional().nullable(),
-  returns: z.object({
-    week_1: z.coerce.number().optional().nullable(),
-    year_1: z.coerce.number().optional().nullable(),
-    year_3: z.coerce.number().optional().nullable(),
-    year_5: z.coerce.number().optional().nullable(),
-    inception: z.coerce.number().optional().nullable(),
-    date: z.string().optional().nullable(),
-  }).optional().nullable(),
+  nav: z
+    .object({
+      nav: z.coerce.number().optional().nullable(),
+      date: z.string().optional().nullable(),
+    })
+    .optional()
+    .nullable(),
+  last_nav: z
+    .object({
+      nav: z.coerce.number().optional().nullable(),
+      date: z.string().optional().nullable(),
+    })
+    .optional()
+    .nullable(),
+  returns: z
+    .object({
+      week_1: z.coerce.number().optional().nullable(),
+      year_1: z.coerce.number().optional().nullable(),
+      year_3: z.coerce.number().optional().nullable(),
+      year_5: z.coerce.number().optional().nullable(),
+      inception: z.coerce.number().optional().nullable(),
+      date: z.string().optional().nullable(),
+    })
+    .optional()
+    .nullable(),
   start_date: z.string().optional().nullable(),
   expense_ratio: z.coerce.number().optional().nullable(),
   expense_ratio_date: z.string().optional().nullable(),
@@ -72,22 +81,25 @@ export const fundDetailSchema = z.object({
   fund_rating_date: z.string().optional().nullable(),
   crisil_rating: z.string().optional().nullable(),
   tags: z.array(z.string()).optional().nullable(),
-  comparison: z.array(
-    z.object({
-      name: z.string(),
-      short_name: z.string().optional().nullable(),
-      code: z.string(),
-      slug: z.string().optional().nullable(),
-      "1y": z.coerce.number().optional().nullable(),
-      "3y": z.coerce.number().optional().nullable(),
-      "5y": z.coerce.number().optional().nullable(),
-      inception: z.coerce.number().optional().nullable(),
-      volatility: z.coerce.number().optional().nullable(),
-      expense_ratio: z.coerce.number().optional().nullable(),
-      aum: z.coerce.number().optional().nullable(),
-      info_ratio: z.coerce.number().optional().nullable(),
-    })
-  ).optional().nullable(),
+  comparison: z
+    .array(
+      z.object({
+        name: z.string(),
+        short_name: z.string().optional().nullable(),
+        code: z.string(),
+        slug: z.string().optional().nullable(),
+        "1y": z.coerce.number().optional().nullable(),
+        "3y": z.coerce.number().optional().nullable(),
+        "5y": z.coerce.number().optional().nullable(),
+        inception: z.coerce.number().optional().nullable(),
+        volatility: z.coerce.number().optional().nullable(),
+        expense_ratio: z.coerce.number().optional().nullable(),
+        aum: z.coerce.number().optional().nullable(),
+        info_ratio: z.coerce.number().optional().nullable(),
+      }),
+    )
+    .optional()
+    .nullable(),
 });
 
 export type FundDetail = z.infer<typeof fundDetailSchema>;
@@ -106,4 +118,6 @@ export const categoryAverageItemSchema = z.object({
 export type CategoryAverageItem = z.infer<typeof categoryAverageItemSchema>;
 
 /** Top-level shape of fund_categories.json. */
-export const categoryAveragesResponseSchema = z.array(categoryAverageItemSchema);
+export const categoryAveragesResponseSchema = z.array(
+  categoryAverageItemSchema,
+);

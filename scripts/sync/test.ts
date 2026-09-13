@@ -31,7 +31,9 @@ async function main(): Promise<void> {
 
     // Test simple ping query
     const dbPing = await db.execute(sql`SELECT NOW() as now`);
-    logger.info("✅ Database connection successful", { time: JSON.stringify(dbPing) });
+    logger.info("✅ Database connection successful", {
+      time: JSON.stringify(dbPing),
+    });
 
     // Count rows in funds
     const fundsCountResult = await db

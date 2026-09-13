@@ -10,7 +10,7 @@
 export function formatIST(date: Date | string | null): string {
   if (!date) return "Not available";
   const d = typeof date === "string" ? new Date(date) : date;
-  
+
   try {
     const options: Intl.DateTimeFormatOptions = {
       day: "2-digit",
@@ -21,10 +21,10 @@ export function formatIST(date: Date | string | null): string {
       timeZone: "Asia/Kolkata",
       hour12: false,
     };
-    
+
     // Format to "en-IN" style
     const formatted = new Intl.DateTimeFormat("en-IN", options).format(d);
-    
+
     // Standardize comma format (replace comma with space or keep)
     return `${formatted.replace(",", "")} IST`;
   } catch (e) {
@@ -40,13 +40,13 @@ export function formatIST(date: Date | string | null): string {
 export function formatPercent(
   value: number | string | null,
   showSign = true,
-  allowZero = false
+  allowZero = false,
 ): string {
   if (value === null || value === undefined) return "--";
   const num = typeof value === "string" ? parseFloat(value) : value;
   if (isNaN(num)) return "--";
   if (num === 0 && !allowZero) return "--";
-  
+
   const formatted = num.toFixed(2) + "%";
   if (!showSign || num === 0) return formatted;
   return num > 0 ? "+" + formatted : formatted;
@@ -56,15 +56,18 @@ export function formatPercent(
  * Formats currency values in INR (Indian Rupee) format.
  * Example: 5000 -> "₹5,000"
  */
-export function formatINR(value: number | string | null, includeSymbol = true): string {
+export function formatINR(
+  value: number | string | null,
+  includeSymbol = true,
+): string {
   if (value === null || value === undefined) return "--";
   const num = typeof value === "string" ? parseFloat(value) : value;
   if (isNaN(num)) return "--";
-  
+
   const formatted = new Intl.NumberFormat("en-IN", {
     maximumFractionDigits: 0,
   }).format(num);
-  
+
   return includeSymbol ? "₹" + formatted : formatted;
 }
 
@@ -72,16 +75,19 @@ export function formatINR(value: number | string | null, includeSymbol = true): 
  * Formats NAV with 2 decimal points in INR format.
  * Example: 115.2 -> "₹115.20"
  */
-export function formatNAV(value: number | string | null, includeSymbol = true): string {
+export function formatNAV(
+  value: number | string | null,
+  includeSymbol = true,
+): string {
   if (value === null || value === undefined) return "--";
   const num = typeof value === "string" ? parseFloat(value) : value;
   if (isNaN(num)) return "--";
-  
+
   const formatted = new Intl.NumberFormat("en-IN", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(num);
-  
+
   return includeSymbol ? "₹" + formatted : formatted;
 }
 
@@ -93,12 +99,12 @@ export function formatAUM(value: number | string | null): string {
   if (value === null || value === undefined) return "--";
   const num = typeof value === "string" ? parseFloat(value) : value;
   if (isNaN(num)) return "--";
-  
+
   const formatted = new Intl.NumberFormat("en-IN", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(num);
-  
+
   return "₹" + formatted + " Cr";
 }
 
@@ -116,7 +122,7 @@ export function isReturnGenuine(
     returns1y?: string | number | null;
     returns3y?: string | number | null;
     returns5y?: string | number | null;
-  }
+  },
 ): boolean {
   if (val === null || val === undefined) return false;
   const num = typeof val === "string" ? parseFloat(val) : val;
@@ -133,12 +139,13 @@ export function isReturnGenuine(
 
   const periodsOrder = ["1d", "1w", "1y", "3y", "5y"] as const;
   const currentIndex = periodsOrder.indexOf(period);
-  
+
   // Check if any subsequent period to the right has a non-zero value
   for (let i = currentIndex + 1; i < periodsOrder.length; i++) {
     const rightVal = periodFields[periodsOrder[i]];
     if (rightVal !== null && rightVal !== undefined) {
-      const rightNum = typeof rightVal === "string" ? parseFloat(rightVal) : rightVal;
+      const rightNum =
+        typeof rightVal === "string" ? parseFloat(rightVal) : rightVal;
       if (!isNaN(rightNum) && rightNum !== 0) {
         return true;
       }

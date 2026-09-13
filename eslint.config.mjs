@@ -9,10 +9,13 @@ const eslintConfig = defineConfig([
     rules: {
       "react-hooks/set-state-in-effect": "off",
       "react-hooks/static-components": "off",
-      "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_" },
+      ],
       "react/no-unescaped-entities": "off",
-      "@next/next/no-img-element": "off"
-    }
+      "@next/next/no-img-element": "off",
+    },
   },
   // Override default ignores of eslint-config-next.
   globalIgnores([

@@ -25,7 +25,7 @@ interface DiscoveryResult {
  */
 export function discoverFundsForCategory(
   allFunds: FundListItem[],
-  category: FundCategory
+  category: FundCategory,
 ): DiscoveryResult {
   const rejections = {
     notGrowthPlan: 0,
@@ -70,7 +70,7 @@ export function discoverFundsForCategory(
  * Returns a map of category → eligible fund codes.
  */
 export function discoverAllFunds(
-  allFunds: FundListItem[]
+  allFunds: FundListItem[],
 ): Map<FundCategory, string[]> {
   const result = new Map<FundCategory, string[]>();
 

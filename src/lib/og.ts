@@ -12,9 +12,16 @@ function loadGoogleFont(family: string, weight: number): Promise<ArrayBuffer> {
   const promise = (async () => {
     const css = await fetch(
       `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}`,
-      { headers: { "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0" } }
+      {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0",
+        },
+      },
     ).then((response) => response.text());
-    const match = css.match(/src: url\((.+?)\) format\('(?:opentype|truetype|woff)'\)/);
+    const match = css.match(
+      /src: url\((.+?)\) format\('(?:opentype|truetype|woff)'\)/,
+    );
     if (!match) throw new Error(`No TTF source found for ${key}`);
     return fetch(match[1]).then((response) => response.arrayBuffer());
   })();
@@ -26,11 +33,29 @@ function loadGoogleFont(family: string, weight: number): Promise<ArrayBuffer> {
 export const ogSize = { width: 1200, height: 630 };
 
 export async function ogFonts() {
-  const [bold, medium] = await Promise.all([loadGoogleFont("Inter", 800), loadGoogleFont("Inter", 500)]);
+  const [bold, medium] = await Promise.all([
+    loadGoogleFont("Inter", 800),
+    loadGoogleFont("Inter", 500),
+  ]);
   return [
-    { name: "Inter", data: bold, weight: 800 as const, style: "normal" as const },
-    { name: "Inter", data: medium, weight: 500 as const, style: "normal" as const },
+    {
+      name: "Inter",
+      data: bold,
+      weight: 800 as const,
+      style: "normal" as const,
+    },
+    {
+      name: "Inter",
+      data: medium,
+      weight: 500 as const,
+      style: "normal" as const,
+    },
   ];
 }
 
-export const ogColors = { blue: "#006ad6", ink: "#0f172a", paper: "#ffffff", muted: "rgba(255,255,255,0.78)" };
+export const ogColors = {
+  blue: "#006ad6",
+  ink: "#0f172a",
+  paper: "#ffffff",
+  muted: "rgba(255,255,255,0.78)",
+};

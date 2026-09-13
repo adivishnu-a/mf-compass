@@ -33,6 +33,9 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
+      - name: Check Formatting
+        run: npm run format:check
+
       - name: Run Unit Tests
         run: npm run test
 

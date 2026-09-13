@@ -48,7 +48,9 @@ export async function fetchFundList(): Promise<FundListItem[]> {
 
   const response = await fetchWithTimeout(url);
   if (!response.ok) {
-    throw new Error(`Fund list fetch failed: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Fund list fetch failed: ${response.status} ${response.statusText}`,
+    );
   }
 
   const raw = await response.json();
@@ -58,11 +60,16 @@ export async function fetchFundList(): Promise<FundListItem[]> {
 
   const flattened: unknown[] = [];
   for (const assetClass of Object.keys(raw)) {
-    const categoriesObj = (raw as Record<string, unknown>)[assetClass] as Record<string, unknown>;
+    const categoriesObj = (raw as Record<string, unknown>)[
+      assetClass
+    ] as Record<string, unknown>;
     if (!categoriesObj || typeof categoriesObj !== "object") continue;
 
     for (const categoryName of Object.keys(categoriesObj)) {
-      const fundHousesObj = categoriesObj[categoryName] as Record<string, unknown>;
+      const fundHousesObj = categoriesObj[categoryName] as Record<
+        string,
+        unknown
+      >;
       if (!fundHousesObj || typeof fundHousesObj !== "object") continue;
 
       for (const fundHouseName of Object.keys(fundHousesObj)) {
@@ -91,21 +98,30 @@ export async function fetchFundList(): Promise<FundListItem[]> {
   const parsed = fundListResponseSchema.safeParse(flattened);
 
   if (!parsed.success) {
-    throw new Error(`Fund list schema validation failed: ${parsed.error.message}`);
+    throw new Error(
+      `Fund list schema validation failed: ${parsed.error.message}`,
+    );
   }
 
-  logger.info("Fund universe fetched and flattened", { count: parsed.data.length });
+  logger.info("Fund universe fetched and flattened", {
+    count: parsed.data.length,
+  });
   return parsed.data;
 }
 
 /** Fetch detail for a single fund. Returns null on failure (log + skip). */
-export async function fetchFundDetail(code: string): Promise<FundDetail | null> {
+export async function fetchFundDetail(
+  code: string,
+): Promise<FundDetail | null> {
   const url = `${BASE_URL}/v5/fund_schemes/${code}.json`;
 
   try {
     const response = await fetchWithTimeout(url);
     if (!response.ok) {
-      logger.warn("Fund detail fetch failed", { code, status: response.status });
+      logger.warn("Fund detail fetch failed", {
+        code,
+        status: response.status,
+      });
       return null;
     }
 
@@ -132,7 +148,9 @@ export async function fetchFundDetail(code: string): Promise<FundDetail | null> 
 }
 
 /** Fetch details for multiple funds in batches of 10 with 100ms delay. */
-export async function fetchFundDetailsBatched(codes: string[]): Promise<FundDetail[]> {
+export async function fetchFundDetailsBatched(
+  codes: string[],
+): Promise<FundDetail[]> {
   const results: FundDetail[] = [];
   const totalBatches = Math.ceil(codes.length / BATCH_SIZE);
 
@@ -147,7 +165,7 @@ export async function fetchFundDetailsBatched(codes: string[]): Promise<FundDeta
     });
 
     const batchResults = await Promise.allSettled(
-      batch.map((code) => fetchFundDetail(code))
+      batch.map((code) => fetchFundDetail(code)),
     );
 
     for (const result of batchResults) {
@@ -171,14 +189,18 @@ export async function fetchCategoryAverages(): Promise<CategoryAverageItem[]> {
 
   const response = await fetchWithTimeout(url);
   if (!response.ok) {
-    throw new Error(`Category averages fetch failed: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Category averages fetch failed: ${response.status} ${response.statusText}`,
+    );
   }
 
   const raw = await response.json();
   const parsed = categoryAveragesResponseSchema.safeParse(raw);
 
   if (!parsed.success) {
-    throw new Error(`Category averages schema validation failed: ${parsed.error.message}`);
+    throw new Error(
+      `Category averages schema validation failed: ${parsed.error.message}`,
+    );
   }
 
   logger.info("Category averages fetched", { count: parsed.data.length });

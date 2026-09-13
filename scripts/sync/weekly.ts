@@ -25,13 +25,27 @@ import { eq, notInArray, sql } from "drizzle-orm";
 import * as schema from "@drizzle/schema";
 import { funds, categoryAverages } from "@drizzle/schema";
 import type { NewCategoryAverage } from "@drizzle/schema";
-import { fetchFundList, fetchFundDetailsBatched, fetchCategoryAverages } from "@scripts/sync/kuvera/client";
+import {
+  fetchFundList,
+  fetchFundDetailsBatched,
+  fetchCategoryAverages,
+} from "@scripts/sync/kuvera/client";
 import type { FundDetail } from "@scripts/sync/kuvera/schemas";
 import { discoverAllFunds } from "@scripts/sync/pipeline/discovery";
 import { filterFunds } from "@scripts/sync/pipeline/filter";
-import { transformFundDetail, cleanReturns } from "@scripts/sync/pipeline/transform";
-import { computeRawScore, normalizeScores, computeSyntheticBenchmark } from "@/lib/scoring";
-import { FUND_CATEGORIES, SYNTHETIC_BENCHMARK_CATEGORY } from "@/lib/kuvera/categories";
+import {
+  transformFundDetail,
+  cleanReturns,
+} from "@scripts/sync/pipeline/transform";
+import {
+  computeRawScore,
+  normalizeScores,
+  computeSyntheticBenchmark,
+} from "@/lib/scoring";
+import {
+  FUND_CATEGORIES,
+  SYNTHETIC_BENCHMARK_CATEGORY,
+} from "@/lib/kuvera/categories";
 import { logger } from "@scripts/sync/shared/logger";
 
 const BATCH_WRITE_SIZE = 25;
@@ -70,7 +84,9 @@ async function main(): Promise<void> {
     for (const codes of categoryCodeMap.values()) {
       allEligibleCodes.push(...codes);
     }
-    logger.info("Total eligible codes after discovery", { count: allEligibleCodes.length });
+    logger.info("Total eligible codes after discovery", {
+      count: allEligibleCodes.length,
+    });
 
     // Step 3: Batch fetch details
     const fundDetails = await fetchFundDetailsBatched(allEligibleCodes);
@@ -84,7 +100,9 @@ async function main(): Promise<void> {
 
     // Upsert category averages
     for (const cat of kuveraCategoryAverages) {
-      const matchingCategory = FUND_CATEGORIES.find((c) => c === cat.category_name);
+      const matchingCategory = FUND_CATEGORIES.find(
+        (c) => c === cat.category_name,
+      );
       if (!matchingCategory) continue;
 
       const row: NewCategoryAverage = {
@@ -122,7 +140,7 @@ async function main(): Promise<void> {
 
     // Step 6: Compute synthetic benchmark for Multi Asset Allocation
     const multiAssetFunds: FundDetail[] = filteredFunds.filter(
-      (f: FundDetail) => f.fund_category === SYNTHETIC_BENCHMARK_CATEGORY
+      (f: FundDetail) => f.fund_category === SYNTHETIC_BENCHMARK_CATEGORY,
     );
 
     if (multiAssetFunds.length > 0) {
@@ -177,10 +195,13 @@ async function main(): Promise<void> {
       summary.syntheticBenchmarksApplied++;
 
       if (multiAssetFunds.length < 5) {
-        logger.warn("Synthetic benchmark source count below threshold, falling back to absolute returns", {
-          category: SYNTHETIC_BENCHMARK_CATEGORY,
-          sourceCount: multiAssetFunds.length,
-        });
+        logger.warn(
+          "Synthetic benchmark source count below threshold, falling back to absolute returns",
+          {
+            category: SYNTHETIC_BENCHMARK_CATEGORY,
+            sourceCount: multiAssetFunds.length,
+          },
+        );
       }
     }
 
@@ -197,10 +218,12 @@ async function main(): Promise<void> {
             .select({ id: funds.id })
             .from(funds)
             .where(eq(funds.kuveraCode, fund.kuveraCode))
-            .limit(1)
+            .limit(1),
         );
 
-        const selectResults = (await db.batch(selectQueries as unknown as [never, ...never[]])) as unknown as { id: number }[][];
+        const selectResults = (await db.batch(
+          selectQueries as unknown as [never, ...never[]],
+        )) as unknown as { id: number }[][];
 
         const writeQueries = batch.map((fund, idx) => {
           const existing = selectResults[idx];
@@ -250,12 +273,16 @@ async function main(): Promise<void> {
 
     // Step 9: Recompute and normalize scores per category
     const categoryAvgRows = await db.select().from(categoryAverages);
-    const categoryAvgMap = new Map(categoryAvgRows.map((r) => [r.categoryName, r]));
+    const categoryAvgMap = new Map(
+      categoryAvgRows.map((r) => [r.categoryName, r]),
+    );
 
     for (const category of FUND_CATEGORIES) {
       const catAvg = categoryAvgMap.get(category);
       if (!catAvg) {
-        logger.warn("No category average found, skipping scoring", { category });
+        logger.warn("No category average found, skipping scoring", {
+          category,
+        });
         continue;
       }
 
@@ -281,8 +308,8 @@ async function main(): Promise<void> {
             returns3y: f.returns3y ? parseFloat(f.returns3y) : null,
             returns5y: f.returns5y ? parseFloat(f.returns5y) : null,
           },
-          catReturns
-        )
+          catReturns,
+        ),
       );
 
       const normalized = normalizeScores(rawScores);
@@ -298,7 +325,7 @@ async function main(): Promise<void> {
                 totalScore: batchNormalized[idx].toFixed(2),
                 scoreUpdated: sql`NOW()`,
               })
-              .where(eq(funds.id, fund.id))
+              .where(eq(funds.id, fund.id)),
           );
           if (queries.length > 0) {
             await db.batch(queries as unknown as [never, ...never[]]);
@@ -331,7 +358,14 @@ async function main(): Promise<void> {
       ...summary,
       error: err instanceof Error ? err.message : String(err),
     });
-    fs.writeFileSync("summary.json", JSON.stringify({ ...summary, error: err instanceof Error ? err.message : String(err) }, null, 2));
+    fs.writeFileSync(
+      "summary.json",
+      JSON.stringify(
+        { ...summary, error: err instanceof Error ? err.message : String(err) },
+        null,
+        2,
+      ),
+    );
     process.exit(1);
   }
 }

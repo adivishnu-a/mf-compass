@@ -7,14 +7,20 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
 
-    if (category && category !== "all" && !(FUND_CATEGORIES as readonly string[]).includes(category)) {
+    if (
+      category &&
+      category !== "all" &&
+      !(FUND_CATEGORIES as readonly string[]).includes(category)
+    ) {
       return NextResponse.json(
         { success: false, error: `Invalid category: ${category}` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const data = await getLeaderboard(category && category !== "all" ? category : null);
+    const data = await getLeaderboard(
+      category && category !== "all" ? category : null,
+    );
 
     const response = NextResponse.json({
       success: true,
@@ -25,7 +31,7 @@ export async function GET(request: NextRequest) {
     // Cache-Control: public, s-maxage=300, stale-while-revalidate=600
     response.headers.set(
       "Cache-Control",
-      "public, s-maxage=300, stale-while-revalidate=600"
+      "public, s-maxage=300, stale-while-revalidate=600",
     );
 
     return response;
@@ -33,7 +39,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching funds:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

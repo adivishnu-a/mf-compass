@@ -5,12 +5,15 @@ import { sql } from "drizzle-orm";
 import { FUND_CATEGORIES } from "@/lib/kuvera/categories";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mf-compass.vercel.app";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://mf-compass.vercel.app";
 
   // The site changes when the data does; fall back to build time if the query fails.
   let dataUpdated = new Date();
   try {
-    const [row] = await db.select({ max: sql<Date | null>`MAX(${funds.lastUpdated})` }).from(funds);
+    const [row] = await db
+      .select({ max: sql<Date | null>`MAX(${funds.lastUpdated})` })
+      .from(funds);
     if (row?.max) dataUpdated = new Date(row.max);
   } catch (error) {
     console.error("Error reading data timestamp for sitemap:", error);
