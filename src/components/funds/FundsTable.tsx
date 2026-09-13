@@ -343,7 +343,8 @@ export function FundsTable({ funds }: FundsTableProps) {
                     <button
                       onClick={() => toggleWatchlist(fund.kuveraCode)}
                       className="text-muted-foreground/40 hover:text-rose-500 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 rounded-full p-0.5"
-                      aria-label={`Watch ${fund.schemeName}`}
+                      aria-label={`Save ${fund.schemeName} to watchlist`}
+                      aria-pressed={isWatchChecked}
                     >
                       <Heart 
                         className={cn(
@@ -440,7 +441,8 @@ export function FundsTable({ funds }: FundsTableProps) {
                   <button
                     onClick={() => toggleWatchlist(fund.kuveraCode)}
                     className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-rose-500 transition-colors py-3 px-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1"
-                    aria-label={`Watch ${fund.schemeName}`}
+                    aria-label={`Save ${fund.schemeName} to watchlist`}
+                    aria-pressed={isWatchChecked}
                   >
                     <Heart 
                       className={cn(

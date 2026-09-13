@@ -127,7 +127,7 @@ export function Navbar() {
           >
             <Search className="h-4 w-4" />
             <span className="hidden sm:inline">Search...</span>
-            <kbd className="hidden lg:inline-flex h-5 select-none items-center gap-0.5 rounded border border-border bg-muted px-1.5 text-[10px] font-medium opacity-100 font-data">
+            <kbd aria-hidden="true" className="hidden lg:inline-flex h-5 select-none items-center gap-0.5 rounded border border-border bg-muted px-1.5 text-[10px] font-medium opacity-100 font-data">
               <span className="text-xs">⌘</span>K
             </kbd>
           </button>

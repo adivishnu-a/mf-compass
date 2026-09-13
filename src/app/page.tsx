@@ -1,14 +1,9 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
-import { TrendingUp, ShieldCheck, Award, Search } from "lucide-react";
+import { TrendingUp, ShieldCheck, Award } from "lucide-react";
+import { SearchButton } from "@/components/home/SearchButton";
 
 export default function Home() {
-  const triggerSearch = () => {
-    window.dispatchEvent(new CustomEvent("mfc-open-search"));
-  };
-
   return (
     <div className="flex flex-col items-center">
       {/* Hero Section */}
@@ -42,12 +37,7 @@ export default function Home() {
                 Explore Rankings
               </Link>
               
-              <button
-                onClick={triggerSearch}
-                className="w-full flex items-center justify-center gap-2 rounded-lg border border-border bg-background/50 px-8 py-3 text-sm font-bold text-foreground transition-all hover:bg-accent"
-              >
-                <Search className="h-4 w-4" /> Search Funds
-              </button>
+              <SearchButton />
             </div>
             
             <div className="mt-6 text-[10px] text-muted-foreground hidden lg:block">
@@ -67,9 +57,9 @@ export default function Home() {
                   <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-500 border border-emerald-500/20">
                     Flexi Cap Fund
                   </span>
-                  <h3 className="mt-2 font-heading font-bold text-lg text-foreground tracking-tight">
+                  <p className="mt-2 font-heading font-bold text-lg text-foreground tracking-tight">
                     Alpha Growth Direct-Growth
-                  </h3>
+                  </p>
                   <p className="text-xs text-muted-foreground">
                     Alpha Asset Management
                   </p>
@@ -80,7 +70,7 @@ export default function Home() {
                   <span className="text-2xl font-black text-primary font-mono tracking-tight">
                     96.4
                   </span>
-                  <span className="text-[10px] font-bold text-primary/80 uppercase tracking-wider mt-0.5">
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">
                     MF Score
                   </span>
                 </div>
@@ -251,7 +241,7 @@ export default function Home() {
       {/* Bottom CTA Banner */}
       <section className="w-full bg-background px-4 py-8 lg:py-12 sm:px-6">
         <div className="mx-auto max-w-6xl">
-          <div className="rounded-xl bg-primary px-8 py-10 sm:px-12 sm:py-12 flex flex-col md:flex-row items-center justify-between gap-6 border border-primary/10">
+          <div className="rounded-xl bg-[#0050b3] px-8 py-10 sm:px-12 sm:py-12 flex flex-col md:flex-row items-center justify-between gap-6 border border-primary/10">
             <div className="text-center md:text-left">
               <h2 className="font-heading text-2xl font-extrabold sm:text-3xl text-white tracking-tight">
                 Ready to optimize your portfolio?
@@ -264,7 +254,7 @@ export default function Home() {
             <div className="w-full md:w-auto flex-shrink-0 flex justify-center">
               <Link
                 href="/funds"
-                className="w-full md:w-auto inline-flex items-center justify-center rounded-lg bg-white text-primary px-8 py-3.5 text-sm font-extrabold transition-all hover:bg-white/90 shadow-sm active:scale-[0.98]"
+                className="w-full md:w-auto inline-flex items-center justify-center rounded-lg bg-white text-[#0050b3] px-8 py-3.5 text-sm font-extrabold transition-all hover:bg-white/90 shadow-sm active:scale-[0.98]"
               >
                 Get Started Free
               </Link>

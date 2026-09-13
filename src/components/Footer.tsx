@@ -53,9 +53,9 @@ export async function Footer() {
 
           {/* Explore Columns */}
           <div>
-            <h3 className="font-heading font-semibold text-sm tracking-wide text-foreground uppercase">
+            <h2 className="font-heading font-semibold text-sm tracking-wide text-foreground uppercase">
               Explore Equity
-            </h3>
+            </h2>
             <ul className="mt-4 space-y-2 text-sm">
               <li>
                 <Link href="/funds?group=equity&category=Large%20Cap%20Fund" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -82,9 +82,9 @@ export async function Footer() {
 
           {/* Tools Columns */}
           <div>
-            <h3 className="font-heading font-semibold text-sm tracking-wide text-foreground uppercase">
+            <h2 className="font-heading font-semibold text-sm tracking-wide text-foreground uppercase">
               MF Compass
-            </h3>
+            </h2>
             <ul className="mt-4 space-y-2 text-sm">
               <li>
                 <Link href="/funds" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -106,9 +106,9 @@ export async function Footer() {
         {/* SEBI Disclaimer Section */}
         <div className="mt-12 border-t border-border/60 pt-8">
           <div className="rounded-xl border border-border/80 bg-background/50 p-4">
-            <h4 className="font-heading font-bold text-xs tracking-wider text-foreground uppercase">
+            <h3 className="font-heading font-bold text-xs tracking-wider text-foreground uppercase">
               SEBI Disclaimer & Risk Warning
-            </h4>
+            </h3>
             <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
               Mutual Fund investments are subject to market risks, read all scheme related documents carefully. Past performance is not an indicator or guarantee of future returns. 
             </p>

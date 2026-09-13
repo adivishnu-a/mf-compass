@@ -87,8 +87,12 @@ export function AmcLogo({ fundHouse, fundHouseName, className, size = "md" }: Am
       </svg>
 
       <img
-        src={`/logos/amc/${fundHouse}.png`}
+        src={`/logos/amc/${fundHouse}.webp`}
         alt={fundHouseName || "AMC Logo"}
+        width={128}
+        height={128}
+        loading="lazy"
+        decoding="async"
         className="w-full h-full object-cover"
         onError={() => setHasError(true)}
       />

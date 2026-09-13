@@ -513,7 +513,7 @@ function SkeletonTable() {
     <div className="w-full border border-border rounded-xl overflow-hidden bg-card animate-pulse shadow-sm">
       <div className="h-12 border-b border-border bg-muted/20 w-full" />
       <div className="divide-y divide-border/60">
-        {[...Array(6)].map((_, i) => (
+        {[...Array(10)].map((_, i) => (
           <div key={i} className="flex items-center p-4 gap-4 w-full">
             <div className="h-4 w-6 bg-muted rounded-md shrink-0" />
             <div className="h-4 w-6 bg-muted rounded-md shrink-0" />
