@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
 import { ThemeScript } from "@/components/ThemeScript";
 import { ToastProvider } from "@/components/Toast";
@@ -22,12 +22,33 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mf-compass.vercel.app";
+
 export const metadata: Metadata = {
-  title: "MF Compass — Mutual Fund Outperformance Discovery",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "MF Compass — Mutual Fund Outperformance Discovery",
+    template: "%s | MF Compass",
+  },
   description: "Identify Indian mutual funds that consistently outperform their peers. Zero ads, zero tracking, purely data-driven discovery.",
   icons: {
     icon: "/favicon.ico",
   },
+  openGraph: {
+    type: "website",
+    siteName: "MF Compass",
+    locale: "en_IN",
+  },
+  twitter: {
+    card: "summary",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f0f13" },
+  ],
 };
 
 export default function RootLayout({

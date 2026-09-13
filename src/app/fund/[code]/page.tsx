@@ -1,4 +1,5 @@
-import React from "react";
+import React, { cache } from "react";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db";
@@ -40,15 +41,32 @@ function parseFundManagers(managers: unknown): string[] {
   return [];
 }
 
+const getFund = cache(async (code: string) =>
+  db.query.funds.findFirst({ where: eq(funds.kuveraCode, code) })
+);
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { code } = await params;
+  const fund = code ? await getFund(code) : undefined;
+  if (!fund) return { title: "Fund not found" };
+
+  const score = fund.totalScore ? `Outperformance score ${Number(fund.totalScore).toFixed(1)}. ` : "";
+  const description = `${fund.schemeName} by ${fund.fundHouseName ?? "its fund house"}, ${fund.fundCategory ?? "mutual fund"}. ${score}Returns compared with the category average across 1, 3 and 5 years.`;
+
+  return {
+    title: fund.schemeName,
+    description,
+    alternates: { canonical: `/fund/${fund.kuveraCode}` },
+    openGraph: { title: fund.schemeName, description },
+  };
+}
+
 export default async function FundDetailPage({ params }: PageProps) {
   const { code } = await params;
 
   if (!code) notFound();
 
-  // Fetch fund details
-  const fund = await db.query.funds.findFirst({
-    where: eq(funds.kuveraCode, code),
-  });
+  const fund = await getFund(code);
 
   if (!fund) notFound();
 
