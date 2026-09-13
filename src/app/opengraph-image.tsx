@@ -31,7 +31,7 @@ export default async function OpenGraphImage() {
           <div style={{ maxWidth: 760, lineHeight: 1.3 }}>
             Scored against the category average, not raw returns. Direct growth plans only. Free, anonymous, refreshed daily.
           </div>
-          <div style={{ color: ogColors.muted }}>mf-compass.vercel.app</div>
+          <div style={{ color: ogColors.muted, whiteSpace: "nowrap", flexShrink: 0, marginLeft: 48 }}>mf-compass.vercel.app</div>
         </div>
       </div>
     ),
