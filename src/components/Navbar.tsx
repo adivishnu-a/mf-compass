@@ -138,7 +138,7 @@ export function Navbar() {
           {/* Search Trigger */}
           <button
             onClick={triggerSearch}
-            className="flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-all hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
+            className="flex h-9 w-9 items-center justify-center gap-2 rounded-lg border border-border bg-card/50 text-sm text-muted-foreground transition-all hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none sm:w-auto sm:px-3"
             aria-label="Search funds"
           >
             <Search className="h-4 w-4" />
