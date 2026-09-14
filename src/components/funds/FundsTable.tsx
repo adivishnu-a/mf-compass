@@ -204,7 +204,7 @@ export function FundsTable({ funds }: FundsTableProps) {
           <thead>
             <tr className="border-b border-border bg-muted/40 transition-colors">
               <th className="w-16 py-3 pr-2 pl-6 text-center font-semibold text-muted-foreground">
-                Rank
+                #
               </th>
               <th
                 className="cursor-pointer px-2 py-3 font-semibold text-muted-foreground transition-colors select-none hover:bg-muted/60 focus-visible:bg-muted/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset"

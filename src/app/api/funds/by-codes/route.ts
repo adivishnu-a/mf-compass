@@ -27,9 +27,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (codes.length > 10) {
+    // Matches the watchlist ceiling in useWatchlist.
+    if (codes.length > 200) {
       return NextResponse.json(
-        { success: false, error: "Cannot request more than 10 codes" },
+        { success: false, error: "Cannot request more than 200 codes" },
         { status: 400 },
       );
     }

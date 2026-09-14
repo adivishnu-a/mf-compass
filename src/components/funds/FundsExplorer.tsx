@@ -236,6 +236,10 @@ export function FundsExplorer({
               </span>
             </span>
           </p>
+          <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground md:hidden">
+            Score: weighted 1Y, 3Y and 5Y returns versus the category average,
+            with a penalty on negative returns, normalized from 50 to 100.
+          </p>
         </div>
 
         {/* Group Tab Switcher (Equity / Hybrid) */}

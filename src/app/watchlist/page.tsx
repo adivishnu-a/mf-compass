@@ -92,11 +92,11 @@ export default function WatchlistPage() {
 
   // Stale codes (watchlist entries that are no longer present in the database)
   const staleCodes = useMemo(() => {
-    if (loading) return [];
+    if (loading || error) return [];
     return watchlist.filter(
       (code) => !funds.some((f) => f.kuveraCode === code),
     );
-  }, [watchlist, funds, loading]);
+  }, [watchlist, funds, loading, error]);
 
   const handleRemoveStale = (code: string) => {
     toggleWatchlist(code);

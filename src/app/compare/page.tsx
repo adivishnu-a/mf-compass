@@ -131,11 +131,11 @@ function CompareContent() {
 
   // Detect which funds are "stale" or "no longer tracked"
   const staleCodes = useMemo(() => {
-    if (loading) return [];
+    if (loading || error) return [];
     return requestedCodes.filter(
       (code) => !funds.some((f) => f.kuveraCode === code),
     );
-  }, [requestedCodes, funds, loading]);
+  }, [requestedCodes, funds, loading, error]);
 
   // Utility to determine best/worst styling for cell comparisons
   // returns: 'best' | 'worst' | 'normal'

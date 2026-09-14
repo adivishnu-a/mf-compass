@@ -31,7 +31,7 @@ The application is built on Next.js 16 (App Router), React 19, Neon Postgres, an
 ### 2. Key Technical Implementations
 
 - **In-Memory Search Index**: The search API caches minimal fund data columns in-memory with a 5-minute TTL to keep query latencies under 5ms, avoiding heavy SQL queries on every keystroke.
-- **Tokenized Relevance Search**: Relies on a deterministic query-tokenization algorithm that splits multi-word searches into prefixes and yields precise, weighted outperformance scores rather than fuzzy matching.
+- **Tokenized Relevance Search**: Relies on a deterministic query-tokenization algorithm that splits multi-word searches into prefixes and yields precise, weighted relevance scores rather than fuzzy matching.
 - **Optimized State Transitions**: Employs dynamic React keys on tables to trigger hardware-accelerated CSS animations during filter switches.
 - **Accessibility & Reduced Motion**: Full keyboard focus sequencing, active `aria-sort` column status tags, and a global `@media (prefers-reduced-motion: reduce)` rule that instantly disables animations for users with motion-sensitive configurations.
 - **Type-Safe Database Interfacing**: Uses Drizzle ORM to compile queries down to SQL, mapping results directly to inferred schemas and preventing input injection.
@@ -52,7 +52,7 @@ The application is built on Next.js 16 (App Router), React 19, Neon Postgres, an
 
 ### 1. Prerequisites
 
-Ensure you have [Node.js](https://nodejs.org/) (v18 or higher) and [npm](https://www.npmjs.com/) installed.
+Ensure you have [Node.js](https://nodejs.org/) 24 (see `.nvmrc`) and [npm](https://www.npmjs.com/) installed.
 
 ### 2. Environment Configuration
 

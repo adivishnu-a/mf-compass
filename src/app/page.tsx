@@ -152,6 +152,10 @@ export default function Home() {
               </div>
             </div>
 
+            <span className="absolute right-2 -bottom-9 text-[10px] text-muted-foreground">
+              Illustrative example, not a real fund
+            </span>
+
             {/* Small floating badges around the card for depth */}
             <div className="absolute -top-4 -right-4 flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-[11px] font-bold text-foreground shadow-lg">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
