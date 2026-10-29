@@ -1,14 +1,17 @@
 "use client";
 import { useSyncExternalStore } from "react";
-import { AnimatePresence, motion } from "motion/react";
 import { flushSync } from "react-dom";
 import { MoonIcon, SunIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 const KEY = "mfc:theme";
 
-/** Runs before paint so a dark-mode visitor never sees a light flash. */
-export const themeScript = `try{if(localStorage.getItem("${KEY}")==="dark")document.documentElement.dataset.theme="dark"}catch(e){}`;
+/**
+ * Runs before paint: the saved theme, and the phone's status-bar colour to match, so a dark-mode visitor never
+ * sees a light flash. It creates the theme-color tag itself; React or Next rendering one would add a second copy
+ * after a script changes it.
+ */
+export const themeScript = `try{var d=localStorage.getItem("${KEY}")==="dark";if(d)document.documentElement.dataset.theme="dark";var m=document.createElement("meta");m.name="theme-color";m.content=d?"#152027":"#FFFFFF";document.head.appendChild(m)}catch(e){}`;
 
 const listeners = new Set<() => void>();
 const isDark = () => document.documentElement.dataset.theme === "dark";
@@ -53,18 +56,16 @@ export function ThemeToggle({ bordered }: { bordered?: boolean }) {
           : "hover:bg-surface-2",
       )}
     >
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.span
-          key={dark ? "sun" : "moon"}
-          initial={{ opacity: 0, rotate: -40, scale: 0.7 }}
-          animate={{ opacity: 1, rotate: 0, scale: 1 }}
-          exit={{ opacity: 0, rotate: 40, scale: 0.7 }}
-          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-          className="grid place-items-center"
-        >
-          {dark ? <SunIcon /> : <MoonIcon />}
-        </motion.span>
-      </AnimatePresence>
+      {/* Both icons, picked by the theme attribute the head script sets before paint. The server can't know the
+          theme, so choosing in React would show the moon first and spin it into the sun on every dark load. */}
+      <span className="grid place-items-center *:col-start-1 *:row-start-1 *:transition-[opacity,rotate,scale] *:duration-200 *:ease-[cubic-bezier(0.16,1,0.3,1)]">
+        <span className="grid place-items-center dark:scale-70 dark:-rotate-40 dark:opacity-0">
+          <MoonIcon />
+        </span>
+        <span className="grid scale-70 rotate-40 place-items-center opacity-0 dark:scale-100 dark:rotate-0 dark:opacity-100">
+          <SunIcon />
+        </span>
+      </span>
     </button>
   );
 }

@@ -541,7 +541,7 @@ export function SipCard({
                 "",
               ],
               [
-                "Return a year",
+                "Return (annualised)",
                 f.perYear !== null
                   ? `${f.perYear < 0 ? "−" : "+"}${Math.abs(f.perYear).toFixed(1)}%`
                   : "—",
@@ -564,11 +564,12 @@ export function SipCard({
               <div
                 key={i}
                 className={cn(
-                  "min-w-0",
+                  // Labels may wrap on a phone; the figures stay on one line along the bottom.
+                  "flex min-w-0 flex-col justify-between",
                   i > 0 && "border-l border-hairline pl-3",
                 )}
               >
-                <dt className="truncate text-[13px] text-text-3">{k}</dt>
+                <dt className="text-[13px] leading-snug text-text-3">{k}</dt>
                 <dd
                   className={cn(
                     "mt-0.5 text-[17px] font-bold tabular-nums",

@@ -15,7 +15,6 @@ import "./globals.css";
 const anek = Anek_Latin({
   variable: "--font-anek",
   subsets: ["latin", "latin-ext"],
-  axes: ["wdth"],
   display: "swap",
 });
 
@@ -41,7 +40,6 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FFFFFF",
   viewportFit: "cover",
 };
 
@@ -54,6 +52,7 @@ export default async function RootLayout({
   return (
     <html lang="en-IN" className={anek.variable} suppressHydrationWarning>
       <head>
+        {/* Also writes the theme-color tag (not React: it re-adds its own copy when a script has changed one). */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="flex min-h-dvh flex-col">

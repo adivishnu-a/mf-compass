@@ -663,9 +663,7 @@ export function Leaderboard({ board }: { board: CategoryBoard }) {
                       <motion.tr
                         key={f.code}
                         layout={resorted ? "position" : false}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ ...spring, opacity: { duration: 0.2 } }}
+                        transition={spring}
                         onClick={() => setFocus(f.code)}
                         className={cn(
                           "mfc-tr cursor-pointer border-t border-hairline",
