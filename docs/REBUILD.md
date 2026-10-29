@@ -105,7 +105,7 @@ Status: ✅ done · 🔄 in progress · ⏳ next · 💬 needs a decision · ⬜
 - ✅ `fund_metrics` stops storing three in-between values (`windows`, shrunk `excess_return` and `consistency`); the site reads the raw ones
 - ✅ Obsolete research scripts removed (design mock data, old-column inspector, backtest against the retired method); `lucide-react` dropped
 - ✅ New AMC logos (Abakkus, AlphaGrep, Old Bridge, ASK, Monarch, Carnelian) and refreshed Aditya Birla Sun Life, Bajaj Finserv, Invesco, Union
-- ⏳ Migration `0002_retire_old_score_and_unused_fields.sql`: run right after the merge deploys (the old site on main reads these columns), no backup (Adi's call). Frees about 0.5 MB.
+- ✅ Migration `0002_retire_old_score_and_unused_fields.sql` applied after the merge deployed (2026-10-29); daily sync verified on the new schema (324 updated, 239 rated, 0 errors)
 
 ## 8. Ship
 

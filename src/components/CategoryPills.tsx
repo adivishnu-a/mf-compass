@@ -4,6 +4,10 @@ import { useLayoutEffect, useRef, ViewTransition } from "react";
 import { CATEGORIES } from "@/lib/categories";
 import { cn } from "@/lib/utils";
 
+/** Where each row was scrolled, so the next category page opens with the row exactly where the user left it. */
+const lastScroll = { phone: 0, laptop: 0 };
+const EDGE = 16;
+
 /** Category pills (mock: rankings). The active pill glides to its new place between categories. */
 export function CategoryPills({
   current,
@@ -13,17 +17,24 @@ export function CategoryPills({
   phone?: boolean;
 }) {
   const nav = useRef<HTMLElement>(null);
-  // Each category is its own page, so the row starts scrolled to the left; bring the active pill into view.
+  const key = phone ? "phone" : "laptop";
+  // Each category is its own page. Keep the row still between them (a re-centred row makes every pill jump),
+  // and scroll only if the chosen pill is cut off, just far enough to show it.
   useLayoutEffect(() => {
     const row = nav.current;
     const pill = row?.querySelector<HTMLElement>("[aria-current=page]");
-    if (row && pill && row.scrollWidth > row.clientWidth)
-      row.scrollLeft =
-        pill.offsetLeft - (row.clientWidth - pill.offsetWidth) / 2;
-  }, [current]);
+    if (!row || !pill) return;
+    let left = lastScroll[key];
+    if (pill.offsetLeft < left + EDGE) left = pill.offsetLeft - EDGE;
+    else if (pill.offsetLeft + pill.offsetWidth > left + row.clientWidth - EDGE)
+      left = pill.offsetLeft + pill.offsetWidth - row.clientWidth + EDGE;
+    row.scrollLeft = Math.max(0, left);
+    lastScroll[key] = row.scrollLeft;
+  }, [current, key]);
   return (
     <nav
       ref={nav}
+      onScroll={(e) => (lastScroll[key] = e.currentTarget.scrollLeft)}
       aria-label="Kinds of fund"
       className={cn(
         "relative [scrollbar-width:none] overflow-x-auto",
