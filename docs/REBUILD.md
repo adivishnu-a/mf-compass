@@ -17,7 +17,7 @@ Status: ✅ done · 🔄 in progress · ⏳ next · 💬 needs a decision · ⬜
 
 - ✅ Missing returns stored as `0.0000` and scored as a real 0% (young funds ranked on one year; empty funds ranked above established ones). Found in the DB: 28 one-year, 84 three-year, 129 five-year fake zeros
 - ✅ The negative-return "penalty" multiplied wins over the category as well as losses
-- ⏳ Re-sync so stored rows drop the fake zeros (`.env.local` is in place; run once the new score ships, so the live site never shows a half-fixed state)
+- ✅ Re-synced after the merge (2026-10-29): every row rewritten with unearned periods masked; the score never reads Kuvera returns now
 
 ## 2. NAV history
 
@@ -73,7 +73,7 @@ Status: ✅ done · 🔄 in progress · ⏳ next · 💬 needs a decision · ⬜
 - ✅ Compare: table with Add a fund column, "Who leads on what" in sentences, SIP spread; phone sticky cards with Swap and an add bar
 - ✅ Motion: page transitions (React View Transitions: forward/back slides, fades, logo and name morph from list to fund page, active category pill glides); Motion library for listbox/dropdown/sheet/overlay enter-exit, sliding segmented pill and nav pill, gliding numbers, chart period glide, sort reordering, finder question slides, tray and badge springs, theme crossfade; reduced-motion fallbacks
 - ✅ Slimmer crescent moon icon
-- ⬜ Animations verified in code and DOM only: the in-app browser runs the tab as a background page, which pauses animations, so smoothness needs a look in a normal browser
+- ✅ Animations checked in a visible browser at phone and laptop sizes (frozen mid-frames), and by Adi on an iPhone PWA
 
 ### 6c. Third pass (Adi's review, 2026-10-29)
 
@@ -109,5 +109,5 @@ Status: ✅ done · 🔄 in progress · ⏳ next · 💬 needs a decision · ⬜
 
 ## 8. Ship
 
-- 🟨 Visual check on laptop and phone done in dev (home, rankings, fund, compare, finder, dark mode, phone overflow fixed); `/audit` next
-- ⬜ PR from `rebuild` to `main`
+- ✅ Visual check against every mock board at laptop and phone sizes
+- ✅ Merged to `main` (#2) and live; follow-up fixes pushed to `main`; CI green
