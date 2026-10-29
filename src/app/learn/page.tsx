@@ -4,6 +4,7 @@ import { KindIcon } from "@/components/KindIcon";
 import { Disclaimer, Page } from "@/components/Page";
 import { BackButton } from "@/components/PhoneBar";
 import { ScoreStrip } from "@/components/ScoreStrip";
+import { SectionLink } from "./SectionLink";
 import { CATEGORIES } from "@/lib/categories";
 import { getBoard } from "@/lib/data";
 
@@ -338,12 +339,12 @@ export default async function LearnPage() {
               <ol className="mt-2 grid gap-1 text-sm">
                 {SECTIONS.map(([id, title]) => (
                   <li key={id}>
-                    <a
-                      href={`#${id}`}
+                    <SectionLink
+                      id={id}
                       className="block rounded-md py-1 text-text-2 hover:text-ink"
                     >
                       {title}
-                    </a>
+                    </SectionLink>
                   </li>
                 ))}
               </ol>

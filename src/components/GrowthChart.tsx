@@ -53,11 +53,18 @@ export function GrowthChart({
 }) {
   const box = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
-  const [from, setFrom] = useState(fromDay);
+  // The window's start, and while gliding to a new period, each line's ₹100 base.
+  const [{ from, bases }, setFrame] = useState<{
+    from: number;
+    bases: (number | null)[] | null;
+  }>({ from: fromDay, bases: null });
   const [hover, setHover] = useState<number | null>(null);
   const [drawn, setDrawn] = useState(false);
   const reduce = useReducedMotion();
-  const shown = useRef(fromDay);
+  const shown = useRef<{ from: number; bases: (number | null)[] | null }>({
+    from: fromDay,
+    bases: null,
+  });
 
   useEffect(() => {
     const el = box.current;
@@ -69,21 +76,38 @@ export function GrowthChart({
     return () => ro.disconnect();
   }, []);
 
+  // Gliding to a new period: the window slides, and each line's base eases from its old value to its new one.
+  // Re-basing on the actual price at every in-between day instead would make a line twitch with each up and
+  // down week it passes; the line the scale follows hides it, the other (the grey average) shows it.
   useEffect(() => {
-    if (reduce || shown.current === fromDay) {
-      shown.current = fromDay;
-      setFrom(fromDay);
+    const start = shown.current;
+    if (reduce || start.from === fromDay) {
+      shown.current = { from: fromDay, bases: null };
+      setFrame(shown.current);
       return;
     }
-    const c = animate(shown.current, fromDay, {
+    const a = start.bases ?? lines.map((l) => valueOn(l.series, start.from));
+    const b = lines.map((l) => valueOn(l.series, fromDay));
+    const c = animate(0, 1, {
       duration: 0.55,
       ease: [0.16, 1, 0.3, 1],
-      onUpdate: (v) => {
-        shown.current = v;
-        setFrom(v);
+      onUpdate: (p) => {
+        shown.current = {
+          from: start.from + (fromDay - start.from) * p,
+          bases: b.map((end, i) => {
+            const st = a[i];
+            return st && end ? st * Math.pow(end / st, p) : end;
+          }),
+        };
+        setFrame(shown.current);
+      },
+      onComplete: () => {
+        shown.current = { from: fromDay, bases: null };
+        setFrame(shown.current);
       },
     });
     return () => c.stop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- lines are read at the start of each glide only
   }, [fromDay, reduce]);
 
   useEffect(() => {
@@ -94,10 +118,11 @@ export function GrowthChart({
   const end = Math.max(...lines.map((l) => l.series.at(-1)?.[0] ?? 0));
   const geo = useMemo(() => {
     if (!width) return null;
-    const visible = lines.map((l) => {
-      const base = valueOn(l.series, from);
-      if (!base) return [] as Series;
-      const pts: Series = [[from, 100]];
+    const visible = lines.map((l, i) => {
+      const start = valueOn(l.series, from);
+      const base = bases?.[i] ?? start;
+      if (!base || !start) return [] as Series;
+      const pts: Series = [[from, (start / base) * 100]];
       for (const [d, v] of l.series)
         if (d > from) pts.push([d, (v / base) * 100]);
       return pts;
@@ -124,7 +149,7 @@ export function GrowthChart({
         .join(""),
     );
     return { visible, sx, sy, paths };
-  }, [lines, from, end, width, height]);
+  }, [lines, from, bases, end, width, height]);
 
   // x labels: start month, each new year that fits, end month.
   const ticks = useMemo(() => {

@@ -255,18 +255,18 @@ export function GrowthCard({
       muted: true,
     },
   ];
+  const since = {
+    value: "all" as const,
+    label: `Since ${new Date(first * DAY).getUTCFullYear()}`,
+  };
+  // A phone has room for three: the third is 5Y when the fund is that old, otherwise its whole life.
   const opts = (phone: boolean) => [
     { value: "1" as const, label: "1Y", disabled: !has(1) },
     { value: "3" as const, label: "3Y", disabled: !has(3) },
-    { value: "5" as const, label: "5Y", disabled: !has(5) },
-    ...(phone
-      ? []
-      : [
-          {
-            value: "all" as const,
-            label: `Since ${new Date(first * DAY).getUTCFullYear()}`,
-          },
-        ]),
+    ...(phone && !has(5)
+      ? [since]
+      : [{ value: "5" as const, label: "5Y", disabled: !has(5) }]),
+    ...(phone ? [] : [since]),
   ];
 
   return (
@@ -282,7 +282,7 @@ export function GrowthCard({
           <Segmented
             compact
             label="Period"
-            value={period === "all" ? "5" : period}
+            value={period === "all" && has(5) ? "5" : period}
             onChange={setPeriod}
             options={opts(true)}
           />
