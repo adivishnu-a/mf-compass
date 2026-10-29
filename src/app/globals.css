@@ -320,6 +320,27 @@
     260ms ease-out 40ms both vt-fade,
     360ms var(--ease-out) both vt-up;
 }
+/* Category switch: the content crossfades in place; the old content steps aside a little faster. */
+::view-transition-old(.page-swap) {
+  animation: 160ms ease-out both vt-fade reverse;
+}
+::view-transition-new(.page-swap) {
+  animation: 260ms ease-out both vt-fade;
+}
+/* The category pill row plays its own glide live on top while the content swaps (CategoryPills.tsx). */
+::view-transition-group(cat-pills),
+::view-transition-group(cat-pills-p) {
+  animation: none;
+  z-index: 50;
+}
+::view-transition-old(cat-pills),
+::view-transition-old(cat-pills-p) {
+  display: none;
+}
+::view-transition-new(cat-pills),
+::view-transition-new(cat-pills-p) {
+  animation: none;
+}
 /* Shared fund identity (logo, name, score) morphs from list to page. */
 ::view-transition-group(.morph) {
   animation-duration: 420ms;
@@ -356,6 +377,21 @@
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 280ms;
+}
+
+/* Theme switch: the new theme fades in over the old across the whole screen, the header and any fixed bars too
+   (they otherwise sit outside the crossfade and would snap). The old stays opaque underneath, so nothing dips. */
+html:active-view-transition-type(theme)::view-transition-group(*) {
+  animation: none;
+}
+html:active-view-transition-type(theme)::view-transition-old(*) {
+  display: block;
+  mix-blend-mode: normal;
+  animation: none;
+}
+html:active-view-transition-type(theme)::view-transition-new(*) {
+  mix-blend-mode: normal;
+  animation: 420ms cubic-bezier(0.4, 0, 0.2, 1) both vt-fade;
 }
 
 /* ---------- Phone transitions: the whole screen moves as one, like a native app ----------

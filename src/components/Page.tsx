@@ -5,6 +5,8 @@ import { useWide } from "@/components/Shared";
 const TYPES = {
   "nav-forward": "page-forward",
   "nav-back": "page-back",
+  // Between categories the content swaps in place under the pill row (CategoryPills.tsx).
+  category: "page-swap",
   default: "page-fade",
 };
 

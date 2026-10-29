@@ -40,9 +40,15 @@ export function ThemeToggle({ bordered }: { bordered?: boolean }) {
     const reduce = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    if (document.startViewTransition && !reduce)
-      document.startViewTransition(() => flushSync(() => apply(next)));
-    else apply(next);
+    if (!document.startViewTransition || reduce) return apply(next);
+    const update = () => flushSync(() => apply(next));
+    // Typed, so the CSS can fade the whole screen (header included) to the new theme. Older Safari only takes
+    // the callback form; there the default crossfade still runs.
+    try {
+      document.startViewTransition({ update, types: ["theme"] });
+    } catch {
+      document.startViewTransition(update);
+    }
   }
   return (
     <button
