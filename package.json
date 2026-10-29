@@ -19,7 +19,9 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "sync:navs": "tsx scripts/sync/navs.ts",
+    "db:apply": "tsx scripts/db/apply-migration.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
@@ -27,7 +29,7 @@
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
-    "lucide-react": "^1.17.0",
+    "motion": "^12.43.0",
     "next": "^16.3.5",
     "react": "19.2.4",
     "react-dom": "19.2.4",

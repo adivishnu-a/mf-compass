@@ -1,290 +1,333 @@
-import React from "react";
 import Link from "next/link";
-import { TrendingUp, ShieldCheck, Award } from "lucide-react";
-import { SearchButton } from "@/components/home/SearchButton";
+import { AmcLogo } from "@/components/AmcLogo";
+import { ChevronRight } from "@/components/icons";
+import { KindList, KindTiles } from "@/components/Kinds";
+import { Mark } from "@/components/Mark";
+import { Disclaimer, Page } from "@/components/Page";
+import { SavedStrip } from "@/components/SavedStrip";
+import { ScoreStrip } from "@/components/ScoreStrip";
+import { SearchField } from "@/components/SearchField";
+import { Shared } from "@/components/Shared";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { getAllBoards } from "@/lib/data";
+import { day, rankOf } from "@/lib/format";
 
-export default function Home() {
+export const revalidate = 3600;
+
+const PARTS = [
+  [
+    "Returns vs peers · 35%",
+    "How far ahead or behind the average fund of its kind, per year.",
+  ],
+  [
+    "Consistency · 25%",
+    "How often it was ahead, so one great year can't carry it.",
+  ],
+  ["Downside protection · 30%", "How much less it fell when markets fell."],
+  ["Cost · 10%", "What it charges you every year."],
+] as const;
+
+const fundHref = (code: string) => `/fund/${encodeURIComponent(code)}`;
+
+export default async function Home() {
+  const boards = await getAllBoards();
+  const total = boards.reduce((s, b) => s + b.funds.length, 0);
+  const asOf =
+    boards
+      .map((b) => b.asOf)
+      .filter(Boolean)
+      .sort()
+      .at(-1) ?? null;
+  const best = ["large-cap", "mid-cap", "small-cap"]
+    .map((slug) => boards.find((b) => b.info.slug === slug))
+    .filter((b) => b && b.funds[0]?.score !== null)
+    .map((b) => ({ board: b!, fund: b!.funds[0] }));
+
   return (
-    <div className="flex flex-col items-center">
-      {/* Hero Section */}
-      <section className="relative w-full overflow-hidden border-b border-border bg-card px-4 py-20 sm:px-6 lg:py-28">
-        {/* Subtle grid pattern background */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.02] dark:opacity-[0.05]"
-          style={{
-            backgroundImage: `radial-gradient(var(--foreground) 1px, transparent 1px)`,
-            backgroundSize: "24px 24px",
-          }}
-        />
-
-        <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 sm:px-6 lg:grid-cols-12">
-          {/* Left Column: Text & CTAs */}
-          <div className="flex flex-col items-center text-center lg:col-span-7 lg:items-start lg:text-left">
-            <h1 className="mt-2 font-heading text-4xl leading-[1.15] font-extrabold tracking-tight text-foreground sm:text-6xl">
-              Discover Indian Mutual Funds <br className="hidden sm:inline" />
-              that <span className="text-primary">Truly Outperform</span>
+    <Page>
+      {/* ---------- Phone (mock: PhoneHome) ---------- */}
+      <div className="md:hidden">
+        <header className="flex items-center gap-2.5 px-4 pt-[calc(14px+env(safe-area-inset-top))] pb-1.5">
+          <Mark size={30} />
+          <span className="flex-1 text-[19px] font-bold">MF Compass</span>
+          <ThemeToggle />
+        </header>
+        <div className="flex flex-col gap-[18px] px-4 pt-2">
+          <section>
+            <h1 className="text-[28px] leading-[1.1] font-bold tracking-[-0.02em]">
+              Which funds have really beaten their peers?
             </h1>
-
-            <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              MF Compass answers one question fast. We rank funds by relative
-              outperformance over category averages (relative alpha) instead of
-              absolute returns. Direct and growth plans only. Refreshed daily.
-            </p>
-
-            {/* Action CTAs */}
-            <div className="mt-10 flex w-full max-w-md flex-col items-center gap-4 sm:flex-row">
-              <Link
-                href="/funds"
-                className="w-full rounded-lg bg-primary px-8 py-3 text-center text-sm font-bold text-primary-foreground shadow-sm transition-all hover:bg-primary/90"
+            <SearchField
+              variant="phone"
+              placeholder="Search a fund"
+              className="mt-3.5"
+            />
+          </section>
+          <Link
+            href="/finder"
+            transitionTypes={["nav-forward"]}
+            className="press flex items-center gap-3.5 rounded-[18px] bg-brand p-4 text-on-brand hover:text-on-brand"
+          >
+            <svg
+              width="44"
+              height="44"
+              viewBox="0 0 44 44"
+              aria-hidden="true"
+              className="shrink-0"
+            >
+              <circle cx="22" cy="22" r="21" fill="#08455F" />
+              <g
+                className="mfc-needle"
+                style={{ transformOrigin: "22px 22px" }}
               >
-                Explore Rankings
-              </Link>
-
-              <SearchButton />
-            </div>
-
-            <div className="mt-6 hidden text-[10px] text-muted-foreground lg:block">
-              Press{" "}
-              <kbd className="font-data rounded border border-border bg-muted px-1">
-                ⌘K
-              </kbd>{" "}
-              or{" "}
-              <kbd className="font-data rounded border border-border bg-muted px-1">
-                Ctrl+K
-              </kbd>{" "}
-              to search from anywhere
-            </div>
-          </div>
-
-          {/* Right Column: Interactive Floating Card Mockup */}
-          <div className="group relative flex w-full justify-center lg:col-span-5">
-            {/* The Card Surface */}
-            <div className="relative w-full max-w-md rounded-2xl border border-border/80 bg-card p-6 shadow-sm transition-all duration-500 hover:-translate-y-2 hover:border-primary/40">
-              {/* Header inside card */}
-              <div className="flex items-center justify-between gap-4 border-b border-border/40 pb-4">
-                <div className="text-left">
-                  <span className="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-500">
-                    Flexi Cap Fund
-                  </span>
-                  <p className="mt-2 font-heading text-lg font-bold tracking-tight text-foreground">
-                    Alpha Growth Direct-Growth
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Alpha Asset Management
-                  </p>
-                </div>
-
-                {/* Total Score Badge */}
-                <div className="flex flex-col items-center justify-center rounded-xl border border-primary/20 bg-primary/10 px-3.5 py-2.5">
-                  <span className="font-mono text-2xl font-black tracking-tight text-primary">
-                    96.4
-                  </span>
-                  <span className="mt-0.5 text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                    MF Score
-                  </span>
-                </div>
-              </div>
-
-              {/* Mid section: Metrics */}
-              <div className="grid grid-cols-2 gap-4 border-b border-border/40 py-4 text-left">
-                <div>
-                  <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                    Relative 3Y Return
-                  </span>
-                  <div className="mt-1 flex items-baseline gap-1">
-                    <span className="font-mono text-xl font-bold text-emerald-500">
-                      +8.45%
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      vs avg
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                    Expense Ratio
-                  </span>
-                  <div className="mt-1">
-                    <span className="font-mono text-xl font-bold text-foreground">
-                      0.38%
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                    Total AUM
-                  </span>
-                  <div className="mt-1">
-                    <span className="font-mono text-base font-bold text-foreground">
-                      ₹4,820 Cr
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                    Consistency Rating
-                  </span>
-                  <div className="mt-1 flex items-center gap-0.5 text-sm text-emerald-500">
-                    ★ ★ ★ ★ ★
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer: Monospaced Performance Matrix */}
-              <div className="flex items-center justify-between pt-4">
-                <div className="text-left">
-                  <span className="block text-[10px] text-muted-foreground">
-                    Relative Alpha
-                  </span>
-                  <span className="text-xs font-bold text-foreground">
-                    Peer outperformance matrix
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1.5">
-                  <span className="font-data inline-flex items-center rounded border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
-                    1Y: +12.4%
-                  </span>
-                  <span className="font-data inline-flex items-center rounded border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
-                    5Y: +8.9%
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <span className="absolute right-2 -bottom-9 text-[10px] text-muted-foreground">
-              Illustrative example, not a real fund
+                <polygon points="31,13 24.6,24.6 19.4,19.4" fill="#F0A202" />
+                <polygon points="13,31 19.4,19.4 24.6,24.6" fill="#FFFFFF" />
+              </g>
+            </svg>
+            <span className="flex-1 leading-[1.3]">
+              <span className="block text-[17px] font-bold">
+                Not sure where to start?
+              </span>
+              <span className="block text-sm text-brand-muted dark:text-[#0E1519]/75">
+                3 quick questions, then the kinds of funds that fit
+              </span>
             </span>
-
-            {/* Small floating badges around the card for depth */}
-            <div className="absolute -top-4 -right-4 flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-[11px] font-bold text-foreground shadow-lg">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-              Rank #1 in Category
-            </div>
-            <div className="absolute -bottom-3 -left-4 flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-[11px] font-bold text-foreground shadow-lg">
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" /> Direct &
-              Commission-Free
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="w-full border-b border-border bg-background px-4 py-10 sm:px-6">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 text-center sm:grid-cols-3">
-          <div className="rounded-xl border border-border/60 bg-card p-6 shadow-sm">
-            <span className="font-data font-heading text-3xl font-extrabold text-foreground sm:text-4xl">
-              310+
-            </span>
-            <p className="mt-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-              Open-Ended Funds Tracked
-            </p>
-          </div>
-          <div className="rounded-xl border border-border/60 bg-card p-6 shadow-sm">
-            <span className="font-data font-heading text-3xl font-extrabold text-foreground sm:text-4xl">
-              9
-            </span>
-            <p className="mt-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-              Core Categories Ranks
-            </p>
-          </div>
-          <div className="rounded-xl border border-border/60 bg-card p-6 shadow-sm">
-            <span className="font-data font-heading text-3xl font-extrabold text-primary sm:text-4xl">
-              Daily
-            </span>
-            <p className="mt-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-              NAV & Outperformance Updates
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Value Propositions */}
-      <section className="w-full bg-card px-4 pt-16 pb-8 sm:px-6 lg:pt-24 lg:pb-12">
-        <div className="mx-auto max-w-6xl">
-          <div className="text-center">
-            <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              Engineered for Rational Investors
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-sm text-muted-foreground sm:text-base">
-              We cut through marketing noise, stars ratings, and commission
-              biases. Rankings are strictly performance-relative.
-            </p>
-          </div>
-
-          <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
-            {/* Prop 1 */}
-            <div className="flex flex-col items-start rounded-2xl border border-border bg-background p-6 transition-all duration-200 hover:shadow-md">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary">
-                <TrendingUp className="h-5 w-5" />
-              </div>
-              <h3 className="mt-4 font-heading text-base font-semibold text-foreground">
-                Relative Alpha Metrics
-              </h3>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                Absolute returns are deceptive during bull or bear markets. We
-                compare each fund's return against its category average across
-                1W, 1Y, 3Y, and 5Y to measure true alpha.
-              </p>
-            </div>
-
-            {/* Prop 2 */}
-            <div className="flex flex-col items-start rounded-2xl border border-border bg-background p-6 transition-all duration-200 hover:shadow-md">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary">
-                <ShieldCheck className="h-5 w-5" />
-              </div>
-              <h3 className="mt-4 font-heading text-base font-semibold text-foreground">
-                100% Free & Anonymous
-              </h3>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                No accounts, no phone numbers, and no brokerage integrations. We
-                don't sell mutual funds, so we have zero interest in pushing
-                specific schemes.
-              </p>
-            </div>
-
-            {/* Prop 3 */}
-            <div className="flex flex-col items-start rounded-2xl border border-border bg-background p-6 transition-all duration-200 hover:shadow-md">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary">
-                <Award className="h-5 w-5" />
-              </div>
-              <h3 className="mt-4 font-heading text-base font-semibold text-foreground">
-                Direct & Growth Only
-              </h3>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                Regular plans with commission loads are excluded. We show only
-                Direct Growth plans to evaluate compounding potential cleanly.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Bottom CTA Banner */}
-      <section className="w-full bg-background px-4 py-8 sm:px-6 lg:py-12">
-        <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col items-center justify-between gap-6 rounded-xl border border-primary/10 bg-[#0050b3] px-8 py-10 sm:px-12 sm:py-12 md:flex-row">
-            <div className="text-center md:text-left">
-              <h2 className="font-heading text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-                Ready to optimize your portfolio?
+            <ChevronRight size={20} />
+          </Link>
+          <SavedStrip />
+          {best.length > 0 && (
+            <section aria-labelledby="best-p">
+              <h2 id="best-p" className="text-lg font-bold">
+                Best records right now
               </h2>
-              <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/90 sm:text-base">
-                Explore the complete outperformance database and compare funds
-                with institutional-grade relative metrics. 100% free.
-              </p>
-            </div>
-
-            <div className="flex w-full flex-shrink-0 justify-center md:w-auto">
-              <Link
-                href="/funds"
-                className="inline-flex w-full items-center justify-center rounded-lg bg-white px-8 py-3.5 text-sm font-extrabold text-[#0050b3] shadow-sm transition-all hover:bg-white/90 active:scale-[0.98] md:w-auto"
-              >
-                Get Started Free
-              </Link>
-            </div>
-          </div>
+              <ul className="mt-2.5 rounded-2xl border border-border bg-surface px-3.5 py-1">
+                {best.map(({ board, fund }, i) => (
+                  <li
+                    key={fund.code}
+                    className={i ? "border-t border-hairline" : ""}
+                  >
+                    <Link
+                      href={fundHref(fund.code)}
+                      transitionTypes={["nav-forward"]}
+                      className="grid grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-3 py-3 text-ink hover:text-ink"
+                    >
+                      <Shared name={`logo-${fund.code}`} on="phone">
+                        <AmcLogo
+                          houseCode={fund.houseCode}
+                          house={fund.house}
+                          size={36}
+                        />
+                      </Shared>
+                      <span className="min-w-0 leading-tight">
+                        <span className="block truncate font-semibold">
+                          {fund.name}
+                        </span>
+                        <span className="block text-[13px] text-text-3">
+                          {board.info.label} ·{" "}
+                          {rankOf(1, board.rated).toLowerCase()}
+                        </span>
+                      </span>
+                      <strong className="text-xl">
+                        {fund.score!.toFixed(1)}
+                      </strong>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+          <section aria-labelledby="kinds-p">
+            <h2 id="kinds-p" className="text-lg font-bold">
+              Kinds of funds
+            </h2>
+            <KindList boards={boards} className="mt-2.5" />
+          </section>
+          <Link
+            href="/learn"
+            transitionTypes={["nav-forward"]}
+            className="flex items-center gap-3.5 rounded-2xl border border-border bg-surface p-4 text-ink hover:text-ink"
+          >
+            <span className="min-w-0 flex-1 leading-[1.3]">
+              <span className="block font-bold">New to mutual funds?</span>
+              <span className="block text-sm text-text-2">
+                Learn the basics in about 10 minutes
+              </span>
+            </span>
+            <span className="grid h-10 shrink-0 place-items-center rounded-[10px] bg-brand px-3.5 text-[15px] font-semibold text-on-brand">
+              Learn
+            </span>
+          </Link>
+          <Disclaimer className="pb-2 text-xs">
+            Not investment advice. MF Compass compares funds' past records and
+            is not a SEBI-registered adviser. Direct, growth plans only. Data:
+            AMFI, Kuvera.
+          </Disclaimer>
         </div>
-      </section>
-    </div>
+      </div>
+
+      {/* ---------- Laptop (mock: LaptopHome) ---------- */}
+      <div className="mx-auto hidden max-w-[1280px] px-8 pt-12 pb-16 md:block">
+        <section className="flex flex-wrap items-center gap-10">
+          <div className="min-w-0 flex-[1_1_520px]">
+            <h1 className="max-w-[15ch] text-[46px] leading-[1.05] font-bold tracking-[-0.03em]">
+              Which funds have really beaten their peers?
+            </h1>
+            <p className="mt-4 max-w-[46ch] text-lg text-text-2">
+              We compare every direct mutual fund with others like it, across
+              years, falls and costs, and say it plainly. Free, no sign-up.
+            </p>
+            <SearchField
+              variant="hero"
+              placeholder="Search a fund, e.g. Parag Parikh flexi"
+              className="mt-7 max-w-[560px]"
+            />
+            <p className="mt-3.5 text-[15px] text-text-2">
+              Not sure where to start?{" "}
+              <Link
+                href="/finder"
+                transitionTypes={["nav-forward"]}
+                className="font-bold"
+              >
+                Answer 3 questions
+              </Link>{" "}
+              and see which kinds of funds fit.
+            </p>
+          </div>
+          {best.length > 0 && (
+            <section
+              aria-labelledby="best-l"
+              className="min-w-0 flex-[1_1_400px] rounded-[20px] border border-border bg-surface p-[22px]"
+            >
+              <h2 id="best-l" className="text-lg font-bold">
+                Best records right now
+              </h2>
+              <p className="mt-0.5 mb-3.5 text-sm text-text-3">
+                Top Compass Score in each of three popular categories
+              </p>
+              <ul className="grid gap-1">
+                {best.map(({ board, fund }) => (
+                  <li key={fund.code}>
+                    <Link
+                      href={fundHref(fund.code)}
+                      transitionTypes={["nav-forward"]}
+                      className="grid grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-3 rounded-xl px-1.5 py-2.5 text-ink hover:bg-row-hover hover:text-ink"
+                    >
+                      <Shared name={`logo-${fund.code}`} on="laptop">
+                        <AmcLogo
+                          houseCode={fund.houseCode}
+                          house={fund.house}
+                          size={40}
+                        />
+                      </Shared>
+                      <span className="min-w-0 leading-tight">
+                        <span className="block truncate font-semibold">
+                          {fund.name}
+                        </span>
+                        <span className="block text-[13px] text-text-3">
+                          {board.info.label} ·{" "}
+                          {rankOf(1, board.rated).toLowerCase()}
+                        </span>
+                        <ScoreStrip
+                          score={fund.score!}
+                          peers={board.funds
+                            .slice(1)
+                            .flatMap((f) =>
+                              f.score === null ? [] : [f.score],
+                            )}
+                          size="sm"
+                          className="mt-1.5 mr-2"
+                          label={`Score ${fund.score!.toFixed(1)}, best of ${board.rated} ${board.info.plural}. Grey dots are the others.`}
+                        />
+                      </span>
+                      <span className="text-2xl font-bold">
+                        {fund.score!.toFixed(1)}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </section>
+
+        <section aria-labelledby="cats" className="mt-16">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id="cats" className="text-[28px] font-bold tracking-[-0.015em]">
+              Pick a kind of fund
+            </h2>
+            <p className="text-sm text-text-3">
+              {total} direct, growth funds
+              {asOf ? ` · prices as of ${day(asOf)}` : ""}
+            </p>
+          </div>
+          <div className="mt-[18px]">
+            <KindTiles boards={boards} />
+          </div>
+        </section>
+
+        <section
+          aria-labelledby="how"
+          className="mt-16 rounded-[20px] border border-border bg-surface p-8"
+        >
+          <h2 id="how" className="text-[28px] font-bold tracking-[-0.015em]">
+            How the Compass Score works
+          </h2>
+          <p className="mt-2 max-w-[62ch] text-[17px] text-text-2">
+            Each fund is compared with others of its kind over every 3-year
+            stretch of the last six years, not one lucky year. It looks back. It
+            doesn't predict, and it isn't advice.
+          </p>
+          <dl className="mt-6 grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-6">
+            {PARTS.map(([name, line]) => (
+              <div key={name}>
+                <dt className="font-bold">{name}</dt>
+                <dd className="mt-1 text-[15px] text-text-2">{line}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-5 text-[15px] text-text-2">
+            Funds younger than 3 years show as{" "}
+            <strong className="text-ink">too new to rate</strong> instead of
+            getting a score.{" "}
+            <Link
+              href="/method"
+              transitionTypes={["nav-forward"]}
+              className="font-semibold"
+            >
+              The full method
+            </Link>
+          </p>
+        </section>
+        <section
+          aria-labelledby="learn"
+          className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-4 rounded-[20px] bg-brand-soft px-8 py-7"
+        >
+          <div className="min-w-0 flex-[1_1_420px]">
+            <h2
+              id="learn"
+              className="text-[22px] font-bold tracking-[-0.01em] text-brand-ink"
+            >
+              New to mutual funds?
+            </h2>
+            <p className="mt-1 max-w-[60ch] text-[17px] text-ink">
+              What a fund is, what NAV, SIP and cost mean, and how to read every
+              number on this site. About 10 minutes, no jargon.
+            </p>
+          </div>
+          <Link
+            href="/learn"
+            transitionTypes={["nav-forward"]}
+            className="press grid h-12 place-items-center rounded-xl bg-brand px-6 text-base font-semibold text-on-brand hover:bg-brand-hover hover:text-on-brand"
+          >
+            Learn the basics
+          </Link>
+        </section>
+        <Disclaimer className="mt-12 max-w-[900px]">
+          Not investment advice. MF Compass compares funds' past records and is
+          not a SEBI-registered adviser. Direct, growth plans only. NAVs from
+          AMFI; fund details from Kuvera. No tracking, no ads.
+        </Disclaimer>
+      </div>
+    </Page>
   );
 }

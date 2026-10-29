@@ -6,11 +6,9 @@
  * 1. Discover eligible funds across all 9 categories (§7 Stage 1)
  * 2. Batch fetch details (§6)
  * 3. Apply Stage 2 filters (§7 Stage 2)
- * 4. Refresh category averages from Kuvera
- * 5. Compute synthetic benchmarks where needed
- * 6. Upsert all surviving funds
- * 7. Hard-delete funds absent from this run
- * 8. Recompute + normalize scores
+ * 4. Upsert all surviving funds
+ * 5. Hard-delete funds absent from this run
+ * 6. NAV history (backfill new funds, heal the last 120 days), then Compass Scores
  *
  * Target runtime: under 3 minutes.
  */
@@ -23,30 +21,20 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { eq, notInArray, sql } from "drizzle-orm";
 import * as schema from "@drizzle/schema";
-import { funds, categoryAverages } from "@drizzle/schema";
-import type { NewCategoryAverage } from "@drizzle/schema";
+import { funds } from "@drizzle/schema";
 import {
   fetchFundList,
   fetchFundDetailsBatched,
-  fetchCategoryAverages,
 } from "@scripts/sync/kuvera/client";
-import type { FundDetail } from "@scripts/sync/kuvera/schemas";
 import { discoverAllFunds } from "@scripts/sync/pipeline/discovery";
 import { filterFunds } from "@scripts/sync/pipeline/filter";
-import {
-  transformFundDetail,
-  cleanReturns,
-} from "@scripts/sync/pipeline/transform";
-import {
-  computeRawScore,
-  normalizeScores,
-  computeSyntheticBenchmark,
-} from "@/lib/scoring";
-import {
-  FUND_CATEGORIES,
-  SYNTHETIC_BENCHMARK_CATEGORY,
-} from "@/lib/kuvera/categories";
+import { transformFundDetail } from "@scripts/sync/pipeline/transform";
 import { logger } from "@scripts/sync/shared/logger";
+import {
+  backfillNavs,
+  reconcileNavs,
+  computeScores,
+} from "@scripts/sync/nav/jobs";
 
 const BATCH_WRITE_SIZE = 25;
 
@@ -62,11 +50,9 @@ async function main(): Promise<void> {
   const db = drizzle(sqlClient, { schema });
 
   const summary = {
-    categoriesSynced: 0,
     fundsUpdated: 0,
     fundsInserted: 0,
     fundsDeleted: 0,
-    syntheticBenchmarksApplied: 0,
     errors: 0,
     durationMs: 0,
   };
@@ -95,117 +81,7 @@ async function main(): Promise<void> {
     // Step 4: Apply Stage 2 filters
     const { passed: filteredFunds } = filterFunds(fundDetails);
 
-    // Step 5: Refresh category averages from Kuvera
-    const kuveraCategoryAverages = await fetchCategoryAverages();
-
-    // Upsert category averages
-    for (const cat of kuveraCategoryAverages) {
-      const matchingCategory = FUND_CATEGORIES.find(
-        (c) => c === cat.category_name,
-      );
-      if (!matchingCategory) continue;
-
-      const row: NewCategoryAverage = {
-        categoryName: cat.category_name,
-        reportDate: cat.report_date ?? new Date().toISOString().split("T")[0],
-        returns1w: cat.week_1?.toFixed(4) ?? null,
-        returns1y: cat.year_1?.toFixed(4) ?? null,
-        returns3y: cat.year_3?.toFixed(4) ?? null,
-        returns5y: cat.year_5?.toFixed(4) ?? null,
-        returnsInception: cat.inception?.toFixed(4) ?? null,
-        isSynthetic: false,
-        sourceCount: null,
-      };
-
-      await db
-        .insert(categoryAverages)
-        .values(row)
-        .onConflictDoUpdate({
-          target: categoryAverages.categoryName,
-          set: {
-            reportDate: row.reportDate,
-            returns1w: row.returns1w,
-            returns1y: row.returns1y,
-            returns3y: row.returns3y,
-            returns5y: row.returns5y,
-            returnsInception: row.returnsInception,
-            isSynthetic: false,
-            sourceCount: null,
-            updatedAt: sql`NOW()`,
-          },
-        });
-
-      summary.categoriesSynced++;
-    }
-
-    // Step 6: Compute synthetic benchmark for Multi Asset Allocation
-    const multiAssetFunds: FundDetail[] = filteredFunds.filter(
-      (f: FundDetail) => f.fund_category === SYNTHETIC_BENCHMARK_CATEGORY,
-    );
-
-    if (multiAssetFunds.length > 0) {
-      const fundReturns = multiAssetFunds.map((f: FundDetail) => {
-        const cleaned = cleanReturns(f.returns, true);
-        return {
-          returns1w: cleaned.returns1w ? parseFloat(cleaned.returns1w) : null,
-          returns1y: cleaned.returns1y ? parseFloat(cleaned.returns1y) : null,
-          returns3y: cleaned.returns3y ? parseFloat(cleaned.returns3y) : null,
-          returns5y: cleaned.returns5y ? parseFloat(cleaned.returns5y) : null,
-        };
-      });
-
-      const synthetic = computeSyntheticBenchmark(fundReturns);
-
-      const maxReturnsDate = multiAssetFunds
-        .map((f: FundDetail) => f.returns?.date)
-        .filter((d): d is string => d !== null && d !== undefined)
-        .sort()
-        .pop();
-
-      const syntheticRow: NewCategoryAverage = {
-        categoryName: SYNTHETIC_BENCHMARK_CATEGORY,
-        reportDate: maxReturnsDate ?? new Date().toISOString().split("T")[0],
-        returns1w: synthetic.returns1w?.toFixed(4) ?? null,
-        returns1y: synthetic.returns1y?.toFixed(4) ?? null,
-        returns3y: synthetic.returns3y?.toFixed(4) ?? null,
-        returns5y: synthetic.returns5y?.toFixed(4) ?? null,
-        returnsInception: null,
-        isSynthetic: true,
-        sourceCount: multiAssetFunds.length,
-      };
-
-      await db
-        .insert(categoryAverages)
-        .values(syntheticRow)
-        .onConflictDoUpdate({
-          target: categoryAverages.categoryName,
-          set: {
-            reportDate: syntheticRow.reportDate,
-            returns1w: syntheticRow.returns1w,
-            returns1y: syntheticRow.returns1y,
-            returns3y: syntheticRow.returns3y,
-            returns5y: syntheticRow.returns5y,
-            returnsInception: syntheticRow.returnsInception,
-            isSynthetic: true,
-            sourceCount: multiAssetFunds.length,
-            updatedAt: sql`NOW()`,
-          },
-        });
-
-      summary.syntheticBenchmarksApplied++;
-
-      if (multiAssetFunds.length < 5) {
-        logger.warn(
-          "Synthetic benchmark source count below threshold, falling back to absolute returns",
-          {
-            category: SYNTHETIC_BENCHMARK_CATEGORY,
-            sourceCount: multiAssetFunds.length,
-          },
-        );
-      }
-    }
-
-    // Step 7: Transform and upsert funds in transactional batches of 25
+    // Step 5: Transform and upsert funds in transactional batches of 25
     const transformedFunds = filteredFunds.map(transformFundDetail);
     const allUpsertedCodes: string[] = [];
 
@@ -255,7 +131,7 @@ async function main(): Promise<void> {
       }
     }
 
-    // Step 8: Hard-delete absent funds
+    // Step 6: Hard-delete absent funds
     if (allUpsertedCodes.length > 0 && summary.errors === 0) {
       const deleted = await db
         .delete(funds)
@@ -271,80 +147,16 @@ async function main(): Promise<void> {
       }
     }
 
-    // Step 9: Recompute and normalize scores per category
-    const categoryAvgRows = await db.select().from(categoryAverages);
-    const categoryAvgMap = new Map(
-      categoryAvgRows.map((r) => [r.categoryName, r]),
-    );
-
-    for (const category of FUND_CATEGORIES) {
-      const catAvg = categoryAvgMap.get(category);
-      if (!catAvg) {
-        logger.warn("No category average found, skipping scoring", {
-          category,
-        });
-        continue;
-      }
-
-      const categoryFunds = await db
-        .select()
-        .from(funds)
-        .where(eq(funds.fundCategory, category));
-
-      if (categoryFunds.length === 0) continue;
-
-      const catReturns = {
-        returns1w: catAvg.returns1w ? parseFloat(catAvg.returns1w) : null,
-        returns1y: catAvg.returns1y ? parseFloat(catAvg.returns1y) : null,
-        returns3y: catAvg.returns3y ? parseFloat(catAvg.returns3y) : null,
-        returns5y: catAvg.returns5y ? parseFloat(catAvg.returns5y) : null,
-      };
-
-      const rawScores = categoryFunds.map((f) =>
-        computeRawScore(
-          {
-            returns1w: f.returns1w ? parseFloat(f.returns1w) : null,
-            returns1y: f.returns1y ? parseFloat(f.returns1y) : null,
-            returns3y: f.returns3y ? parseFloat(f.returns3y) : null,
-            returns5y: f.returns5y ? parseFloat(f.returns5y) : null,
-          },
-          catReturns,
-        ),
-      );
-
-      const normalized = normalizeScores(rawScores);
-
-      for (let k = 0; k < categoryFunds.length; k += BATCH_WRITE_SIZE) {
-        const batch = categoryFunds.slice(k, k + BATCH_WRITE_SIZE);
-        const batchNormalized = normalized.slice(k, k + BATCH_WRITE_SIZE);
-        try {
-          const queries = batch.map((fund, idx) =>
-            db
-              .update(funds)
-              .set({
-                totalScore: batchNormalized[idx].toFixed(2),
-                scoreUpdated: sql`NOW()`,
-              })
-              .where(eq(funds.id, fund.id)),
-          );
-          if (queries.length > 0) {
-            await db.batch(queries as unknown as [never, ...never[]]);
-          }
-        } catch (err) {
-          summary.errors += batch.length;
-          logger.error("Batch score update failed", {
-            error: err instanceof Error ? err.message : String(err),
-          });
-        }
-      }
-
-      logger.info("Scores computed", {
-        category,
-        funds: categoryFunds.length,
-        scoreRange: {
-          min: Math.min(...normalized),
-          max: Math.max(...normalized),
-        },
+    // Step 7: NAV history (backfill new funds, heal the last 120 days), then Compass Scores (docs/SCORE.md).
+    try {
+      await backfillNavs(db);
+      await reconcileNavs(db);
+      await computeScores(db);
+    } catch (err) {
+      summary.errors++;
+      process.exitCode = 1; // the run shows as failed in Actions; the data written above stays
+      logger.error("NAV history or scoring failed", {
+        error: err instanceof Error ? err.message : String(err),
       });
     }
 

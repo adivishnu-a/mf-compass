@@ -1,25 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Geist_Mono } from "next/font/google";
-import { ThemeScript } from "@/components/ThemeScript";
-import { ToastProvider } from "@/components/Toast";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
-import { CommandMenuLoader } from "@/components/CommandMenuLoader";
-import { CompareStickyBar } from "@/components/CompareStickyBar";
-import "./globals.css";
+import { Anek_Latin } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Suspense } from "react";
+import { CompareTray } from "@/components/CompareTray";
+import { Header } from "@/components/Header";
+import { MotionPrefs } from "@/components/MotionPrefs";
+import { SearchOverlay } from "@/components/SearchOverlay";
+import { TabBar } from "@/components/TabBar";
+import { themeScript } from "@/components/ThemeToggle";
+import { getLookup } from "@/lib/data";
+import "./globals.css";
 
-export const revalidate = 300; // Revalidate layout/footer data every 5 minutes
-
-const inter = Inter({
-  variable: "--font-sans-default",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const anek = Anek_Latin({
+  variable: "--font-anek",
+  subsets: ["latin", "latin-ext"],
+  axes: ["wdth"],
+  display: "swap",
 });
 
 const siteUrl =
@@ -28,52 +24,55 @@ const siteUrl =
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "MF Compass — Mutual Fund Outperformance Discovery",
-    template: "%s | MF Compass",
+    default: "MF Compass · Which mutual funds have really beaten their peers",
+    template: "%s · MF Compass",
   },
   description:
-    "Identify Indian mutual funds that consistently outperform their peers. Zero ads, zero tracking, purely data-driven discovery.",
-  icons: {
-    icon: "/favicon.ico",
+    "Every direct equity and hybrid mutual fund in India, compared with others of its kind across years, falls and costs, and explained plainly. Free, no sign-up.",
+  applicationName: "MF Compass",
+  appleWebApp: {
+    capable: true,
+    title: "MF Compass",
+    statusBarStyle: "default",
   },
-  openGraph: {
-    type: "website",
-    siteName: "MF Compass",
-    locale: "en_IN",
-  },
-  twitter: {
-    card: "summary_large_image",
-  },
+  openGraph: { type: "website", siteName: "MF Compass", locale: "en_IN" },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
-    { media: "(prefers-color-scheme: dark)", color: "#0f0f13" },
-  ],
+  themeColor: "#FFFFFF",
+  viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
+  const total = await getLookup()
+    .then((f) => f.length)
+    .catch(() => null);
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${geistMono.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
+    <html lang="en-IN" className={anek.variable} suppressHydrationWarning>
       <head>
-        <ThemeScript />
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="flex min-h-full flex-col bg-background text-foreground selection:bg-brand-gilt/20 selection:text-foreground">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <CommandMenuLoader />
-        <CompareStickyBar />
-        <ToastProvider />
+      <body className="flex min-h-dvh flex-col">
+        <a
+          href="#main"
+          className="sr-only z-50 rounded-lg bg-brand px-4 py-2 text-on-brand focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+        >
+          Skip to content
+        </a>
+        <MotionPrefs>
+          <Header total={total} />
+          <main id="main" className="pb-tabbar flex-1">
+            {children}
+          </main>
+          <CompareTray />
+          <Suspense>
+            <TabBar />
+          </Suspense>
+          <SearchOverlay />
+        </MotionPrefs>
         <SpeedInsights />
       </body>
     </html>

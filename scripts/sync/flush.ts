@@ -9,7 +9,7 @@ dotenv.config();
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "@drizzle/schema";
-import { funds, categoryAverages } from "@drizzle/schema";
+import { funds } from "@drizzle/schema";
 import { logger } from "@scripts/sync/shared/logger";
 
 async function main(): Promise<void> {
@@ -38,10 +38,6 @@ async function main(): Promise<void> {
     logger.info("Dropping all records from funds table...");
     await db.delete(funds);
     logger.info("✅ funds table flushed");
-
-    logger.info("Dropping all records from category_averages table...");
-    await db.delete(categoryAverages);
-    logger.info("✅ category_averages table flushed");
 
     logger.info("✅ Database flush completed successfully.");
     process.exit(0);

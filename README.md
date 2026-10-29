@@ -8,42 +8,40 @@ Live Application: [https://mf-compass.vercel.app/](https://mf-compass.vercel.app
 
 ## 🏗️ Codebase & Architecture
 
-The application is built on Next.js 16 (App Router), React 19, Neon Postgres, and Drizzle ORM, prioritizing type safety, small payload sizes, and extremely low latency.
+Next.js 16 (App Router), React 19, Neon Postgres and Drizzle ORM. How the score works: `docs/SCORE.md`. How data
+gets in: `docs/DATA.md`.
 
 ### 1. Directory Structure
 
-- **`src/app/`**: Next.js App Router entrypoints.
-  - `funds/`: Leaderboard view with filtering.
-  - `fund/[code]/`: ISR-cached detail pages (revalidated every 5 minutes) configured with static loading fallbacks (`loading.tsx`) for instant route switches.
-  - `compare/`: Multi-fund comparison dashboard.
-  - `watchlist/`: Client-side saved watchlist tracking.
-  - `api/`: API routes (including cached search indexing and parameter-validated fund querying).
-- **`src/components/`**: Meticulously separated React components:
-  - `ui/`: Core styling blocks (such as squirpled AMC Logo tags and toast notifications).
-  - `funds/`: Category sorting and list triggers.
-  - Global shell elements (`Navbar`, `Footer`, `CommandMenu`, `CompareStickyBar`).
-- **`src/hooks/`**: Custom React state managers (`useWatchlist`, `useCompare`) synchronized with LocalStorage.
+- **`src/app/`**: pages, each with its own phone and laptop layout.
+  - `page.tsx` home · `funds/` kinds of fund and each kind's ranking · `fund/[code]/` a fund (ISR, 1 hour)
+  - `compare/` up to four funds side by side · `saved/` · `finder/` three questions · `learn/` · `method/`
+  - `api/`: two routes: `funds/lookup` (every fund for in-browser search) and `funds/[code]/growth` (the rankings preview chart).
+- **`src/components/`**: the UI, one file per piece (header, tab bar, search, rankings table, charts, icons).
 - **`src/lib/`**:
-  - `db/`: Neon Serverless Postgres client setup.
-  - `format/`: Numeric formatting helpers with formatting safeguards.
-  - `scoring/`: Category benchmarks and outperformance criteria.
+  - `data.ts`: every query the pages make, cached for an hour.
+  - `metrics/`: category indexes and the Compass Score.
+  - `picks.ts`: saved and compare lists, kept in this browser only (no accounts).
+  - `format.ts`, `verdict.ts`, `growth.ts`: numbers, plain-language lines, SIP and growth maths.
+- **`scripts/sync/`**: the daily and weekly jobs (Kuvera details, AMFI and mfapi.in prices, scores).
+- **`drizzle/`**: schema and migrations.
 
 ### 2. Key Technical Implementations
 
-- **In-Memory Search Index**: The search API caches minimal fund data columns in-memory with a 5-minute TTL to keep query latencies under 5ms, avoiding heavy SQL queries on every keystroke.
-- **Tokenized Relevance Search**: Relies on a deterministic query-tokenization algorithm that splits multi-word searches into prefixes and yields precise, weighted relevance scores rather than fuzzy matching.
-- **Optimized State Transitions**: Employs dynamic React keys on tables to trigger hardware-accelerated CSS animations during filter switches.
-- **Accessibility & Reduced Motion**: Full keyboard focus sequencing, active `aria-sort` column status tags, and a global `@media (prefers-reduced-motion: reduce)` rule that instantly disables animations for users with motion-sensitive configurations.
-- **Type-Safe Database Interfacing**: Uses Drizzle ORM to compile queries down to SQL, mapping results directly to inferred schemas and preventing input injection.
+- **Search in the browser**: one ~30 KB list of every fund, fetched once and searched locally on each keystroke.
+- **Scores from price history**: every return, fall and score is computed from daily NAVs against an equal-weight
+  average of the same kind of fund, over the same dates.
+- **Motion with restraint**: page transitions use React View Transitions, in-page motion uses Motion; both honour
+  the system's reduced-motion setting.
 
 ---
 
 ## 🛠️ Technology Stack
 
 - **Framework**: Next.js 16 (App Router) & React 19
-- **Styling**: Tailwind CSS v4 & Lucide React Icons
-- **Database**: Neon Serverless Postgres
-- **Database ORM**: Drizzle ORM
+- **Styling**: Tailwind CSS v4, authored SVG icons
+- **Motion**: React View Transitions and Motion
+- **Database**: Neon Serverless Postgres with Drizzle ORM
 - **Deployment**: Vercel
 
 ---
@@ -88,7 +86,7 @@ The project includes pre-configured Node scripts for database synchronization, t
 - **`npm run lint`**: Inspects static JavaScript/TypeScript code using ESLint.
 - **`npm run test`**: Runs unit and integration tests using Vitest.
 - **`npm run db:generate`**: Generates SQL migration files based on schema changes.
-- **`npm run db:migrate`**: Applies SQL migration files to the database (recommended for production environments).
+- **`npm run db:apply -- <file>`**: Applies one migration file in a single transaction (the production database has no drizzle history, so don't use `db:migrate`; see `docs/DATA.md`).
 - **`npm run db:push`**: Pushes Drizzle schema definitions directly to the database (for rapid local prototyping).
-- **`npm run sync:daily`**: Synchronizes NAV values, assets under management (AUM), and fund parameters.
-- **`npm run sync:weekly`**: Executes heavier category-wide benchmarking, calculates averages, and normalizes outperformance rankings.
+- **`npm run sync:daily`**: Refreshes fund details (cost, size, latest NAV), appends today's prices and recomputes Compass Scores.
+- **`npm run sync:weekly`**: Rediscovers eligible funds, refreshes their details, backfills and heals NAV history, and recomputes Compass Scores.

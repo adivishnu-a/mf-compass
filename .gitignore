@@ -55,3 +55,6 @@ DESIGN.md
 .cursor/
 .gemini/
 /summary.json
+
+# research and backfill cache
+.cache/

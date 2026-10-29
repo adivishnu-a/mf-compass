@@ -1,685 +1,617 @@
-import React from "react";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import Link from "next/link";
-import { db } from "@/lib/db";
-import { funds, categoryAverages } from "@drizzle/schema";
-import { eq, and, gt, sql } from "drizzle-orm";
+import { notFound } from "next/navigation";
+import { AmcLogo } from "@/components/AmcLogo";
 import {
-  formatPercent,
-  formatINR,
-  formatAUM,
-  formatNAV,
-  isReturnGenuine,
-} from "@/lib/format";
-import { FundDetailActions } from "@/components/funds/FundDetailActions";
-import { ArrowLeft, Calendar, Activity, Star } from "lucide-react";
-import { AmcLogo } from "@/components/ui/AmcLogo";
-import { getFund } from "@/lib/funds/queries";
+  FundActionBar,
+  FundButtons,
+  FundTopBar,
+  GrowthCard,
+  SipCard,
+} from "@/components/FundParts";
+import { Disclaimer, Page } from "@/components/Page";
+import { ScoreStrip } from "@/components/ScoreStrip";
+import { Shared } from "@/components/Shared";
+import { getFundDetail, type FundDetail, type FundRow } from "@/lib/data";
+import { aum, day, fall, inr, month, nav, pct, rankOf } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { median, partNotes, plainWords, worstFallWords } from "@/lib/verdict";
 
-// ISR caching: revalidate every 5 minutes
-export const revalidate = 300;
+export const revalidate = 3600;
 
-interface PageProps {
-  params: Promise<{ code: string }>;
-}
-
-interface PeerFund {
-  code: string;
-  name: string;
-  short_name?: string | null;
-  "1y"?: number | null;
-  "3y"?: number | null;
-  expense_ratio?: number | null;
-  aum?: number | null;
-}
-
-function parseFundManagers(managers: unknown): string[] {
-  if (!managers) return [];
-  if (Array.isArray(managers)) return managers.map(String);
-  if (typeof managers === "string") {
-    try {
-      const parsed = JSON.parse(managers);
-      if (Array.isArray(parsed)) return parsed.map(String);
-    } catch {}
-    return managers
-      .split(";")
-      .map((m: string) => m.trim())
-      .filter(Boolean);
-  }
+/** None at build time; each fund page renders on its first visit, then stays cached for an hour. */
+export function generateStaticParams() {
   return [];
 }
 
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
-  const { code } = await params;
-  const fund = code ? await getFund(code) : undefined;
-  if (!fund) return { title: "Fund not found" };
+type Params = { params: Promise<{ code: string }> };
 
-  const score = fund.totalScore
-    ? `Outperformance score ${Number(fund.totalScore).toFixed(1)}. `
-    : "";
-  const description = `${fund.schemeName} by ${fund.fundHouseName ?? "its fund house"}, ${fund.fundCategory ?? "mutual fund"}. ${score}Returns compared with the category average across 1, 3 and 5 years.`;
-
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const detail = await getFundDetail(decodeURIComponent((await params).code));
+  if (!detail) return { title: "Fund not found" };
+  const { fund, board } = detail;
+  const score =
+    fund.score !== null
+      ? `Compass Score ${fund.score.toFixed(1)}, ${rankOf(fund.rank!, board.rated).toLowerCase()} ${board.info.plural}`
+      : "Too new to rate";
   return {
-    title: fund.schemeName,
-    description,
-    alternates: { canonical: `/fund/${fund.kuveraCode}` },
-    openGraph: { title: fund.schemeName, description },
+    title: `${fund.name}: ${score}`,
+    description: `How ${fund.name} (direct, growth) compares with other ${board.info.plural}: returns, consistency, falls and cost, from real prices.`,
   };
 }
 
-export default async function FundDetailPage({ params }: PageProps) {
-  const { code } = await params;
+const PARTS = [
+  ["returns", "Returns vs peers"],
+  ["consistency", "Consistency"],
+  ["downside", "Downside protection"],
+  ["cost", "Cost"],
+] as const;
 
-  if (!code) notFound();
+function sinceLaunch(d: FundDetail) {
+  const f = d.weekly.fund;
+  const c = d.weekly.category;
+  const g = (s: typeof f) =>
+    s.length > 1 && s.at(-1)![0] - s[0][0] >= 365
+      ? (Math.pow(s.at(-1)![1] / s[0][1], 365.25 / (s.at(-1)![0] - s[0][0])) -
+          1) *
+        100
+      : null;
+  return { fund: g(f), category: g(c) };
+}
 
-  const fund = await getFund(code);
+const riskWords = (r: string | null) =>
+  r
+    ? r
+        .replace(/\s*risk$/i, "")
+        .toLowerCase()
+        .replace(/^./, (c) => c.toUpperCase())
+    : null;
+const toneOf = (n: number | null) =>
+  n === null
+    ? ""
+    : Math.round(n * 10) > 0
+      ? "text-gain"
+      : Math.round(n * 10) < 0
+        ? "text-loss"
+        : "";
+const card = "rounded-[18px] border border-border bg-surface";
 
-  if (!fund) notFound();
-
-  // Fetch category average returns to compute outperformance comparison
-  const categoryAvg = await db.query.categoryAverages.findFirst({
-    where: eq(categoryAverages.categoryName, fund.fundCategory || ""),
-  });
-
-  // Calculate the rank of the fund in its category based on totalScore
-  let rank: number | null = null;
-  if (fund.totalScore) {
-    const rankResult = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(funds)
-      .where(
-        and(
-          eq(funds.fundCategory, fund.fundCategory || ""),
-          gt(funds.totalScore, fund.totalScore),
-        ),
-      );
-    rank = Number(rankResult[0]?.count || 0) + 1;
-  }
-
-  const managers = parseFundManagers(fund.fundManagers);
-
-  const returnPeriods = [
-    { label: "1 Day Return", key: "returns1d", catKey: "returns1d" }, // Category averages don't store 1D, we can compare fund return to 0 or leave empty
-    { label: "1 Week Return", key: "returns1w", catKey: "returns1w" },
-    { label: "1 Year Return", key: "returns1y", catKey: "returns1y" },
-    { label: "3 Year Return", key: "returns3y", catKey: "returns3y" },
-    { label: "5 Year Return", key: "returns5y", catKey: "returns5y" },
-    {
-      label: "Inception Return",
-      key: "returnsInception",
-      catKey: "returnsInception",
-    },
-  ] as const;
-
-  const inflowsPaused = fund.lumpAvailable === "N" && fund.sipAvailable === "N";
-
-  return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      {/* Back button */}
-      <Link
-        href="/funds"
-        className="mb-6 inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
+function ScoreCard({
+  fund,
+  detail,
+  peers,
+}: {
+  fund: FundRow;
+  detail: FundDetail;
+  peers: number[];
+}) {
+  const { board } = detail;
+  const info = board.info;
+  if (fund.score === null || !fund.parts)
+    return (
+      <section
+        aria-label="Compass Score"
+        className="rounded-[18px] bg-marigold-soft p-4 text-marigold-ink md:p-6"
       >
-        <ArrowLeft className="h-4 w-4" /> Back to Rankings
-      </Link>
-
-      {/* Header Container */}
-      <div className="animate-in fade-in rounded-xl border border-border bg-card p-6 shadow-sm duration-200">
-        {/* Main info row */}
-        <div className="flex items-start gap-4">
-          <AmcLogo
-            fundHouse={fund.fundHouse}
-            fundHouseName={fund.fundHouseName}
-            size="lg"
-            className="mt-1.5 flex shrink-0"
-          />
-          <div className="min-w-0 flex-1 space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-muted-foreground uppercase">
-                {fund.fundCategory} • {fund.fundType}
-              </span>
-              {rank !== null && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-primary uppercase">
-                  #{rank}
-                </span>
-              )}
-            </div>
-            <h1 className="font-heading text-xl leading-tight font-extrabold text-foreground sm:text-2xl">
-              {fund.schemeName}
-            </h1>
-            {Array.isArray(fund.tags) && fund.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {fund.tags.map((tag: string) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-primary uppercase"
-                  >
-                    {tag.replace(/_/g, " ")}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-          {/* Score + NAV: desktop only – sits beside the content */}
-          <div className="hidden shrink-0 flex-col items-end gap-3.5 border-l border-border/60 pl-6 md:flex">
-            {/* NAV at top */}
-            <div className="flex items-baseline gap-2">
-              <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                NAV
-              </span>
-              <div className="flex flex-col items-end text-right">
-                <span className="font-data text-xl leading-none font-extrabold text-foreground">
-                  {formatNAV(fund.currentNav)}
-                </span>
-                <span className="font-data mt-0.5 block text-[9px] text-muted-foreground">
-                  {fund.currentNavDate
-                    ? new Date(fund.currentNavDate).toLocaleDateString(
-                        "en-IN",
-                        { day: "2-digit", month: "short", year: "numeric" },
-                      )
-                    : "--"}
-                </span>
-              </div>
-            </div>
-
-            {/* Score below NAV */}
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                Score
-              </span>
-              <span className="font-data inline-flex items-center justify-center rounded-lg border border-primary/20 bg-primary/10 px-3 py-1.5 text-sm font-extrabold text-primary">
-                {parseFloat(fund.totalScore || "0").toFixed(1)}
-              </span>
-            </div>
-          </div>
+        <p className="text-sm md:text-[15px]">Compass Score</p>
+        <h2 className="text-[17px] font-bold md:text-[22px]">
+          Too new to rate
+        </h2>
+        <p className="mt-1.5 max-w-[60ch] text-[15px]">
+          {fund.unratedReason === "Less than 3 years of history"
+            ? `A score needs 3 years of prices to compare fairly with other ${info.plural}.${fund.startDate ? ` This fund started in ${month(fund.startDate)}.` : ""} Its record so far is below; treat a short record with care.`
+            : `${fund.unratedReason}. We'll score it once that changes.`}
+        </p>
+      </section>
+    );
+  const notes = partNotes(fund);
+  const label = `Score ${fund.score.toFixed(1)}: ${rankOf(fund.rank!, board.rated).toLowerCase()} rated ${info.plural}. Grey dots are the others.`;
+  return (
+    <section aria-label="Compass Score" className={cn(card, "p-4 md:p-6")}>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-sm text-text-2 md:text-[15px]">Compass Score</p>
+          <p className="text-base font-bold md:text-[22px]">
+            {rankOf(fund.rank!, board.rated)}{" "}
+            <span className="md:hidden">{info.short}</span>
+            <span className="hidden md:inline">{info.plural}</span>
+          </p>
         </div>
-
-        {/* Score + NAV: mobile only – compact horizontal row */}
-        <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-4 md:hidden">
-          {/* NAV on left */}
-          <div className="text-left">
-            <div className="flex items-baseline justify-start gap-1.5">
-              <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                NAV
-              </span>
-              <span className="font-data text-lg leading-none font-extrabold text-foreground">
-                {formatNAV(fund.currentNav)}
-              </span>
-            </div>
-            <span className="font-data mt-0.5 block text-[9px] text-muted-foreground">
-              {fund.currentNavDate
-                ? new Date(fund.currentNavDate).toLocaleDateString("en-IN", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })
-                : "--"}
-            </span>
-          </div>
-
-          {/* Score on right */}
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-              Score
-            </span>
-            <span className="font-data inline-flex items-center justify-center rounded-lg border border-primary/20 bg-primary/10 px-3 py-1.5 text-sm font-extrabold text-primary">
-              {parseFloat(fund.totalScore || "0").toFixed(1)}
-            </span>
-          </div>
-        </div>
-
-        {/* Action Buttons (Watchlist & Compare) */}
-        <div className="mt-4 flex items-center justify-between gap-3 border-t border-border/60 pt-4">
-          {/* Left side: ISIN + Kuvera Code (desktop only) */}
-          <div className="hidden items-center text-[11px] font-medium text-muted-foreground md:flex">
-            <span>
-              ISIN:{" "}
-              <span className="font-data font-semibold text-foreground/80">
-                {fund.isin || "--"}
-              </span>
-            </span>
-            <span className="mx-2 text-border">•</span>
-            <span>
-              Kuvera:{" "}
-              <span className="font-data font-semibold text-foreground/80">
-                {fund.kuveraCode}
-              </span>
-            </span>
-          </div>
-
-          {/* Right side: Action buttons */}
-          <div className="ml-auto flex items-center gap-3">
-            {inflowsPaused && (
-              <span className="inline-flex items-center gap-1 rounded border border-rose-500/15 bg-rose-500/10 px-2.5 py-1 text-[10px] font-bold tracking-wide text-rose-600 uppercase dark:text-rose-400">
-                Inflows Paused
-              </span>
-            )}
-            <FundDetailActions
-              kuveraCode={fund.kuveraCode}
-              schemeName={fund.shortName || fund.schemeName}
-            />
-          </div>
-        </div>
+        <Shared name={`score-${fund.code}`}>
+          <p className="text-[40px] leading-none font-bold md:text-[52px]">
+            {fund.score.toFixed(1)}
+          </p>
+        </Shared>
       </div>
-
-      {/* Returns Grid & Outperformance comparisons */}
-      <h2 className="mt-10 mb-4 font-heading text-lg font-bold text-foreground">
-        Returns & Outperformance Analysis
-      </h2>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-        {returnPeriods.map((period) => {
-          const fundReturn = fund[period.key as keyof typeof fund]
-            ? parseFloat(fund[period.key as keyof typeof fund] as string)
-            : null;
-
-          // Category averages don't have 1D or Inception return values
-          const catReturn =
-            period.catKey !== "returns1d" &&
-            period.catKey !== "returnsInception" &&
-            categoryAvg
-              ? categoryAvg[period.catKey as keyof typeof categoryAvg]
-                ? parseFloat(
-                    categoryAvg[
-                      period.catKey as keyof typeof categoryAvg
-                    ] as string,
-                  )
-                : null
-              : null;
-
-          const outperformance =
-            fundReturn !== null && catReturn !== null
-              ? fundReturn - catReturn
-              : null;
-
-          const displayKeyMap: Record<
-            string,
-            "1d" | "1w" | "1y" | "3y" | "5y"
-          > = {
-            returns1d: "1d",
-            returns1w: "1w",
-            returns1y: "1y",
-            returns3y: "3y",
-            returns5y: "5y",
-          };
-          const periodCode = displayKeyMap[period.key];
-          const isGenuine = periodCode
-            ? isReturnGenuine(fundReturn, periodCode, {
-                returns1d: fund.returns1d,
-                returns1w: fund.returns1w,
-                returns1y: fund.returns1y,
-                returns3y: fund.returns3y,
-                returns5y: fund.returns5y,
-              })
-            : fundReturn !== null;
-
-          const displayValue = isGenuine
-            ? formatPercent(fundReturn, true, true)
-            : "--";
-
+      <ScoreStrip
+        score={fund.score}
+        peers={peers}
+        size="lg"
+        label={label}
+        className="mx-2.5 mt-3 md:hidden"
+      />
+      <ScoreStrip
+        score={fund.score}
+        peers={peers}
+        size="xl"
+        label={label}
+        className="mx-3 mt-[18px] hidden md:block"
+      />
+      <div className="flex justify-between text-xs text-text-3 md:text-[13px]">
+        <span>Weakest record</span>
+        <span>Strongest</span>
+      </div>
+      {/* Laptop: four columns with notes */}
+      <div className="mt-5 hidden grid-cols-4 gap-4 border-t border-hairline pt-5 md:grid">
+        {PARTS.map(([k, name], i) => {
+          const v = Math.round(fund.parts![k]);
           return (
-            <div
-              key={period.key}
-              className="flex flex-col justify-between rounded-xl border border-border bg-card p-3.5 shadow-sm transition-all hover:shadow-md"
-            >
-              <div>
-                <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                  {period.label}
-                </span>
-                <div
-                  className={cn(
-                    "mt-1 text-lg",
-                    isGenuine
-                      ? "font-data font-extrabold text-foreground"
-                      : "font-sans text-muted-foreground/45",
-                  )}
-                >
-                  {displayValue}
-                </div>
-              </div>
-
-              {/* Peer average comparison info */}
-              <div className="mt-4 flex min-h-[42px] flex-col justify-center border-t border-border/40 pt-3 text-[10px] text-muted-foreground">
-                {catReturn !== null ? (
-                  <div className="space-y-0.5">
-                    <div className="flex items-center justify-between">
-                      <span>Cat. Average</span>
-                      <span className="font-data text-foreground/80">
-                        {formatPercent(catReturn, false)}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>MFC Alpha</span>
-                      <span
-                        className={cn(
-                          "font-data font-bold",
-                          outperformance! > 0
-                            ? "text-emerald-600 dark:text-emerald-400"
-                            : outperformance! < 0
-                              ? "text-rose-600 dark:text-rose-400"
-                              : "text-muted-foreground",
-                        )}
-                      >
-                        {formatPercent(outperformance, true, true)}
-                      </span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="py-1 text-center text-muted-foreground/50 italic">
-                    No peer benchmark
-                  </div>
-                )}
-              </div>
+            <div key={k}>
+              <p className="text-sm text-text-2">{name}</p>
+              <p className="mt-0.5 mb-1.5 text-2xl font-bold">{v}</p>
+              <span
+                role="meter"
+                aria-label={`${name}: ${v} out of 100`}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={v}
+                className="block h-2 overflow-hidden rounded bg-bar"
+              >
+                <span
+                  className="mfc-fill block h-full rounded bg-brand"
+                  style={{
+                    width: `${Math.max(v, 2)}%`,
+                    animationDelay: `${150 + i * 80}ms`,
+                  }}
+                />
+              </span>
+              {notes[k] && (
+                <p className="mt-1.5 text-[13px] text-text-3">{notes[k]}</p>
+              )}
             </div>
           );
         })}
       </div>
+      {/* Phone: rows */}
+      <ul className="mt-3.5 grid gap-2.5 border-t border-hairline pt-3.5 md:hidden">
+        {PARTS.map(([k, name], i) => {
+          const v = Math.round(fund.parts![k]);
+          return (
+            <li
+              key={k}
+              className="grid grid-cols-[140px_minmax(0,1fr)_28px] items-center gap-2.5 text-sm"
+            >
+              <span className="text-text-2">{name}</span>
+              <span
+                role="meter"
+                aria-label={`${name}: ${v} out of 100`}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={v}
+                className="block h-2 overflow-hidden rounded bg-bar"
+              >
+                <span
+                  className="mfc-fill block h-full rounded bg-brand"
+                  style={{
+                    width: `${Math.max(v, 2)}%`,
+                    animationDelay: `${150 + i * 80}ms`,
+                  }}
+                />
+              </span>
+              <span className="text-right font-semibold">{v}</span>
+            </li>
+          );
+        })}
+      </ul>
+      <Link
+        href="/method"
+        transitionTypes={["nav-forward"]}
+        className="mt-3 inline-block text-sm font-semibold md:hidden"
+      >
+        What these mean
+      </Link>
+    </section>
+  );
+}
 
-      {/* Detailed Parameters */}
-      <div className="mt-10 grid grid-cols-1 items-stretch gap-6 md:grid-cols-2">
-        {/* Left Column: Fund Metadata */}
-        <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-6 shadow-sm">
-          <h3 className="flex items-center gap-1.5 border-b border-border/60 pb-2.5 font-heading text-sm font-bold text-foreground">
-            <Calendar className="h-4 w-4 text-primary" /> Fund Statistics
-          </h3>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-xs">
-            <div>
-              <span className="block text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                Fund House
-              </span>
-              <span
-                className={cn(
-                  "mt-0.5 block truncate",
-                  fund.fundHouseName
-                    ? "font-medium text-foreground"
-                    : "font-sans text-muted-foreground/45",
-                )}
-                title={fund.fundHouseName || ""}
-              >
-                {fund.fundHouseName || "--"}
-              </span>
-            </div>
-            <div>
-              <span className="block text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                Total AUM
-              </span>
-              <span className="font-data mt-0.5 block font-bold text-foreground">
-                {formatAUM(fund.aum)}
-              </span>
-            </div>
-            <div>
-              <span className="block text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                Launch Date
-              </span>
-              <span
-                className={cn(
-                  "mt-0.5 block",
-                  fund.startDate
-                    ? "font-data font-medium text-foreground"
-                    : "font-sans text-muted-foreground/45",
-                )}
-              >
-                {fund.startDate
-                  ? new Date(fund.startDate).toLocaleDateString("en-IN", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })
-                  : "--"}
-              </span>
-            </div>
-            <div>
-              <span className="block text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                Expense Ratio
-              </span>
-              <span
-                className={cn(
-                  "mt-0.5 block",
-                  fund.expenseRatio
-                    ? "font-data font-bold text-foreground"
-                    : "font-sans text-muted-foreground/45",
-                )}
-              >
-                {fund.expenseRatio ? `${fund.expenseRatio}%` : "--"}
-              </span>
+export default async function FundPage({ params }: Params) {
+  const detail = await getFundDetail(decodeURIComponent((await params).code));
+  if (!detail) notFound();
+  const { fund, board } = detail;
+  const info = board.info;
+  const rated = board.funds.filter((f) => f.score !== null);
+  const peers = rated.filter((f) => f.code !== fund.code).map((f) => f.score!);
+  const words = plainWords(
+    fund,
+    info,
+    board.returns.r1y,
+    median(board.funds.map((f) => f.expense)),
+  );
+  const launch = sinceLaunch(detail);
+  const startYear = fund.startDate?.slice(0, 4);
+  const at = fund.rank ? fund.rank - 1 : 0;
+  const lo = Math.max(0, Math.min(at - 1, rated.length - 4));
+  const rivals = rated.slice(lo, lo + 4);
+  const returns = [
+    ["1 year", fund.r1y, board.returns.r1y],
+    ["3 years", fund.r3y, board.returns.r3y],
+    ["5 years", fund.r5y, board.returns.r5y],
+    [
+      startYear ? `Since ${startYear}` : "Since launch",
+      launch.fund,
+      launch.category,
+    ],
+  ] as const;
+  const details: [string, React.ReactNode, boolean][] = [
+    [
+      "Cost per year",
+      fund.expense !== null ? `${fund.expense.toFixed(2)}%` : null,
+      true,
+    ],
+    ["Fund size", aum(fund.aum), true],
+    [
+      fund.managers.length === 1 ? "Manager" : "Managers",
+      fund.managers.length
+        ? fund.managers.map((m) => (
+            <span key={m} className="block">
+              {m}
+            </span>
+          ))
+        : null,
+      true,
+    ],
+    ["Smallest SIP", detail.sipMin ? inr(detail.sipMin) : null, true],
+    [
+      "Lock-in",
+      detail.lockInDays === null
+        ? null
+        : detail.lockInDays <= 0
+          ? "None"
+          : detail.lockInDays % 365 === 0
+            ? `${detail.lockInDays / 365} years`
+            : `${detail.lockInDays} days`,
+      false,
+    ],
+    ["Risk (SEBI)", riskWords(detail.risk), true],
+  ];
+  const navText = `NAV ${nav(fund.nav)}${fund.navDate ? ` on ${day(fund.navDate)}` : ""}`;
+
+  const plainCard = (
+    <section
+      aria-labelledby="plain-h"
+      className="rounded-[18px] bg-brand-soft p-4 md:p-5"
+    >
+      <h2
+        id="plain-h"
+        className="mb-2 text-[17px] font-bold text-brand-ink md:mb-2.5 md:text-lg"
+      >
+        In plain words
+      </h2>
+      {words.length ? (
+        <ul className="grid list-disc gap-1.5 pl-[18px] text-[15px] text-ink marker:text-brand md:gap-2">
+          {words.map((w) => (
+            <li key={w}>{w}</li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-[15px] text-ink">
+          We'll describe its record once it has 3 years of prices to compare.
+        </p>
+      )}
+    </section>
+  );
+
+  return (
+    <>
+      <FundTopBar
+        code={fund.code}
+        category={fund.category}
+        label={info.label}
+        back={`/funds/${info.slug}`}
+      />
+      <Page className="mx-auto max-w-[1280px] px-4 pb-6 md:px-8 md:pt-6 md:pb-16">
+        <nav
+          aria-label="Breadcrumb"
+          className="hidden text-sm text-text-3 md:block"
+        >
+          <Link href={`/funds/${info.slug}`} transitionTypes={["nav-back"]}>
+            {info.label} funds
+          </Link>{" "}
+          <span aria-hidden="true">›</span> {fund.name}
+        </nav>
+
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-4 pt-1 md:mt-3.5 md:pt-0">
+          <div className="flex min-w-0 flex-[1_1_360px] items-center gap-3.5 md:gap-6">
+            <span className="md:hidden">
+              <Shared name={`logo-${fund.code}`} on="phone">
+                <AmcLogo
+                  houseCode={fund.houseCode}
+                  house={fund.house}
+                  size={52}
+                  className="bg-white"
+                />
+              </Shared>
+            </span>
+            <span className="hidden md:block">
+              <Shared name={`logo-${fund.code}`} on="laptop">
+                <AmcLogo
+                  houseCode={fund.houseCode}
+                  house={fund.house}
+                  size={64}
+                />
+              </Shared>
+            </span>
+            <div className="min-w-0 leading-tight">
+              <Shared name={`name-${fund.code}`}>
+                <h1 className="text-2xl font-bold tracking-[-0.01em] md:text-[34px] md:tracking-[-0.02em]">
+                  {fund.name}
+                </h1>
+              </Shared>
+              <p className="mt-0.5 text-sm text-text-3 md:mt-1.5 md:text-[15px]">
+                Direct · Growth
+                <span className="hidden md:inline">
+                  {fund.house ? ` · ${fund.house}` : ""}
+                </span>{" "}
+                · {navText}
+              </p>
             </div>
           </div>
+          <div className="hidden md:block">
+            <FundButtons code={fund.code} category={fund.category} />
+          </div>
+        </div>
 
-          <div className="mt-auto border-t border-border/40 pt-4 text-xs">
-            <span className="mb-1.5 block text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-              Fund Managers
-            </span>
-            {managers.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5">
-                {managers.map((manager) => (
-                  <span
-                    key={manager}
-                    className="rounded-full border border-border/40 bg-accent px-2.5 py-0.5 text-[10px] font-medium text-foreground"
+        <div className="mt-3.5 flex flex-wrap items-start gap-3.5 md:mt-6 md:gap-6">
+          <div className="flex min-w-0 flex-[999_1_720px] flex-col gap-3.5 md:gap-6">
+            <ScoreCard fund={fund} detail={detail} peers={peers} />
+            <div className="md:hidden">{plainCard}</div>
+            <GrowthCard
+              name={fund.name}
+              peer={info.peer}
+              fund={detail.weekly.fund}
+              category={detail.weekly.category}
+            />
+            <div className="grid grid-cols-1 gap-3.5 md:grid-cols-[repeat(auto-fit,minmax(320px,1fr))] md:gap-6">
+              <SipCard
+                name={fund.name}
+                fund={detail.weekly.fund}
+                category={detail.weekly.category}
+                monthlyFund={detail.monthly.fund}
+                monthlyCategory={detail.monthly.category}
+              />
+              <section
+                aria-labelledby="ret-h"
+                className={cn(card, "p-4 md:p-6")}
+              >
+                <h2
+                  id="ret-h"
+                  className="mb-1.5 text-[17px] font-bold md:mb-2 md:text-xl"
+                >
+                  Returns, per year
+                </h2>
+                {/* Laptop table */}
+                <table className="hidden w-full border-collapse text-[15px] md:table">
+                  <caption className="sr-only">
+                    {fund.name} returns per year against its category
+                  </caption>
+                  <thead>
+                    <tr className="text-right text-[13px] text-text-3">
+                      <th scope="col" className="py-1.5 text-left font-medium">
+                        <span className="sr-only">Period</span>
+                      </th>
+                      <th scope="col" className="font-medium">
+                        This fund
+                      </th>
+                      <th scope="col" className="font-medium">
+                        Category
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {returns.map(([l, f, c]) => (
+                      <tr
+                        key={l}
+                        className="border-t border-hairline text-right"
+                      >
+                        <th
+                          scope="row"
+                          className="py-2.5 text-left font-medium"
+                        >
+                          {l}
+                        </th>
+                        <td className={cn("font-bold", toneOf(f))}>{pct(f)}</td>
+                        <td className="text-text-2">{pct(c)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {/* Phone: four figures */}
+                <dl className="grid grid-cols-4 gap-1 text-center md:hidden">
+                  {returns.map(([l, f]) => (
+                    <div key={l} className="py-2">
+                      <dt className="text-[13px] text-text-3">{l}</dt>
+                      <dd className={cn("font-bold", toneOf(f))}>{pct(f)}</dd>
+                    </div>
+                  ))}
+                </dl>
+                {detail.worst && (
+                  <p className="mt-2.5 rounded-xl bg-marigold-soft p-3 text-sm text-marigold-ink md:hidden">
+                    <strong className="font-bold">
+                      Worst fall: {fall(detail.worst.fall)}
+                    </strong>
+                    , {month(detail.worst.peak)} to {month(detail.worst.trough)}
+                    .{" "}
+                    {detail.worst.recovered
+                      ? `Back at its old high by ${month(detail.worst.recovered)}.`
+                      : "Not yet back at its old high."}
+                  </p>
+                )}
+                <p className="mt-2 text-[13px] text-text-3">
+                  {board.asOf ? `To ${day(board.asOf)}. ` : ""}Category: average
+                  of direct plans. A dash: not around that long.
+                </p>
+              </section>
+            </div>
+            {rated.length > 0 && (
+              <section
+                aria-labelledby="rivals-h"
+                className={cn(card, "p-4 md:p-6")}
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h2
+                    id="rivals-h"
+                    className="text-[17px] font-bold md:text-xl"
                   >
-                    {manager}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <span className="text-[11px] text-muted-foreground italic">
-                No manager details listed
-              </span>
+                    Closest rivals
+                  </h2>
+                  <Link
+                    href={`/funds/${info.slug}`}
+                    transitionTypes={["nav-back"]}
+                    className="text-[15px] font-semibold"
+                  >
+                    All {board.rated} {info.short}
+                  </Link>
+                </div>
+                <table className="-mx-4 mt-2.5 w-[calc(100%+2rem)] border-collapse text-[15px] md:-mx-6 md:w-[calc(100%+3rem)]">
+                  <thead>
+                    <tr className="text-right text-[13px] text-text-3">
+                      <th
+                        scope="col"
+                        className="py-2 pl-4 text-left font-medium md:pl-6"
+                      >
+                        Fund
+                      </th>
+                      <th
+                        scope="col"
+                        className="pr-4 pl-4 text-right font-medium sm:pr-0"
+                      >
+                        Compass Score
+                      </th>
+                      <th
+                        scope="col"
+                        className="hidden pl-4 font-medium sm:table-cell"
+                      >
+                        3 yrs
+                      </th>
+                      <th
+                        scope="col"
+                        className="hidden pl-4 font-medium max-md:pr-4 sm:table-cell"
+                      >
+                        Cost
+                      </th>
+                      <th
+                        scope="col"
+                        className="hidden pr-6 font-medium md:table-cell"
+                      >
+                        Size
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rivals.map((r) => {
+                      const me = r.code === fund.code;
+                      return (
+                        <tr
+                          key={r.code}
+                          className={cn(
+                            "border-t border-hairline",
+                            me && "bg-[#FBF7EC] dark:bg-[#211d12]",
+                          )}
+                        >
+                          <th
+                            scope="row"
+                            className="py-3 pl-4 text-left font-semibold md:pl-6"
+                          >
+                            <Link
+                              href={`/fund/${encodeURIComponent(r.code)}`}
+                              aria-current={me ? "page" : undefined}
+                              className="flex items-center gap-2.5 text-ink hover:text-brand"
+                            >
+                              <AmcLogo
+                                houseCode={r.houseCode}
+                                house={r.house}
+                                size={28}
+                              />
+                              <span className="min-w-0 truncate">{r.name}</span>
+                            </Link>
+                          </th>
+                          <td className="pr-4 pl-4 text-right font-bold sm:pr-0">
+                            {r.score!.toFixed(1)}
+                          </td>
+                          <td
+                            className={cn(
+                              "hidden pl-4 text-right font-semibold sm:table-cell",
+                              toneOf(r.r3y),
+                            )}
+                          >
+                            {pct(r.r3y)}
+                          </td>
+                          <td className="hidden pl-4 text-right max-md:pr-4 sm:table-cell">
+                            {r.expense !== null
+                              ? `${r.expense.toFixed(2)}%`
+                              : "—"}
+                          </td>
+                          <td className="hidden pr-6 pl-4 text-right whitespace-nowrap text-text-2 md:table-cell">
+                            {aum(r.aum)}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </section>
             )}
           </div>
-        </div>
 
-        {/* Right Column: Risk & Options */}
-        <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-6 shadow-sm">
-          <h3 className="flex items-center gap-1.5 border-b border-border/60 pb-2.5 font-heading text-sm font-bold text-foreground">
-            <Activity className="h-4 w-4 text-primary" /> Risk & Purchase
-            parameters
-          </h3>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-xs">
-            <div>
-              <span className="block text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                CRISIL Rating
-              </span>
-              <span
-                className={cn(
-                  "mt-0.5 block font-bold",
-                  fund.crisilRating
-                    ? "text-foreground"
-                    : "font-sans text-muted-foreground/45",
-                )}
+          <aside
+            className="flex min-w-0 flex-[1_1_320px] flex-col gap-3.5 md:gap-6"
+            aria-label="About this fund"
+          >
+            <div className="hidden md:block">{plainCard}</div>
+            {detail.worst && (
+              <section
+                aria-labelledby="worst-h"
+                className="hidden rounded-[18px] bg-marigold-soft p-5 text-marigold-ink md:block"
               >
-                {fund.crisilRating ? `★ ${fund.crisilRating}` : "--"}
-              </span>
-            </div>
-            <div>
-              <span className="block text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                Star Rating
-              </span>
-              <div className="mt-0.5 flex h-4 items-center">
-                {fund.fundRating ? (
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className={cn(
-                        "h-3.5 w-3.5",
-                        i < fund.fundRating!
-                          ? "fill-foreground text-foreground"
-                          : "fill-muted text-muted",
-                      )}
-                    />
-                  ))
-                ) : (
-                  <span className="font-sans font-bold text-muted-foreground/45">
-                    --
-                  </span>
-                )}
-              </div>
-            </div>
-            <div>
-              <span className="block text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                Lock-In Period
-              </span>
-              <span className="font-data mt-0.5 block font-bold text-foreground">
-                {fund.lockInPeriod ? `${fund.lockInPeriod} days` : "No Lock-in"}
-              </span>
-            </div>
-            <div>
-              <span className="block text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                Volatility (Std Dev)
-              </span>
-              <span
-                className={cn(
-                  "mt-0.5 block",
-                  fund.volatility
-                    ? "font-data font-bold text-foreground"
-                    : "font-sans text-muted-foreground/45",
-                )}
-              >
-                {fund.volatility
-                  ? parseFloat(fund.volatility).toFixed(2)
-                  : "--"}
-              </span>
-            </div>
-            <div className="col-span-2">
-              <span className="block text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                Portfolio Turnover
-              </span>
-              <span
-                className={cn(
-                  "mt-0.5 block",
-                  fund.portfolioTurnover
-                    ? "font-data font-medium text-foreground"
-                    : "font-sans text-muted-foreground/45",
-                )}
-              >
-                {fund.portfolioTurnover
-                  ? `${(parseFloat(fund.portfolioTurnover) * 100).toFixed(0)}%`
-                  : "--"}
-              </span>
-            </div>
-          </div>
-
-          <div className="mt-auto grid grid-cols-2 gap-4 border-t border-border/40 pt-4 text-xs">
-            <div>
-              <span className="block text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                Min Lump Sum
-              </span>
-              <span className="font-data mt-0.5 block font-bold text-foreground">
-                {fund.lumpAvailable === "Y"
-                  ? formatINR(fund.lumpMin)
-                  : "Not available"}
-              </span>
-            </div>
-            <div>
-              <span className="block text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                Min Monthly SIP
-              </span>
-              <span className="font-data mt-0.5 block font-bold text-foreground">
-                {fund.sipAvailable === "Y"
-                  ? formatINR(fund.sipMin)
-                  : "Not available"}
-              </span>
-            </div>
-          </div>
+                <h2 id="worst-h" className="text-lg font-bold">
+                  Worst fall: {fall(detail.worst.fall)}
+                </h2>
+                <p className="mt-1.5 text-[15px]">
+                  {worstFallWords(detail.worst)}
+                </p>
+              </section>
+            )}
+            <section
+              aria-label="Details"
+              className={cn(card, "px-4 py-1 md:px-5 md:py-2")}
+            >
+              <dl className="text-[15px]">
+                {details.map(([k, v, phone], i) => (
+                  <div
+                    key={k}
+                    className={cn(
+                      "flex justify-between gap-3 py-3",
+                      i < details.length - 1 && "border-b border-hairline",
+                      !phone && "max-md:hidden",
+                    )}
+                  >
+                    <dt className="text-text-3">{k}</dt>
+                    <dd className="min-w-0 text-right font-semibold [overflow-wrap:anywhere]">
+                      {v ?? "—"}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+            <Disclaimer className="max-md:text-xs">
+              Not investment advice. MF Compass compares past records; past
+              returns don't guarantee future ones. Data: AMFI, Kuvera. Category
+              figures use direct plans.
+            </Disclaimer>
+          </aside>
         </div>
-      </div>
-
-      {/* Investment Objective */}
-      <div className="mt-10 rounded-xl border border-border bg-card p-6 shadow-sm">
-        <h3 className="mb-4 border-b border-border/60 pb-2.5 font-heading text-sm font-bold text-foreground">
-          Investment Objective
-        </h3>
-        <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">
-          {fund.investmentObjective ||
-            "No investment objective details provided by the AMC."}
-        </p>
-      </div>
-
-      {/* Similar Funds */}
-      {Array.isArray(fund.comparison) && fund.comparison.length > 0 && (
-        <div className="mt-10">
-          <h2 className="mb-4 font-heading text-lg font-bold text-foreground">
-            Similar Funds
-          </h2>
-          <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
-            <table className="w-full border-collapse text-left text-sm">
-              <thead>
-                <tr className="border-b border-border bg-muted/40">
-                  <th className="py-3 pr-4 pl-6 font-semibold text-muted-foreground">
-                    Fund Name
-                  </th>
-                  <th className="hidden px-4 py-3 text-center font-semibold text-muted-foreground sm:table-cell">
-                    1Y
-                  </th>
-                  <th className="px-4 py-3 text-center font-semibold text-muted-foreground">
-                    3Y
-                  </th>
-                  <th className="hidden px-4 py-3 text-center font-semibold text-muted-foreground sm:table-cell">
-                    Exp. Ratio
-                  </th>
-                  <th className="hidden py-3 pr-6 pl-4 text-center font-semibold text-muted-foreground sm:table-cell">
-                    AUM (Cr)
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {Array.isArray(fund.comparison) &&
-                  (fund.comparison as unknown as PeerFund[]).map((peer) => (
-                    <tr
-                      key={peer.code}
-                      className="transition-colors hover:bg-muted/20"
-                    >
-                      <td className="py-3 pr-4 pl-6">
-                        <Link
-                          href={`/fund/${peer.code}`}
-                          className="font-heading text-xs font-medium text-foreground transition-colors hover:text-primary sm:text-sm"
-                        >
-                          {peer.short_name || peer.name}
-                        </Link>
-                      </td>
-                      <td className="hidden px-4 py-3 text-center text-xs sm:table-cell sm:text-sm">
-                        <span
-                          className={cn(
-                            "font-data font-semibold",
-                            (peer["1y"] ?? 0) > 0
-                              ? "text-emerald-600 dark:text-emerald-400"
-                              : (peer["1y"] ?? 0) < 0
-                                ? "text-rose-600 dark:text-rose-400"
-                                : "text-muted-foreground",
-                          )}
-                        >
-                          {peer["1y"] ? formatPercent(peer["1y"]) : "--"}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-center text-xs sm:text-sm">
-                        <span
-                          className={cn(
-                            "font-data font-semibold",
-                            (peer["3y"] ?? 0) > 0
-                              ? "text-emerald-600 dark:text-emerald-400"
-                              : (peer["3y"] ?? 0) < 0
-                                ? "text-rose-600 dark:text-rose-400"
-                                : "text-muted-foreground",
-                          )}
-                        >
-                          {peer["3y"] ? formatPercent(peer["3y"]) : "--"}
-                        </span>
-                      </td>
-                      <td className="font-data hidden px-4 py-3 text-center text-xs text-muted-foreground sm:table-cell sm:text-sm">
-                        {peer.expense_ratio ? `${peer.expense_ratio}%` : "--"}
-                      </td>
-                      <td className="font-data hidden py-3 pr-6 pl-4 text-center text-xs text-muted-foreground sm:table-cell sm:text-sm">
-                        {formatAUM(peer.aum?.toString() || "0")}
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-    </div>
+      </Page>
+      <FundActionBar code={fund.code} category={fund.category} />
+    </>
   );
 }

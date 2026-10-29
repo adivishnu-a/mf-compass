@@ -1,25 +1,31 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "MF Compass",
-    short_name: "MFC",
+    short_name: "MF Compass",
     description:
-      "Identify Indian mutual funds that consistently outperform their peers.",
+      "Which mutual funds have really beaten their peers, explained plainly.",
+    id: "/",
     start_url: "/",
+    scope: "/",
     display: "standalone",
-    background_color: "#f8fafc",
-    theme_color: "#006ad6",
+    orientation: "portrait",
+    background_color: "#F3F5F6",
+    theme_color: "#FFFFFF",
+    categories: ["finance", "education"],
     icons: [
       {
         src: "/icons/icon-192.png",
         sizes: "192x192",
         type: "image/png",
+        purpose: "any",
       },
       {
         src: "/icons/icon-512.png",
         sizes: "512x512",
         type: "image/png",
+        purpose: "any",
       },
       {
         src: "/icons/icon-512-maskable.png",

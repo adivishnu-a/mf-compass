@@ -1,79 +1,44 @@
-import { MetadataRoute } from "next";
-import { db } from "@/lib/db";
-import { funds } from "@drizzle/schema";
-import { sql } from "drizzle-orm";
-import { FUND_CATEGORIES } from "@/lib/kuvera/categories";
+import type { MetadataRoute } from "next";
+import { CATEGORIES } from "@/lib/categories";
+import { getLookup } from "@/lib/data";
+
+export const revalidate = 86400;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl =
+  const base =
     process.env.NEXT_PUBLIC_SITE_URL || "https://mf-compass.vercel.app";
-
-  // The site changes when the data does; fall back to build time if the query fails.
-  let dataUpdated = new Date();
-  try {
-    const [row] = await db
-      .select({ max: sql<Date | null>`MAX(${funds.lastUpdated})` })
-      .from(funds);
-    if (row?.max) dataUpdated = new Date(row.max);
-  } catch (error) {
-    console.error("Error reading data timestamp for sitemap:", error);
-  }
-
-  const routes = [
+  const now = new Date();
+  const pages: MetadataRoute.Sitemap = [
+    { url: base, lastModified: now, changeFrequency: "daily", priority: 1 },
     {
-      url: baseUrl,
-      lastModified: dataUpdated,
-      changeFrequency: "daily" as const,
-      priority: 1.0,
-    },
-    {
-      url: `${baseUrl}/funds`,
-      lastModified: dataUpdated,
-      changeFrequency: "daily" as const,
+      url: `${base}/funds`,
+      lastModified: now,
+      changeFrequency: "daily",
       priority: 0.8,
     },
+    { url: `${base}/method`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${base}/learn`, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${base}/finder`, changeFrequency: "monthly", priority: 0.5 },
+    ...CATEGORIES.map((c) => ({
+      url: `${base}/funds/${c.slug}`,
+      lastModified: now,
+      changeFrequency: "daily" as const,
+      priority: 0.8,
+    })),
   ];
-
-  // Category deep-links
-  const categoryRoutes = FUND_CATEGORIES.map((cat) => {
-    const group = [
-      "Large Cap Fund",
-      "Mid Cap Fund",
-      "Small Cap Fund",
-      "Flexi Cap Fund",
-      "Multi Cap Fund",
-      "Large & Mid Cap fund",
-    ].includes(cat)
-      ? "equity"
-      : "hybrid";
-
-    return {
-      url: `${baseUrl}/funds?group=${group}&category=${encodeURIComponent(cat)}`,
-      lastModified: dataUpdated,
-      changeFrequency: "daily" as const,
-      priority: 0.7,
-    };
-  });
-
-  // Fund detail routes dynamically generated from the database
   try {
-    const dbFunds = await db.query.funds.findMany({
-      columns: {
-        kuveraCode: true,
-        lastUpdated: true,
-      },
-    });
-
-    const fundRoutes = dbFunds.map((fund) => ({
-      url: `${baseUrl}/fund/${fund.kuveraCode}`,
-      lastModified: fund.lastUpdated ? new Date(fund.lastUpdated) : new Date(),
-      changeFrequency: "daily" as const,
-      priority: 0.6,
-    }));
-
-    return [...routes, ...categoryRoutes, ...fundRoutes];
+    const funds = await getLookup();
+    return [
+      ...pages,
+      ...funds.map((f) => ({
+        url: `${base}/fund/${encodeURIComponent(f.code)}`,
+        lastModified: now,
+        changeFrequency: "daily" as const,
+        priority: 0.6,
+      })),
+    ];
   } catch (error) {
-    console.error("Error generating sitemap:", error);
-    return [...routes, ...categoryRoutes];
+    console.error("Error listing funds for the sitemap:", error);
+    return pages;
   }
 }
