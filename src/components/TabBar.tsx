@@ -93,7 +93,6 @@ export function TabBar() {
     <nav
       aria-label="Main"
       className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface pb-[max(14px,env(safe-area-inset-bottom))] md:hidden"
-      style={{ viewTransitionName: "tab-bar" }}
     >
       <ul className="grid h-[66px] grid-cols-4">
         {TABS.map((t) => {

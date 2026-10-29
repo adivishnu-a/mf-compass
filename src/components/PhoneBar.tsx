@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Mark } from "@/components/Mark";
 import { BackIcon, SearchIcon } from "@/components/icons";
+import { goBack } from "@/components/Transitions";
 import { openSearch } from "@/components/SearchOverlay";
 import { cn } from "@/lib/utils";
 
@@ -42,7 +43,7 @@ export function BackButton({
           document.referrer.startsWith(window.location.origin)
         ) {
           e.preventDefault();
-          router.back();
+          goBack(router.back);
         }
       }}
       className="grid size-11 shrink-0 place-items-center rounded-xl text-ink hover:bg-surface-2 hover:text-ink"

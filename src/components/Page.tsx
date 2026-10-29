@@ -1,4 +1,6 @@
+"use client";
 import { ViewTransition } from "react";
+import { useWide } from "@/components/Shared";
 
 const TYPES = {
   "nav-forward": "page-forward",
@@ -7,8 +9,9 @@ const TYPES = {
 };
 
 /**
- * Wraps each page's content so route changes animate: forward links slide in from the right, back
- * links from the left, everything else fades up. The header and tab bar stay anchored.
+ * Wraps each page's content so route changes animate on a laptop: forward links slide in from the right, back
+ * links from the left, everything else fades up, under a header that stays put. On a phone the page takes no
+ * part of its own: the whole screen moves as one (globals.css, "Phone transitions").
  */
 export function Page({
   children,
@@ -17,8 +20,13 @@ export function Page({
   children: React.ReactNode;
   className?: string;
 }) {
+  const wide = useWide();
   return (
-    <ViewTransition enter={TYPES} exit={TYPES} default="none">
+    <ViewTransition
+      enter={wide === false ? "none" : TYPES}
+      exit={wide === false ? "none" : TYPES}
+      default="none"
+    >
       <div className={className}>{children}</div>
     </ViewTransition>
   );

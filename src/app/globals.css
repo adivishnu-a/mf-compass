@@ -124,6 +124,8 @@
   --color-on-brand: var(--on-brand);
   --font-sans: var(--font-anek), ui-sans-serif, system-ui, sans-serif;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Close to the curve of an iOS navigation push. */
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
   --shadow-card: 0 6px 18px rgb(var(--shadow) / 0.08);
   --shadow-seg: 0 1px 2px rgb(var(--shadow) / 0.12);
   --shadow-menu: 0 12px 32px rgb(var(--shadow) / 0.16), 0 0 0 1px var(--border);
@@ -199,9 +201,13 @@
       box-shadow 150ms var(--ease-out),
       transform 120ms var(--ease-out);
   }
-  button:not(:disabled):active,
-  .press:active {
-    transform: scale(0.98);
+  /* A pressed-in feel for mouse and trackpad only: on a touch screen :active fires as soon as a finger lands,
+     even to scroll, and cards would flicker smaller under the thumb. */
+  @media (hover: hover) and (pointer: fine) {
+    button:not(:disabled):active,
+    .press:active {
+      transform: scale(0.98);
+    }
   }
 }
 
@@ -275,18 +281,15 @@
   animation-duration: 380ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
-/* Header and tab bar stay put while content moves. */
-::view-transition-group(site-header),
-::view-transition-group(tab-bar) {
+/* Laptop: the header stays put while content moves. */
+::view-transition-group(site-header) {
   animation: none;
   z-index: 100;
 }
-::view-transition-old(site-header),
-::view-transition-old(tab-bar) {
+::view-transition-old(site-header) {
   display: none;
 }
-::view-transition-new(site-header),
-::view-transition-new(tab-bar) {
+::view-transition-new(site-header) {
   animation: none;
 }
 ::view-transition-old(.page-forward) {
@@ -296,7 +299,7 @@
 }
 ::view-transition-new(.page-forward) {
   animation:
-    240ms ease-out 100ms both vt-fade,
+    240ms ease-out 40ms both vt-fade,
     420ms var(--ease-out) both vt-right;
 }
 ::view-transition-old(.page-back) {
@@ -306,7 +309,7 @@
 }
 ::view-transition-new(.page-back) {
   animation:
-    240ms ease-out 100ms both vt-fade,
+    240ms ease-out 40ms both vt-fade,
     420ms var(--ease-out) both vt-left;
 }
 ::view-transition-old(.page-fade) {
@@ -314,7 +317,7 @@
 }
 ::view-transition-new(.page-fade) {
   animation:
-    260ms ease-out 80ms both vt-fade,
+    260ms ease-out 40ms both vt-fade,
     360ms var(--ease-out) both vt-up;
 }
 /* Shared fund identity (logo, name, score) morphs from list to page. */
@@ -353,6 +356,64 @@
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 280ms;
+}
+
+/* ---------- Phone transitions: the whole screen moves as one, like a native app ----------
+   Pages and fund logos take no part of their own here (Page.tsx, Shared.tsx), so the root snapshot is the
+   screen: top bar, content and bottom bar together. Types come from links (transitionTypes) and from
+   our back button (Transitions.tsx, which also keeps the screen itself in the transition). Browser back and
+   swipe-back get no transition from us: React applies them instantly and Safari animates them itself. */
+@media (max-width: 767px) {
+  /* Peers (tabs, categories): a short crossfade, nothing slides. */
+  ::view-transition-old(root) {
+    animation: 160ms ease-out both vt-fade reverse;
+  }
+  ::view-transition-new(root) {
+    animation: 220ms ease-out both vt-fade;
+  }
+  /* Forward: the new screen slides in from the right over the old one, which drifts left and dims. */
+  html:active-view-transition-type(nav-forward)::view-transition-old(root) {
+    mix-blend-mode: normal;
+    animation: 440ms var(--ease-ios) both vt-push-under;
+  }
+  html:active-view-transition-type(nav-forward)::view-transition-new(root) {
+    mix-blend-mode: normal;
+    box-shadow: -8px 0 24px rgb(19 33 42 / 0.12);
+    animation: 440ms var(--ease-ios) both vt-push-over;
+  }
+  /* Back: the reverse; the leaving screen stays on top as it slides away. */
+  html:active-view-transition-type(nav-back)::view-transition-old(root) {
+    mix-blend-mode: normal;
+    z-index: 1;
+    box-shadow: -8px 0 24px rgb(19 33 42 / 0.12);
+    animation: 400ms var(--ease-ios) both vt-pop-off;
+  }
+  html:active-view-transition-type(nav-back)::view-transition-new(root) {
+    mix-blend-mode: normal;
+    animation: 400ms var(--ease-ios) both vt-pop-under;
+  }
+}
+@keyframes vt-push-over {
+  from {
+    translate: 100% 0;
+  }
+}
+@keyframes vt-push-under {
+  to {
+    translate: -28% 0;
+    filter: brightness(0.94);
+  }
+}
+@keyframes vt-pop-off {
+  to {
+    translate: 100% 0;
+  }
+}
+@keyframes vt-pop-under {
+  from {
+    translate: -28% 0;
+    filter: brightness(0.94);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

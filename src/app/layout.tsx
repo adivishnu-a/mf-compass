@@ -4,6 +4,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Suspense } from "react";
 import { CompareTray } from "@/components/CompareTray";
 import { Header } from "@/components/Header";
+import { Transitions } from "@/components/Transitions";
 import { MotionPrefs } from "@/components/MotionPrefs";
 import { SearchOverlay } from "@/components/SearchOverlay";
 import { TabBar } from "@/components/TabBar";
@@ -72,6 +73,7 @@ export default async function RootLayout({
             <TabBar />
           </Suspense>
           <SearchOverlay />
+          <Transitions />
         </MotionPrefs>
         <SpeedInsights />
       </body>

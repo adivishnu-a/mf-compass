@@ -29,7 +29,16 @@ const str = (v: unknown) => (typeof v === "string" && v ? v : null);
 const toDay = (iso: string) =>
   Math.round(Date.parse(iso + "T00:00:00Z") / DAY_MS);
 
+let warned = false;
+
 async function rows(query: ReturnType<typeof sql>): Promise<Row[]> {
+  // CI builds without credentials: pages prerender empty there. Vercel has the URL and builds them with data.
+  if (!process.env.DATABASE_URL) {
+    if (!warned)
+      console.warn("DATABASE_URL is not set: rendering without fund data");
+    warned = true;
+    return [];
+  }
   const result = (await db.execute(query)) as unknown as { rows: Row[] };
   return result.rows;
 }

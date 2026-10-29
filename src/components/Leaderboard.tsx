@@ -487,6 +487,9 @@ function SortSheet({
 
 export function Leaderboard({ board }: { board: CategoryBoard }) {
   const [sort, setSort] = useState<SortKey>("score");
+  // Rows glide to their new places only once the user re-sorts; before that, a layout shift (fonts, logos
+  // loading) would set them moving for no reason.
+  const [resorted, setResorted] = useState(false);
   const [asc, setAsc] = useState(false);
   const [sheet, setSheet] = useState(false);
   const rated = board.funds.filter((f) => f.score !== null);
@@ -510,6 +513,7 @@ export function Leaderboard({ board }: { board: CategoryBoard }) {
   const focused = rated.find((f) => f.code === focus) ?? rated[0];
 
   function sortBy(k: SortKey) {
+    setResorted(true);
     if (k === sort) setAsc(!asc);
     else {
       setSort(k);
@@ -658,7 +662,7 @@ export function Leaderboard({ board }: { board: CategoryBoard }) {
                     return (
                       <motion.tr
                         key={f.code}
-                        layout="position"
+                        layout={resorted ? "position" : false}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ ...spring, opacity: { duration: 0.2 } }}
@@ -777,7 +781,11 @@ export function Leaderboard({ board }: { board: CategoryBoard }) {
           className="grid grid-cols-1 gap-2.5 px-4 pt-2"
         >
           {rows.map((f, i) => (
-            <motion.li key={f.code} layout="position" transition={spring}>
+            <motion.li
+              key={f.code}
+              layout={resorted ? "position" : false}
+              transition={spring}
+            >
               <Link
                 href={href(f)}
                 transitionTypes={["nav-forward"]}
@@ -825,7 +833,7 @@ export function Leaderboard({ board }: { board: CategoryBoard }) {
         <SortSheet
           open={sheet}
           value={sort}
-          onChange={(k) => (setSort(k), setAsc(false))}
+          onChange={(k) => (setSort(k), setAsc(false), setResorted(true))}
           onClose={() => setSheet(false)}
         />
       </div>

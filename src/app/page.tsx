@@ -40,7 +40,7 @@ export default async function Home() {
       .at(-1) ?? null;
   const best = ["large-cap", "mid-cap", "small-cap"]
     .map((slug) => boards.find((b) => b.info.slug === slug))
-    .filter((b) => b && b.funds[0]?.score !== null)
+    .filter((b) => b && b.funds[0]?.score != null)
     .map((b) => ({ board: b!, fund: b!.funds[0] }));
 
   return (

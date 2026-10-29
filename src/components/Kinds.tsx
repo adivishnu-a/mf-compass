@@ -8,7 +8,7 @@ export function KindTiles({ boards }: { boards: CategoryBoard[] }) {
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
       {boards.map((b) => {
-        const top = b.funds[0]?.score !== null ? b.funds[0] : null;
+        const top = b.funds[0]?.score != null ? b.funds[0] : null;
         return (
           <Link
             key={b.info.slug}
