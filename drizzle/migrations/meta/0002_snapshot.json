@@ -1,0 +1,531 @@
+{
+  "id": "87f7ffb2-830e-43df-b616-c2e02c9358f6",
+  "prevId": "5ce4b938-091b-4650-ac57-674f994d6fb6",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.category_index": {
+      "name": "category_index",
+      "schema": "",
+      "columns": {
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "point_date": {
+          "name": "point_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "numeric(16, 6)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "category_index_category_point_date_pk": {
+          "name": "category_index_category_point_date_pk",
+          "columns": ["category", "point_date"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.fund_metrics": {
+      "name": "fund_metrics",
+      "schema": "",
+      "columns": {
+        "fund_id": {
+          "name": "fund_id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "as_of": {
+          "name": "as_of",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rated": {
+          "name": "rated",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "unrated_reason": {
+          "name": "unrated_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "history_years": {
+          "name": "history_years",
+          "type": "numeric(6, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "excess_return_raw": {
+          "name": "excess_return_raw",
+          "type": "numeric(10, 4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "consistency_raw": {
+          "name": "consistency_raw",
+          "type": "numeric(7, 4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "downside_capture": {
+          "name": "downside_capture",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "max_drawdown": {
+          "name": "max_drawdown",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "category_max_drawdown": {
+          "name": "category_max_drawdown",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "worst_fall": {
+          "name": "worst_fall",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "worst_fall_peak": {
+          "name": "worst_fall_peak",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "worst_fall_trough": {
+          "name": "worst_fall_trough",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "worst_fall_recovered": {
+          "name": "worst_fall_recovered",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "part_returns": {
+          "name": "part_returns",
+          "type": "numeric(5, 1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "part_consistency": {
+          "name": "part_consistency",
+          "type": "numeric(5, 1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "part_downside": {
+          "name": "part_downside",
+          "type": "numeric(5, 1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "part_cost": {
+          "name": "part_cost",
+          "type": "numeric(5, 1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "score": {
+          "name": "score",
+          "type": "numeric(5, 1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fund_metrics_fund_id_funds_id_fk": {
+          "name": "fund_metrics_fund_id_funds_id_fk",
+          "tableFrom": "fund_metrics",
+          "tableTo": "funds",
+          "columnsFrom": ["fund_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.fund_sources": {
+      "name": "fund_sources",
+      "schema": "",
+      "columns": {
+        "fund_id": {
+          "name": "fund_id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "amfi_code": {
+          "name": "amfi_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "predecessor_amfi_code": {
+          "name": "predecessor_amfi_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "predecessor_scale": {
+          "name": "predecessor_scale",
+          "type": "numeric(20, 12)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "joined_on": {
+          "name": "joined_on",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "verified_at": {
+          "name": "verified_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fund_sources_fund_id_funds_id_fk": {
+          "name": "fund_sources_fund_id_funds_id_fk",
+          "tableFrom": "fund_sources",
+          "tableTo": "funds",
+          "columnsFrom": ["fund_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.funds": {
+      "name": "funds",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "kuvera_code": {
+          "name": "kuvera_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scheme_name": {
+          "name": "scheme_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "short_name": {
+          "name": "short_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "isin": {
+          "name": "isin",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fund_house": {
+          "name": "fund_house",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fund_house_name": {
+          "name": "fund_house_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fund_category": {
+          "name": "fund_category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sip_min": {
+          "name": "sip_min",
+          "type": "numeric(15, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lock_in_period": {
+          "name": "lock_in_period",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "current_nav": {
+          "name": "current_nav",
+          "type": "numeric(10, 5)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "current_nav_date": {
+          "name": "current_nav_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "returns_3y": {
+          "name": "returns_3y",
+          "type": "numeric(8, 4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "returns_5y": {
+          "name": "returns_5y",
+          "type": "numeric(8, 4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "returns_inception": {
+          "name": "returns_inception",
+          "type": "numeric(8, 4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "returns_date": {
+          "name": "returns_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "expense_ratio": {
+          "name": "expense_ratio",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fund_managers": {
+          "name": "fund_managers",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "investment_objective": {
+          "name": "investment_objective",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aum": {
+          "name": "aum",
+          "type": "numeric(15, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "crisil_rating": {
+          "name": "crisil_rating",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_updated": {
+          "name": "last_updated",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_funds_kuvera_code": {
+          "name": "idx_funds_kuvera_code",
+          "columns": [
+            {
+              "expression": "kuvera_code",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_funds_isin": {
+          "name": "idx_funds_isin",
+          "columns": [
+            {
+              "expression": "isin",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_funds_fund_category": {
+          "name": "idx_funds_fund_category",
+          "columns": [
+            {
+              "expression": "fund_category",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_funds_fund_house": {
+          "name": "idx_funds_fund_house",
+          "columns": [
+            {
+              "expression": "fund_house",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "funds_kuvera_code_unique": {
+          "name": "funds_kuvera_code_unique",
+          "nullsNotDistinct": false,
+          "columns": ["kuvera_code"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.nav_history": {
+      "name": "nav_history",
+      "schema": "",
+      "columns": {
+        "fund_id": {
+          "name": "fund_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nav_date": {
+          "name": "nav_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nav": {
+          "name": "nav",
+          "type": "numeric(16, 6)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "nav_history_fund_id_funds_id_fk": {
+          "name": "nav_history_fund_id_funds_id_fk",
+          "tableFrom": "nav_history",
+          "tableTo": "funds",
+          "columnsFrom": ["fund_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "nav_history_fund_id_nav_date_pk": {
+          "name": "nav_history_fund_id_nav_date_pk",
+          "columns": ["fund_id", "nav_date"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

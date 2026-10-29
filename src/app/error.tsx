@@ -1,10 +1,8 @@
 "use client";
-
 import { useEffect } from "react";
 import Link from "next/link";
-import { RefreshCw } from "lucide-react";
 
-export default function Error({
+export default function ErrorPage({
   error,
   reset,
 }: {
@@ -14,31 +12,29 @@ export default function Error({
   useEffect(() => {
     console.error(error);
   }, [error]);
-
   return (
-    <div className="mx-auto max-w-xl px-4 py-20 text-center">
-      <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-8">
-        <h1 className="font-heading text-lg font-bold text-foreground">
-          Something went wrong
-        </h1>
-        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-          The page could not be loaded. This is usually a temporary data
-          connection problem.
-        </p>
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <button
-            onClick={reset}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground hover:bg-primary/95"
-          >
-            <RefreshCw className="h-3.5 w-3.5" /> Try Again
-          </button>
-          <Link
-            href="/funds"
-            className="inline-flex rounded-lg border border-border px-5 py-2.5 text-xs font-semibold text-foreground hover:bg-accent"
-          >
-            Back to Rankings
-          </Link>
-        </div>
+    <div className="mx-auto max-w-[560px] px-4 pt-16 md:pt-24">
+      <h1 className="text-[28px] font-bold tracking-[-0.015em] md:text-[34px]">
+        This page didn't load
+      </h1>
+      <p className="mt-2 text-text-2">
+        We couldn't reach the fund data just now. It's usually brief. Try again,
+        and if it keeps happening, come back in a few minutes.
+      </p>
+      <div className="mt-6 flex gap-3">
+        <button
+          type="button"
+          onClick={reset}
+          className="press h-11 rounded-[10px] bg-brand px-5 font-semibold text-on-brand hover:bg-brand-hover"
+        >
+          Try again
+        </button>
+        <Link
+          href="/"
+          className="grid h-11 place-items-center rounded-[10px] border border-border-strong bg-surface px-5 font-semibold text-ink hover:text-ink"
+        >
+          Go home
+        </Link>
       </div>
     </div>
   );

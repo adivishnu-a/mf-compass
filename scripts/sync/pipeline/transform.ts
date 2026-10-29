@@ -19,138 +19,95 @@ function parseFundManagers(raw: string | null | undefined): string[] {
 }
 
 /**
- * Compute 1-day return from current and previous NAV.
- * returns_1d = (current_nav - t1_nav) / t1_nav * 100
+ * Kuvera's trailing returns. We keep only what verifying a merged fund's joined history needs (docs/DATA.md);
+ * every return shown on the site is computed from NAV history instead.
  */
-function computeReturns1d(
-  currentNav: number | null,
-  t1Nav: number | null,
-): string | null {
-  if (currentNav === null || t1Nav === null || t1Nav === 0) return null;
-  return (((currentNav - t1Nav) / t1Nav) * 100).toFixed(4);
-}
-
 export function cleanReturns(
   returns:
     | {
-        week_1?: number | null;
-        year_1?: number | null;
         year_3?: number | null;
         year_5?: number | null;
         inception?: number | null;
       }
     | null
     | undefined,
-  stripTrailingZeros: boolean = false,
 ) {
-  const result = {
-    returns1w: null as string | null,
-    returns1y: null as string | null,
-    returns3y: null as string | null,
-    returns5y: null as string | null,
-    returnsInception: null as string | null,
+  const fixed = (v: number | null | undefined) =>
+    v === null || v === undefined ? null : v.toFixed(4);
+  return {
+    returns3y: fixed(returns?.year_3),
+    returns5y: fixed(returns?.year_5),
+    returnsInception: fixed(returns?.inception),
   };
+}
 
-  if (!returns) return result;
+type CleanedReturns = ReturnType<typeof cleanReturns>;
 
-  const periods = [
-    { key: "returns1w", val: returns.week_1 },
-    { key: "returns1y", val: returns.year_1 },
-    { key: "returns3y", val: returns.year_3 },
-    { key: "returns5y", val: returns.year_5 },
-  ];
+const PERIOD_DAYS = {
+  returns3y: 3 * 365,
+  returns5y: 5 * 365,
+} as const;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
-  let hasNonZero = false;
+/**
+ * Kuvera sends 0 for a period a fund has not lived through. Stored as "0.0000", that read as a real 0% return.
+ * A period counts only if the fund existed for all of it (a few days' slack for weekends and NAV lag). When the
+ * start date is unknown, an exact zero is taken as missing; a true 0.0000% over three years doesn't happen.
+ */
+export function maskUnearnedReturns(
+  cleaned: CleanedReturns,
+  startDate: string | null | undefined,
+  asOf: string | null | undefined,
+): CleanedReturns {
+  const result = { ...cleaned };
+  const start = startDate ? Date.parse(startDate) : NaN;
+  const end = asOf ? Date.parse(asOf) : NaN;
+  const ageDays =
+    Number.isFinite(start) && Number.isFinite(end)
+      ? (end - start) / DAY_MS
+      : null;
 
-  for (let i = periods.length - 1; i >= 0; i--) {
-    const current = periods[i];
-    let val = current.val;
-
-    if (stripTrailingZeros) {
-      if (val === 0 && !hasNonZero) {
-        val = null;
-      } else if (val !== null && val !== undefined && val !== 0) {
-        hasNonZero = true;
-      }
-    }
-
-    if (val === null || val === undefined) {
-      continue;
-    }
-
-    (result as Record<string, string | null>)[current.key] = val.toFixed(4);
+  for (const key of Object.keys(PERIOD_DAYS) as (keyof typeof PERIOD_DAYS)[]) {
+    const value = result[key];
+    if (value === null) continue;
+    const tooYoung = ageDays !== null && ageDays < PERIOD_DAYS[key] - 5;
+    const zeroMarker = ageDays === null && Number(value) === 0;
+    if (tooYoung || zeroMarker) result[key] = null;
   }
-
-  let inceptionVal = returns.inception;
-  if (stripTrailingZeros && inceptionVal === 0 && !hasNonZero) {
-    inceptionVal = null;
-  }
-
-  if (inceptionVal !== null && inceptionVal !== undefined) {
-    result.returnsInception = inceptionVal.toFixed(4);
-  }
-
   return result;
 }
 
 export function transformFundDetail(detail: FundDetail): NewFund {
-  const currentNav = detail.nav?.nav ?? null;
-  const t1Nav = detail.last_nav?.nav ?? null;
-  const aumCrore =
-    detail.aum !== null && detail.aum !== undefined
-      ? (detail.aum / 10).toFixed(2)
-      : null;
-
-  const cleaned = cleanReturns(detail.returns);
+  const cleaned = maskUnearnedReturns(
+    cleanReturns(detail.returns),
+    detail.start_date,
+    detail.returns?.date ?? detail.nav?.date,
+  );
 
   return {
     kuveraCode: detail.code,
     schemeName: detail.name,
     shortName: detail.short_name ?? null,
-    smallScreenName: detail.small_screen_name ?? null,
     isin: detail.ISIN ?? null,
     fundHouse: detail.fund_house ?? null,
     fundHouseName: detail.fund_name ?? null,
     fundCategory: detail.fund_category ?? null,
-    fundType: detail.fund_type ?? null,
-    lumpAvailable: detail.lump_available ?? null,
-    lumpMin: detail.lump_min?.toFixed(2) ?? null,
-    sipAvailable: detail.sip_available ?? null,
     sipMin: detail.sip_min?.toFixed(2) ?? null,
     lockInPeriod: detail.lock_in_period ?? null,
-    currentNav: currentNav?.toFixed(5) ?? null,
+    currentNav: detail.nav?.nav?.toFixed(5) ?? null,
     currentNavDate: detail.nav?.date ?? null,
-    t1Nav: t1Nav?.toFixed(5) ?? null,
-    t1NavDate: detail.last_nav?.date ?? null,
-    returns1d: computeReturns1d(currentNav, t1Nav),
-    returns1w: cleaned.returns1w,
-    returns1y: cleaned.returns1y,
     returns3y: cleaned.returns3y,
     returns5y: cleaned.returns5y,
     returnsInception: cleaned.returnsInception,
     returnsDate: detail.returns?.date ?? null,
     startDate: detail.start_date ?? null,
     expenseRatio: detail.expense_ratio?.toFixed(2) ?? null,
-    expenseRatioDate: detail.expense_ratio_date ?? null,
     fundManagers: parseFundManagers(detail.fund_manager),
     investmentObjective: detail.investment_objective ?? null,
-    volatility: detail.volatility?.toFixed(4) ?? null,
-    portfolioTurnover: detail.portfolio_turnover?.toFixed(4) ?? null,
-    aum: aumCrore,
-    fundRating: detail.fund_rating ?? null,
-    fundRatingDate: detail.fund_rating_date ?? null,
+    aum:
+      detail.aum !== null && detail.aum !== undefined
+        ? (detail.aum / 10).toFixed(2)
+        : null,
     crisilRating: detail.crisil_rating ?? null,
-    tags: detail.tags ?? null,
-    comparison: detail.comparison
-      ? detail.comparison.map((peer) => ({
-          ...peer,
-          aum:
-            peer.aum !== null && peer.aum !== undefined
-              ? peer.aum / 10
-              : peer.aum,
-        }))
-      : null,
-    totalScore: null,
-    scoreUpdated: null,
   };
 }

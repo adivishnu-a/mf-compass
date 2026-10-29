@@ -1,28 +1,25 @@
-import type { Metadata } from "next";
 import Link from "next/link";
-import { Compass } from "lucide-react";
-
-export const metadata: Metadata = { title: "Page not found" };
+import { Page } from "@/components/Page";
+import { SearchField } from "@/components/SearchField";
 
 export default function NotFound() {
   return (
-    <div className="mx-auto max-w-xl px-4 py-20 text-center">
-      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
-        <Compass className="h-6 w-6" />
-      </div>
-      <h1 className="font-heading text-lg font-bold text-foreground">
-        Page not found
+    <Page className="mx-auto max-w-[560px] px-4 pt-16 md:pt-24">
+      <h1 className="text-[28px] font-bold tracking-[-0.015em] md:text-[34px]">
+        We couldn't find that page
       </h1>
-      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-        This page does not exist, or the fund is no longer tracked. Funds drop
-        out when their AUM falls under the threshold or they are merged.
+      <p className="mt-2 text-[15px] text-text-2 md:text-[17px]">
+        The fund may have been merged or closed, or the link has a typo. Search
+        for it, or browse by kind of fund.
       </p>
-      <Link
-        href="/funds"
-        className="mt-6 inline-flex rounded-lg bg-primary px-6 py-2.5 text-xs font-bold text-primary-foreground hover:bg-primary/95"
-      >
-        Explore Leaderboards
+      <SearchField
+        variant="hero"
+        placeholder="Search a fund"
+        className="mt-6"
+      />
+      <Link href="/funds" className="mt-4 inline-block font-semibold">
+        Explore all funds
       </Link>
-    </div>
+    </Page>
   );
 }

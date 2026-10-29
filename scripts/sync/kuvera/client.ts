@@ -7,10 +7,8 @@ import {
   fundListResponseSchema,
   fundListItemRawSchema,
   fundDetailSchema,
-  categoryAveragesResponseSchema,
   type FundListItem,
   type FundDetail,
-  type CategoryAverageItem,
 } from "@scripts/sync/kuvera/schemas";
 import { logger } from "@scripts/sync/shared/logger";
 
@@ -180,29 +178,4 @@ export async function fetchFundDetailsBatched(
   }
 
   return results;
-}
-
-/** Fetch category averages from Kuvera. */
-export async function fetchCategoryAverages(): Promise<CategoryAverageItem[]> {
-  const url = `${BASE_URL}/v4/fund_categories.json`;
-  logger.info("Fetching category averages", { url });
-
-  const response = await fetchWithTimeout(url);
-  if (!response.ok) {
-    throw new Error(
-      `Category averages fetch failed: ${response.status} ${response.statusText}`,
-    );
-  }
-
-  const raw = await response.json();
-  const parsed = categoryAveragesResponseSchema.safeParse(raw);
-
-  if (!parsed.success) {
-    throw new Error(
-      `Category averages schema validation failed: ${parsed.error.message}`,
-    );
-  }
-
-  logger.info("Category averages fetched", { count: parsed.data.length });
-  return parsed.data;
 }

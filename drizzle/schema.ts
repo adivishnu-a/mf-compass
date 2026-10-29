@@ -10,6 +10,7 @@ import {
   jsonb,
   index,
   uniqueIndex,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 
 export const funds = pgTable(
@@ -19,46 +20,24 @@ export const funds = pgTable(
     kuveraCode: text("kuvera_code").unique().notNull(),
     schemeName: text("scheme_name").notNull(),
     shortName: text("short_name"),
-    smallScreenName: text("small_screen_name"),
     isin: text("isin"),
     fundHouse: text("fund_house"),
     fundHouseName: text("fund_house_name"),
     fundCategory: text("fund_category"),
-    fundType: text("fund_type"),
-    lumpAvailable: text("lump_available"),
-    lumpMin: decimal("lump_min", { precision: 15, scale: 2 }),
-    sipAvailable: text("sip_available"),
     sipMin: decimal("sip_min", { precision: 15, scale: 2 }),
     lockInPeriod: integer("lock_in_period"),
     currentNav: decimal("current_nav", { precision: 10, scale: 5 }),
     currentNavDate: date("current_nav_date"),
-    t1Nav: decimal("t1_nav", { precision: 10, scale: 5 }),
-    t1NavDate: date("t1_nav_date"),
-    returns1d: decimal("returns_1d", { precision: 8, scale: 4 }),
-    returns1w: decimal("returns_1w", { precision: 8, scale: 4 }),
-    returns1y: decimal("returns_1y", { precision: 8, scale: 4 }),
     returns3y: decimal("returns_3y", { precision: 8, scale: 4 }),
     returns5y: decimal("returns_5y", { precision: 8, scale: 4 }),
     returnsInception: decimal("returns_inception", { precision: 8, scale: 4 }),
     returnsDate: date("returns_date"),
     startDate: date("start_date"),
     expenseRatio: decimal("expense_ratio", { precision: 5, scale: 2 }),
-    expenseRatioDate: date("expense_ratio_date"),
     fundManagers: jsonb("fund_managers"),
     investmentObjective: text("investment_objective"),
-    volatility: decimal("volatility", { precision: 8, scale: 4 }),
-    portfolioTurnover: decimal("portfolio_turnover", {
-      precision: 8,
-      scale: 4,
-    }),
     aum: decimal("aum", { precision: 15, scale: 2 }),
-    fundRating: integer("fund_rating"),
-    fundRatingDate: date("fund_rating_date"),
     crisilRating: text("crisil_rating"),
-    totalScore: decimal("total_score", { precision: 5, scale: 2 }),
-    scoreUpdated: timestamp("score_updated"),
-    tags: jsonb("tags"),
-    comparison: jsonb("comparison"),
     lastUpdated: timestamp("last_updated").defaultNow(),
     createdAt: timestamp("created_at").defaultNow(),
   },
@@ -67,34 +46,83 @@ export const funds = pgTable(
     index("idx_funds_isin").on(table.isin),
     index("idx_funds_fund_category").on(table.fundCategory),
     index("idx_funds_fund_house").on(table.fundHouse),
-    index("idx_funds_fund_type").on(table.fundType),
-    index("idx_funds_total_score").on(table.totalScore.desc()),
   ],
 );
 
-export const categoryAverages = pgTable(
-  "category_averages",
+/**
+ * Where each fund's NAV history comes from: its AMFI scheme code and, when AMFI issued a new code at a
+ * merger, the verified predecessor scheme whose history is joined on (scaled to continue at the join).
+ */
+export const fundSources = pgTable("fund_sources", {
+  fundId: integer("fund_id")
+    .primaryKey()
+    .references(() => funds.id, { onDelete: "cascade" }),
+  amfiCode: text("amfi_code").notNull(),
+  predecessorAmfiCode: text("predecessor_amfi_code"),
+  predecessorScale: decimal("predecessor_scale", { precision: 20, scale: 12 }),
+  joinedOn: date("joined_on"),
+  verifiedAt: timestamp("verified_at").defaultNow(),
+});
+
+/**
+ * Daily NAVs, one row per fund per trading day. Pre-merger days carry the predecessor's NAV already
+ * scaled onto the fund (see fund_sources), so a fund's series reads as one continuous history.
+ * Composite primary key, no surrogate id: about 1.1M rows stay small and every read is a per-fund range.
+ */
+export const navHistory = pgTable(
+  "nav_history",
   {
-    id: serial("id").primaryKey(),
-    categoryName: text("category_name").unique().notNull(),
-    reportDate: date("report_date").notNull(),
-    returns1w: decimal("returns_1w", { precision: 8, scale: 4 }),
-    returns1y: decimal("returns_1y", { precision: 8, scale: 4 }),
-    returns3y: decimal("returns_3y", { precision: 8, scale: 4 }),
-    returns5y: decimal("returns_5y", { precision: 8, scale: 4 }),
-    returnsInception: decimal("returns_inception", { precision: 8, scale: 4 }),
-    isSynthetic: boolean("is_synthetic").notNull().default(false),
-    sourceCount: integer("source_count"),
-    createdAt: timestamp("created_at").defaultNow(),
-    updatedAt: timestamp("updated_at").defaultNow(),
+    fundId: integer("fund_id")
+      .notNull()
+      .references(() => funds.id, { onDelete: "cascade" }),
+    navDate: date("nav_date").notNull(),
+    nav: decimal("nav", { precision: 16, scale: 6 }).notNull(),
   },
-  (table) => [
-    uniqueIndex("idx_category_averages_name").on(table.categoryName),
-    index("idx_category_averages_date").on(table.reportDate),
-  ],
+  (table) => [primaryKey({ columns: [table.fundId, table.navDate] })],
 );
+
+/** Each category's equal-weight direct-plan index, one point per day, for charts and exact figures vs the category. */
+export const categoryIndexPoints = pgTable(
+  "category_index",
+  {
+    category: text("category").notNull(),
+    pointDate: date("point_date").notNull(),
+    value: decimal("value", { precision: 16, scale: 6 }).notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.category, table.pointDate] })],
+);
+
+/** Compass Score and the numbers behind it, recomputed weekly (src/lib/metrics, docs/SCORE.md). */
+export const fundMetrics = pgTable("fund_metrics", {
+  fundId: integer("fund_id")
+    .primaryKey()
+    .references(() => funds.id, { onDelete: "cascade" }),
+  asOf: date("as_of").notNull(),
+  rated: boolean("rated").notNull(),
+  unratedReason: text("unrated_reason"),
+  historyYears: decimal("history_years", { precision: 6, scale: 2 }),
+  excessReturnRaw: decimal("excess_return_raw", { precision: 10, scale: 4 }),
+  consistencyRaw: decimal("consistency_raw", { precision: 7, scale: 4 }),
+  downsideCapture: decimal("downside_capture", { precision: 10, scale: 2 }),
+  maxDrawdown: decimal("max_drawdown", { precision: 8, scale: 2 }),
+  categoryMaxDrawdown: decimal("category_max_drawdown", {
+    precision: 8,
+    scale: 2,
+  }),
+  worstFall: decimal("worst_fall", { precision: 8, scale: 2 }),
+  worstFallPeak: date("worst_fall_peak"),
+  worstFallTrough: date("worst_fall_trough"),
+  worstFallRecovered: date("worst_fall_recovered"),
+  partReturns: decimal("part_returns", { precision: 5, scale: 1 }),
+  partConsistency: decimal("part_consistency", { precision: 5, scale: 1 }),
+  partDownside: decimal("part_downside", { precision: 5, scale: 1 }),
+  partCost: decimal("part_cost", { precision: 5, scale: 1 }),
+  score: decimal("score", { precision: 5, scale: 1 }),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
 
 export type Fund = typeof funds.$inferSelect;
 export type NewFund = typeof funds.$inferInsert;
-export type CategoryAverage = typeof categoryAverages.$inferSelect;
-export type NewCategoryAverage = typeof categoryAverages.$inferInsert;
+export type FundSource = typeof fundSources.$inferSelect;
+export type NavRow = typeof navHistory.$inferInsert;
+export type FundMetricsRow = typeof fundMetrics.$inferInsert;

@@ -1,11 +1,20 @@
 import { ImageResponse } from "next/og";
-import { ogColors, ogFonts, ogSize } from "@/lib/og";
+import { ogColors as c, ogFonts, ogSize } from "@/lib/og";
 
+export const alt =
+  "MF Compass: which mutual funds have really beaten their peers";
 export const size = ogSize;
 export const contentType = "image/png";
-export const alt = "MF Compass: Indian mutual funds ranked by outperformance";
 
-export default async function OpenGraphImage() {
+const Mark = ({ size: s }: { size: number }) => (
+  <svg width={s} height={s} viewBox="0 0 32 32">
+    <rect width="32" height="32" rx="7.2" fill={c.peacock} />
+    <polygon points="23.5,8.5 18.8,18.8 13.2,13.2" fill={c.marigold} />
+    <polygon points="8.5,23.5 13.2,13.2 18.8,18.8" fill="#FFFFFF" />
+  </svg>
+);
+
+export default async function Image() {
   return new ImageResponse(
     <div
       style={{
@@ -14,51 +23,38 @@ export default async function OpenGraphImage() {
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        padding: "64px 72px",
-        background: ogColors.blue,
-        color: ogColors.paper,
-        fontFamily: "Inter",
+        padding: 72,
+        background: c.paper,
+        fontFamily: "Anek Latin",
+        color: c.ink,
       }}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-        <div style={{ fontSize: 28, fontWeight: 500, color: ogColors.muted }}>
-          MF Compass
-        </div>
-        <div
-          style={{
-            fontSize: 84,
-            fontWeight: 800,
-            lineHeight: 1.05,
-            letterSpacing: -3,
-            maxWidth: 1000,
-          }}
-        >
-          Indian mutual funds ranked by outperformance
-        </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        <Mark size={72} />
+        <span style={{ fontSize: 44, fontWeight: 700 }}>MF Compass</span>
       </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-end",
-          fontSize: 30,
-          fontWeight: 500,
-        }}
-      >
-        <div style={{ maxWidth: 760, lineHeight: 1.3 }}>
-          Scored against the category average, not raw returns. Direct growth
-          plans only. Free, anonymous, refreshed daily.
-        </div>
-        <div
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <span
           style={{
-            color: ogColors.muted,
-            whiteSpace: "nowrap",
-            flexShrink: 0,
-            marginLeft: 48,
+            fontSize: 76,
+            fontWeight: 700,
+            lineHeight: 1.05,
+            maxWidth: 900,
           }}
         >
-          mf-compass.vercel.app
-        </div>
+          Which funds have really beaten their peers?
+        </span>
+        <span
+          style={{
+            fontSize: 32,
+            fontWeight: 500,
+            color: c.text2,
+            marginTop: 24,
+          }}
+        >
+          Every direct mutual fund, compared with its own kind. Free, no
+          sign-up.
+        </span>
       </div>
     </div>,
     { ...size, fonts: await ogFonts() },

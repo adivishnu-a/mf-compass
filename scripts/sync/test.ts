@@ -10,8 +10,8 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { sql } from "drizzle-orm";
 import * as schema from "@drizzle/schema";
-import { funds, categoryAverages } from "@drizzle/schema";
-import { fetchCategoryAverages } from "@scripts/sync/kuvera/client";
+import { funds, navHistory } from "@drizzle/schema";
+import { fetchFundDetail } from "@scripts/sync/kuvera/client";
 import { logger } from "@scripts/sync/shared/logger";
 
 async function main(): Promise<void> {
@@ -41,23 +41,29 @@ async function main(): Promise<void> {
       .from(funds);
     const fundsCount = Number(fundsCountResult[0]?.count ?? 0);
 
-    // Count rows in category averages
-    const categoryCountResult = await db
+    // Count stored NAVs
+    const navCountResult = await db
       .select({ count: sql<number>`count(*)` })
-      .from(categoryAverages);
-    const categoryCount = Number(categoryCountResult[0]?.count ?? 0);
+      .from(navHistory);
+    const navCount = Number(navCountResult[0]?.count ?? 0);
 
     logger.info("✅ Database schemas and row counts audited", {
       fundsCount,
-      categoryCount,
+      navCount,
     });
 
-    // 2. Kuvera API connectivity check
-    logger.info("Pinging Kuvera API (category averages)...");
-    const apiResult = await fetchCategoryAverages();
-    logger.info("✅ Kuvera API is reachable", {
-      categoriesFetched: apiResult.length,
-    });
+    // 2. Kuvera API connectivity check: one fund we already track
+    const [sample] = await db
+      .select({ code: funds.kuveraCode })
+      .from(funds)
+      .limit(1);
+    if (sample) {
+      logger.info("Pinging Kuvera API (one fund)...", { code: sample.code });
+      const detail = await fetchFundDetail(sample.code);
+      if (!detail)
+        throw new Error(`Kuvera returned nothing for ${sample.code}`);
+      logger.info("✅ Kuvera API is reachable", { fund: detail.name });
+    }
 
     logger.info("✅ All systems healthy. MF Compass is ready.");
     process.exit(0);

@@ -34,18 +34,18 @@ export const ogSize = { width: 1200, height: 630 };
 
 export async function ogFonts() {
   const [bold, medium] = await Promise.all([
-    loadGoogleFont("Inter", 800),
-    loadGoogleFont("Inter", 500),
+    loadGoogleFont("Anek Latin", 700),
+    loadGoogleFont("Anek Latin", 500),
   ]);
   return [
     {
-      name: "Inter",
+      name: "Anek Latin",
       data: bold,
-      weight: 800 as const,
+      weight: 700 as const,
       style: "normal" as const,
     },
     {
-      name: "Inter",
+      name: "Anek Latin",
       data: medium,
       weight: 500 as const,
       style: "normal" as const,
@@ -54,8 +54,11 @@ export async function ogFonts() {
 }
 
 export const ogColors = {
-  blue: "#006ad6",
-  ink: "#0f172a",
-  paper: "#ffffff",
-  muted: "rgba(255,255,255,0.78)",
+  peacock: "#0A5878",
+  marigold: "#F0A202",
+  ink: "#13212A",
+  paper: "#F3F5F6",
+  text2: "#45535B",
+  track: "#C7D4DA",
+  peer: "#9FB1B9",
 };
