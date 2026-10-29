@@ -104,8 +104,8 @@ Status: ✅ done · 🔄 in progress · ⏳ next · 💬 needs a decision · ⬜
 - ✅ Kuvera fields nothing reads no longer fetched or stored; the jobs keep 3Y/5Y/since-launch returns only for verifying merger joins
 - ✅ `fund_metrics` stops storing three in-between values (`windows`, shrunk `excess_return` and `consistency`); the site reads the raw ones
 - ✅ Obsolete research scripts removed (design mock data, old-column inspector, backtest against the retired method); `lucide-react` dropped
-- ✅ New AMC logos (Abakkus, AlphaGrep, Old Bridge, ASK, Monarch, Carnelian) and refreshed Bajaj Finserv, Invesco, Union
-- ⏳ Migration `0002_retire_old_score_and_unused_fields.sql`: run right after the merge deploys (the old site on main reads these columns), with a Neon backup branch first. Frees about 0.5 MB.
+- ✅ New AMC logos (Abakkus, AlphaGrep, Old Bridge, ASK, Monarch, Carnelian) and refreshed Aditya Birla Sun Life, Bajaj Finserv, Invesco, Union
+- ⏳ Migration `0002_retire_old_score_and_unused_fields.sql`: run right after the merge deploys (the old site on main reads these columns), no backup (Adi's call). Frees about 0.5 MB.
 
 ## 8. Ship
 
