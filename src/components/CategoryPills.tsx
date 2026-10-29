@@ -149,7 +149,9 @@ export function CategoryPills({
                     pill,
                     size,
                     on
-                      ? `${selected} group-data-gliding:border-border group-data-gliding:bg-surface group-data-gliding:text-ink hover:text-on-brand`
+                      ? // No colour transition on the selected pill: it swaps between plain and selected under the
+                        // gliding overlay, and a fade there (links fade colours site-wide) shows as a flicker.
+                        `${selected} transition-none group-data-gliding:border-border group-data-gliding:bg-surface group-data-gliding:text-ink hover:text-on-brand`
                       : `${plain} hover:border-border-hover hover:text-ink`,
                   )}
                 >
